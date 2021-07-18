@@ -1,0 +1,13 @@
+builds:
+  - main: ./cmd/appcast
+    targets:
+      - go_first_class
+
+archives:
+  - format: binary
+
+checksum:
+  disable: true
+
+changelog:
+  skip: true
