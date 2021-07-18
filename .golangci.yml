@@ -1,0 +1,86 @@
+run:
+  timeout: 5m
+  skip-dirs:
+    - testdata
+
+linters:
+  presets:
+    - bugs
+    - comment
+    - complexity
+    - error
+    - format
+    - import
+    - metalinter
+    - module
+    - performance
+    # - sql
+    - style
+    - test
+    - unused
+  disable:
+    - cyclop
+    - deadcode # deprecated
+    - errorlint # TODO: turn on and fix
+    - exhaustive
+    - exhaustivestruct # deprecated
+    - exhaustruct
+    - godox
+    - goerr113 # TODO: turn on and fix
+    - golint # deprecated
+    - gomnd
+    - interfacer # deprecated
+    - ireturn # false positive on returning generic
+    - maligned # deprecated
+    - nosnakecase # deprecated
+    - nlreturn
+    - paralleltest
+    - scopelint # deprecated
+    - structcheck # deprecated
+    - varcheck # deprecated
+    - varnamelen
+    - wrapcheck
+    - wsl
+
+linters-settings:
+  depguard:
+    list-type: denylist
+    include-go-root: true
+    packages:
+      - encoding/json
+      - github.com/pkg/errors
+  gofumpt:
+    extra-rules: true
+  gosec:
+    excludes:
+      - G107
+      - G204
+      - G401
+      - G505
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+  nolintlint:
+    allow-leading-space: false
+    require-specific: true
+
+issues:
+  fix: true
+  exclude-rules:
+    - path: (.+)_test.go
+      linters:
+        - cyclop
+        - errcheck
+        - funlen
+        - gocognit
+        - lll
+    - linters:
+        - govet
+      text: 'shadow: declaration of "err" shadows declaration'
+    - linters:
+        - staticcheck
+      text: 'SA1019: "crypto/dsa" has been deprecated'
+    - linters:
+        - lll
+      source: '^\s*//'

@@ -1,0 +1,15 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v3
+        with:
+          release-type: go
+          token: ${{ secrets.GITHUB_TOKEN }}
