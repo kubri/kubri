@@ -2,9 +2,9 @@
 package local
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/abemedia/appcast/source"
@@ -12,24 +12,15 @@ import (
 
 type localSource struct {
 	path string
+	root string
 }
 
 func New(c source.Config) (*source.Source, error) {
-	fs, err := os.Stat(c.Repo)
+	root, err := getRoot(c.Repo)
 	if err != nil {
 		return nil, err
 	}
-
-	if !fs.IsDir() {
-		return nil, fmt.Errorf("not a directory: %s", c.Repo)
-	}
-
-	path, err := filepath.Abs(c.Repo)
-	if err != nil {
-		return nil, err
-	}
-
-	return &source.Source{Provider: &localSource{path: path}}, nil
+	return &source.Source{Provider: &localSource{path: c.Repo, root: root}}, nil
 }
 
 func (s *localSource) ListReleases() ([]*source.Release, error) {
@@ -42,7 +33,7 @@ func (s *localSource) ListReleases() ([]*source.Release, error) {
 }
 
 func (s *localSource) GetRelease(version string) (*source.Release, error) {
-	files, err := os.ReadDir(s.path)
+	files, err := getFiles(s.path)
 	if err != nil {
 		return nil, err
 	}
@@ -53,16 +44,21 @@ func (s *localSource) GetRelease(version string) (*source.Release, error) {
 		Assets:  make([]*source.Asset, 0, len(files)),
 	}
 
-	for _, file := range files {
-		fileInfo, err := file.Info()
+	for _, path := range files {
+		f, err := os.Stat(path)
+		if err != nil {
+			return nil, err
+		}
+
+		path, err := filepath.Abs(path)
 		if err != nil {
 			return nil, err
 		}
 
 		r.Assets = append(r.Assets, &source.Asset{
-			Name: file.Name(),
-			URL:  "file://" + filepath.Join(s.path, file.Name()),
-			Size: int(fileInfo.Size()),
+			Name: f.Name(),
+			URL:  "file://" + path,
+			Size: int(f.Size()),
 		})
 	}
 
@@ -70,11 +66,73 @@ func (s *localSource) GetRelease(version string) (*source.Release, error) {
 }
 
 func (s *localSource) UploadAsset(_, name string, data []byte) error {
-	return os.WriteFile(filepath.Join(s.path, name), data, os.ModePerm)
+	return os.WriteFile(filepath.Join(s.root, name), data, os.ModePerm)
 }
 
 func (s *localSource) DownloadAsset(_, name string) ([]byte, error) {
-	return os.ReadFile(filepath.Join(s.path, name))
+	path := filepath.Join(s.root, name)
+	if _, err := os.Stat(path); err == nil {
+		return os.ReadFile(path)
+	}
+
+	files, err := getFiles(s.path)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, path := range files {
+		if filepath.Base(path) == name {
+			return os.ReadFile(path)
+		}
+	}
+
+	return nil, source.ErrAssetNotFound
+}
+
+func getFiles(path string) ([]string, error) {
+	if strings.ContainsRune(path, '*') {
+		return filepath.Glob(path)
+	}
+
+	fi, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if !fi.IsDir() {
+		return []string{path}, nil
+	}
+
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	paths := make([]string, 0, len(files))
+	for _, file := range files {
+		if !file.IsDir() {
+			paths = append(paths, filepath.Join(path, file.Name()))
+		}
+	}
+
+	return paths, nil
+}
+
+func getRoot(path string) (string, error) {
+	if i := strings.IndexRune(path, '*'); i >= 0 {
+		return path[:i], nil
+	}
+
+	fi, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+
+	if !fi.IsDir() {
+		return filepath.Dir(path), nil
+	}
+
+	return path, nil
 }
 
 //nolint:gochecknoinits

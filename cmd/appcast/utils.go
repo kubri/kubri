@@ -4,6 +4,7 @@ import (
 	"encoding/pem"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/abemedia/appcast"
 	"github.com/abemedia/appcast/source"
@@ -33,7 +34,7 @@ func readConfig(path string) (*appcast.Config, error) {
 }
 
 func parseSource(src string) (*source.Source, error) {
-	if _, err := os.Stat(src); err == nil {
+	if !strings.Contains(src, "://") {
 		src = "local://" + src
 	}
 	s := &source.Source{}
