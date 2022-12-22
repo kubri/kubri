@@ -11,7 +11,7 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/memory"
+	"github.com/abemedia/appcast/source/blob/memory"
 )
 
 func TestSign(t *testing.T) {

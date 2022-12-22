@@ -13,8 +13,9 @@ type fakeSource struct {
 
 func (*fakeSource) ListReleases() ([]*source.Release, error) {
 	return []*source.Release{
-		{Version: "v1.0.0"},
+		{Version: "v0.9.0"},
 		{Version: "v1.0.0-pre"},
+		{Version: "v1.0.0"},
 	}, nil
 }
 
@@ -40,6 +41,10 @@ func TestSource(t *testing.T) {
 			Name:       "v1.0.0-pre",
 			Version:    "v1.0.0-pre",
 			Prerelease: true,
+		},
+		{
+			Name:    "v0.9.0",
+			Version: "v0.9.0",
 		},
 	}
 

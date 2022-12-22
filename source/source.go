@@ -3,8 +3,8 @@ package source
 import (
 	"fmt"
 	"log"
-	"net/url"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -34,6 +34,18 @@ type Release struct {
 	Version     string
 	Prerelease  bool
 	Assets      []*Asset
+}
+
+type ByVersion []*Release
+
+func (vs ByVersion) Len() int      { return len(vs) }
+func (vs ByVersion) Swap(i, j int) { vs[i], vs[j] = vs[j], vs[i] }
+func (vs ByVersion) Less(i, j int) bool {
+	cmp := semver.Compare(vs[i].Version, vs[j].Version)
+	if cmp != 0 {
+		return cmp > 0
+	}
+	return vs[i].Version > vs[j].Version
 }
 
 type Asset struct {
@@ -88,6 +100,8 @@ func (s *Source) ListReleases(opt *ListOptions) ([]*Release, error) {
 		return true
 	})
 
+	sort.Sort(ByVersion(releases))
+
 	return releases, nil
 }
 
@@ -103,26 +117,27 @@ func (s *Source) GetRelease(version string) (*Release, error) {
 }
 
 func (s *Source) UnmarshalText(b []byte) error {
-	u, err := url.Parse(string(b))
+	provider, repo, ok := strings.Cut(string(b), "://")
+	if !ok {
+		return fmt.Errorf("invalid source URL: %s", b)
+	}
+
+	factory, ok := sources[provider]
+	if !ok {
+		return fmt.Errorf("unsupported source: %s", provider)
+	}
+
+	source, err := factory(Config{
+		Repo:  repo,
+		Token: os.Getenv(strings.ToUpper(provider) + "_TOKEN"),
+	})
 	if err != nil {
 		return err
 	}
 
-	for scheme, factory := range sources {
-		if u.Scheme == scheme {
-			source, err := factory(Config{
-				Repo:  u.Host + u.Path,
-				Token: os.Getenv(strings.ToUpper(scheme) + "_TOKEN"),
-			})
-			if err != nil {
-				return err
-			}
-			*s = *source
-			return nil
-		}
-	}
+	s.Provider = source.Provider
 
-	return fmt.Errorf("unsupported source: %s", u.Scheme)
+	return nil
 }
 
 func processRelease(r *Release) {

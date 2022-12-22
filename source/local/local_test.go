@@ -110,7 +110,7 @@ func TestLocal(t *testing.T) {
 				}
 			}
 
-			r, err := local.New(source.Config{Repo: test.path})
+			s, err := local.New(source.Config{Repo: test.path})
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -118,7 +118,7 @@ func TestLocal(t *testing.T) {
 			opt := cmpopts.EquateApproxTime(100 * time.Millisecond)
 
 			t.Run("ListReleases", func(t *testing.T) {
-				got, err := r.ListReleases(nil)
+				got, err := s.ListReleases(nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -129,7 +129,7 @@ func TestLocal(t *testing.T) {
 			})
 
 			t.Run("GetRelease", func(t *testing.T) {
-				got, err := r.GetRelease(test.want[0].Version)
+				got, err := s.GetRelease(test.want[0].Version)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -140,7 +140,7 @@ func TestLocal(t *testing.T) {
 			})
 
 			t.Run("UploadAsset", func(t *testing.T) {
-				err := r.UploadAsset(test.want[0].Version, "test.txt", data)
+				err := s.UploadAsset(test.want[0].Version, "test.txt", data)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -161,7 +161,7 @@ func TestLocal(t *testing.T) {
 			})
 
 			t.Run("DownloadAsset", func(t *testing.T) {
-				b, err := r.DownloadAsset(test.want[0].Version, test.want[0].Assets[0].Name)
+				b, err := s.DownloadAsset(test.want[0].Version, test.want[0].Assets[0].Name)
 				if err != nil {
 					t.Fatal(err)
 				}

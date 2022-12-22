@@ -119,13 +119,21 @@ func (s *githubSource) DownloadAsset(version, name string) ([]byte, error) {
 
 	for _, asset := range release.Assets {
 		if asset.GetName() == name {
-			rc, _, err := s.client.Repositories.DownloadReleaseAsset(ctx, s.org, s.repo, release.GetID())
+			r, u, err := s.client.Repositories.DownloadReleaseAsset(ctx, s.org, s.repo, asset.GetID())
 			if err != nil {
 				return nil, err
 			}
-			defer rc.Close()
 
-			return io.ReadAll(rc)
+			if u != "" {
+				res, err := http.Get(u) //nolint:bodyclose // false positive
+				if err != nil {
+					return nil, err
+				}
+				r = res.Body
+			}
+
+			defer r.Close()
+			return io.ReadAll(r)
 		}
 	}
 

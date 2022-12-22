@@ -25,13 +25,13 @@ func Feed(c *Config) (*sparkle.Feed, error) {
 	var items []sparkle.Item
 	for _, release := range releases {
 		if release.Prerelease && !c.Prerelease {
-			log.Println("skipping prelease:", release.Version)
+			log.Println("Skipping prelease:", release.Version)
 			continue
 		}
 
 		item, err := releaseToSparkleItem(c, release)
 		if err != nil {
-			log.Println("warning:", err)
+			log.Printf("Skipping %s: %s", release.Version, err)
 			continue
 		}
 
@@ -71,7 +71,7 @@ func releaseToSparkleItem(c *Config, release *source.Release) ([]sparkle.Item, e
 	for _, asset := range release.Assets {
 		os := detectOS(asset.Name)
 		if os == Unknown {
-			log.Printf("Skipping %s: unsupported file extension\n", asset.Name)
+			log.Printf("Skipping asset %s (%s): unsupported file extension\n", asset.Name, release.Version)
 			continue
 		}
 
