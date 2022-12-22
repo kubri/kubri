@@ -7,7 +7,7 @@ import (
 	"github.com/abemedia/appcast"
 	"github.com/abemedia/appcast/pkg/sparkle"
 	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/memory"
+	"github.com/abemedia/appcast/source/blob/memory"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -59,7 +59,7 @@ func TestFeed(t *testing.T) {
 						Version: "1.0.0",
 						PubDate: time.Now().UTC().Format(time.RFC1123),
 						Enclosure: sparkle.Enclosure{
-							URL:                  "memory://v1.0.0/test.dmg",
+							URL:                  "mem://v1.0.0/test.dmg",
 							OS:                   "macos",
 							Version:              "1.0.0",
 							MinimumSystemVersion: "10.13.0",
@@ -72,7 +72,7 @@ func TestFeed(t *testing.T) {
 						Version: "1.0.0",
 						PubDate: time.Now().UTC().Format(time.RFC1123),
 						Enclosure: sparkle.Enclosure{
-							URL:                "memory://v1.0.0/test_64-bit.msi",
+							URL:                "mem://v1.0.0/test_64-bit.msi",
 							OS:                 "windows-x64",
 							Version:            "1.0.0",
 							InstallerArguments: "/passive",
@@ -85,7 +85,7 @@ func TestFeed(t *testing.T) {
 						Version: "1.0.0",
 						PubDate: time.Now().UTC().Format(time.RFC1123),
 						Enclosure: sparkle.Enclosure{
-							URL:                "memory://v1.0.0/test_32-bit.exe",
+							URL:                "mem://v1.0.0/test_32-bit.exe",
 							OS:                 "windows-x86",
 							Version:            "1.0.0",
 							InstallerArguments: "/passive",

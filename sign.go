@@ -53,9 +53,11 @@ func signRelease(opt *SignOptions, release *source.Release) error {
 	for _, asset := range release.Assets {
 		algo, err := getAlgo(asset.Name)
 		if err != nil {
-			log.Printf("skipping %s: %s\n", asset.Name, err)
+			log.Printf("Skipping asset %s (%s): %s\n", asset.Name, release.Version, err)
 			continue
 		}
+
+		log.Printf("Signing asset %s (%s)\n", asset.Name, release.Version)
 
 		b, err := opt.Source.DownloadAsset(release.Version, asset.Name)
 		if err != nil {
