@@ -3,6 +3,7 @@ package blob
 import (
 	"context"
 	"io"
+	"mime"
 	"path"
 	"strings"
 
@@ -116,7 +117,8 @@ func (s *blobSource) GetRelease(version string) (*source.Release, error) {
 }
 
 func (s *blobSource) UploadAsset(version, name string, data []byte) error {
-	return s.bucket.WriteAll(context.Background(), path.Join(s.prefix, version, name), data, nil)
+	opt := &blob.WriterOptions{ContentType: mime.TypeByExtension(path.Ext(name))}
+	return s.bucket.WriteAll(context.Background(), path.Join(s.prefix, version, name), data, opt)
 }
 
 func (s *blobSource) DownloadAsset(version, name string) ([]byte, error) {
