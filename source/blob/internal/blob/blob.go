@@ -18,8 +18,7 @@ type blobSource struct {
 }
 
 func New(url, prefix, baseURL string) (*source.Source, error) {
-	ctx := context.Background()
-	b, err := blob.OpenBucket(ctx, url)
+	b, err := blob.OpenBucket(context.Background(), url)
 	if err != nil {
 		return nil, err
 	}
@@ -33,6 +32,7 @@ func New(url, prefix, baseURL string) (*source.Source, error) {
 		prefix:  prefix,
 		baseURL: baseURL,
 	}
+
 	return &source.Source{Provider: s}, nil
 }
 
@@ -70,7 +70,7 @@ func (s *blobSource) ListReleases() ([]*source.Release, error) {
 func (s *blobSource) GetRelease(version string) (*source.Release, error) {
 	ctx := context.Background()
 
-	r := &source.Release{Version: version}
+	r := source.Release{Version: version}
 
 	iter := s.bucket.List(&blob.ListOptions{Prefix: path.Join(s.prefix, version) + "/", Delimiter: "/"})
 	for {
@@ -113,7 +113,7 @@ func (s *blobSource) GetRelease(version string) (*source.Release, error) {
 		return nil, source.ErrReleaseNotFound
 	}
 
-	return r, nil
+	return &r, nil
 }
 
 func (s *blobSource) UploadAsset(version, name string, data []byte) error {
