@@ -27,7 +27,7 @@ func main() {
 		},
 	}
 
-	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "enable verbose logging")
+	cmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "enable verbose logging")
 
 	cmd.AddCommand(
 		feedCmd(),
