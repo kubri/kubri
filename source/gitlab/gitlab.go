@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"net/http"
+	"path"
 	"strconv"
 
 	"github.com/abemedia/appcast/source"
@@ -19,12 +20,12 @@ type gitlabSource struct {
 func New(c source.Config) (*source.Source, error) {
 	s := new(gitlabSource)
 
-	git, err := gitlab.NewClient(c.Token)
+	client, err := gitlab.NewClient(c.Token)
 	if err != nil {
 		return nil, err
 	}
 
-	s.client = git
+	s.client = client
 	s.repo = c.Repo
 
 	return &source.Source{Provider: s}, nil
@@ -84,9 +85,13 @@ func (s *gitlabSource) UploadAsset(version, name string, data []byte) error {
 		return err
 	}
 
+	u := s.client.BaseURL()
+	u.Path = path.Join(s.repo, file.URL)
+	url := u.String()
+
 	_, _, err = s.client.ReleaseLinks.CreateReleaseLink(s.repo, version, &gitlab.CreateReleaseLinkOptions{
 		Name: &name,
-		URL:  &file.URL,
+		URL:  &url,
 	})
 
 	return err
