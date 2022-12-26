@@ -1,6 +1,7 @@
 package os
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -18,6 +19,8 @@ const (
 	Windows32
 )
 
+var ErrUnknownOS = errors.New("unknown os")
+
 func (os OS) String() string {
 	switch os {
 	default:
@@ -34,27 +37,30 @@ func (os OS) String() string {
 }
 
 func (os OS) MarshalText() ([]byte, error) {
+	if os > Windows32 {
+		return nil, ErrUnknownOS
+	}
 	return []byte(os.String()), nil
 }
 
 func (os *OS) UnmarshalText(text []byte) error {
 	s := string(text)
-	for i := 0; i < 5; i++ {
-		if OS(i).String() == s {
-			*os = OS(i)
+	for i := Unknown; i <= Windows32; i++ {
+		if i.String() == s {
+			*os = i
 			return nil
 		}
 	}
-	return fmt.Errorf("unknown os: %s", text)
+	return fmt.Errorf("%w: %s", ErrUnknownOS, text)
 }
 
-func Is(constraint, os OS) bool {
-	if constraint == os {
+func Is(os, target OS) bool {
+	if os == target {
 		return true
 	}
 
-	if os == Windows {
-		return constraint > Windows
+	if target == Windows {
+		return os > Windows
 	}
 
 	return false
