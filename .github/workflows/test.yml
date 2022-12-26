@@ -5,6 +5,8 @@ on:
     secrets:
       PERSONAL_ACCESS_TOKEN:
         required: true
+      GITLAB_TOKEN:
+        required: true
 
   pull_request:
     branches:
@@ -32,3 +34,4 @@ jobs:
       - run: go test -v ./...
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
