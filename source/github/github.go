@@ -1,11 +1,13 @@
 package github
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
-	"os"
+	"path"
 	"strings"
 
 	"github.com/abemedia/appcast/source"
@@ -85,29 +87,21 @@ func parseRelease(release *github.RepositoryRelease) *source.Release {
 }
 
 func (s *githubSource) UploadAsset(version, name string, data []byte) error {
-	f, err := os.CreateTemp("", "")
-	if err != nil {
-		return err
-	}
-
-	_, err = f.Write(data)
-	if err != nil {
-		return err
-	}
-
 	ctx := context.Background()
 	release, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.org, s.repo, version)
 	if err != nil {
 		return err
 	}
 
-	opt := &github.UploadOptions{Name: name}
-	_, _, err = s.client.Repositories.UploadReleaseAsset(ctx, s.org, s.repo, release.GetID(), opt, f)
+	u := fmt.Sprintf("repos/%s/%s/releases/%d/assets?name=%s", s.org, s.repo, release.GetID(), name)
+	mediaType := mime.TypeByExtension(path.Ext(name))
+	req, err := s.client.NewUploadRequest(u, bytes.NewReader(data), int64(len(data)), mediaType)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	_, err = s.client.Do(ctx, req, nil)
+	return err
 }
 
 func (s *githubSource) DownloadAsset(version, name string) ([]byte, error) {
