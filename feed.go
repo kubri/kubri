@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/abemedia/appcast/pkg/os"
 	"github.com/abemedia/appcast/pkg/sparkle"
 	"github.com/abemedia/appcast/source"
 	"github.com/russross/blackfriday/v2"
@@ -69,13 +70,13 @@ func releaseToSparkleItem(c *Config, release *source.Release) ([]sparkle.Item, e
 
 	items := make([]sparkle.Item, 0, len(release.Assets))
 	for _, asset := range release.Assets {
-		os := detectOS(asset.Name)
-		if os == Unknown {
+		o := os.Detect(asset.Name)
+		if o == os.Unknown {
 			log.Printf("Skipping asset %s (%s): unsupported file extension\n", asset.Name, release.Version)
 			continue
 		}
 
-		opt, err := getSettings(c.Settings, release.Version, os)
+		opt, err := getSettings(c.Settings, release.Version, o)
 		if err != nil {
 			return nil, err
 		}
@@ -102,7 +103,7 @@ func releaseToSparkleItem(c *Config, release *source.Release) ([]sparkle.Item, e
 				InstallerArguments:   opt.InstallerArguments,
 				MinimumSystemVersion: opt.MinimumSystemVersion,
 				Type:                 getFileType(asset.Name),
-				OS:                   os.String(),
+				OS:                   o.String(),
 				Length:               asset.Size,
 				DSASignature:         signatures.Get(asset.Name, "dsa"),
 				EDSignature:          signatures.Get(asset.Name, "ed25519"),

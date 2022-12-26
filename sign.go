@@ -8,6 +8,7 @@ import (
 
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
+	"github.com/abemedia/appcast/pkg/os"
 	"github.com/abemedia/appcast/source"
 	"golang.org/x/mod/semver"
 )
@@ -87,10 +88,10 @@ func signRelease(opt *SignOptions, release *source.Release) error {
 }
 
 func getAlgo(path string) (string, error) {
-	switch detectOS(path) {
-	case MacOS:
+	switch os.Detect(path) {
+	case os.MacOS:
 		return "ed25519", nil
-	case Windows, Windows64, Windows32:
+	case os.Windows, os.Windows64, os.Windows32:
 		return "dsa", nil
 	default:
 		return "", fmt.Errorf("unsupported file extension")
