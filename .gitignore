@@ -1,2 +1,5 @@
+.task/
+dist/
+
 .env
-dist
+/appcast
