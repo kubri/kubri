@@ -1,0 +1,5 @@
+[appcast]
+name=AppCast
+baseurl=https://yum.fury.io/abemedia/
+enabled=1
+gpgcheck=0

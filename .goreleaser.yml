@@ -6,8 +6,33 @@ builds:
 archives:
   - format: binary
 
-checksum:
-  disable: true
+nfpms:
+  - id: packages
+    file_name_template: '{{ .ConventionalFileName }}'
+    homepage: https://github.com/abemedia/appcast
+    description: A CLI tool for signing update packages and creating appcast XML for use with Sparkle.
+    maintainer: Adam Bouqdib <adam@abemedia.co.uk>
+    license: MIT
+    vendor: AppCast
+    section: utils
+    formats:
+      - deb
+      - rpm
+    contents:
+      - src: build/linux/appcast.list
+        dst: /etc/apt/sources.list.d/appcast.list
+        packager: deb
+      - src: build/linux/appcast.repo
+        dst: /etc/yum.repos.d/appcast.repo
+        packager: rpm
+
+publishers:
+  - name: fury.io
+    ids:
+      - packages
+    env:
+      - FURY_TOKEN={{ .Env.FURY_TOKEN }}
+    cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
 
 changelog:
   skip: true
