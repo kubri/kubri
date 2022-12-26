@@ -1,4 +1,4 @@
-package appcast
+package os
 
 import (
 	"fmt"
@@ -48,7 +48,7 @@ func (os *OS) UnmarshalText(text []byte) error {
 	return fmt.Errorf("unknown os: %s", text)
 }
 
-func matchOS(constraint, os OS) bool {
+func Is(constraint, os OS) bool {
 	if constraint == os {
 		return true
 	}
@@ -66,7 +66,7 @@ var (
 	reWin32 = regexp2.MustCompile(`386|x86(?![\W_]?64)|ia32|32[\W_]?bit`, regexp2.IgnoreCase)
 )
 
-func detectOS(name string) OS {
+func Detect(name string) OS {
 	s := strings.ToLower(name)
 	ext := filepath.Ext(s)
 	switch ext {

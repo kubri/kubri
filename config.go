@@ -1,6 +1,7 @@
 package appcast
 
 import (
+	"github.com/abemedia/appcast/pkg/os"
 	"github.com/abemedia/appcast/source"
 	"github.com/hashicorp/go-version"
 	"github.com/imdario/mergo"
@@ -16,7 +17,7 @@ type Settings struct {
 }
 
 type Rule struct {
-	OS        OS     `yaml:"os"`
+	OS        os.OS  `yaml:"os"`
 	Version   string `yaml:"version"`
 	*Settings `yaml:",inline"`
 }
@@ -33,11 +34,11 @@ type Config struct {
 	Settings []Rule `yaml:"settings"`
 }
 
-func getSettings(settings []Rule, v string, os OS) (*Settings, error) {
+func getSettings(settings []Rule, v string, o os.OS) (*Settings, error) {
 	opt := &Settings{}
 
 	for _, s := range settings {
-		if s.OS != Unknown && !matchOS(os, s.OS) {
+		if s.OS != os.Unknown && !os.Is(o, s.OS) {
 			continue
 		}
 

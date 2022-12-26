@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/abemedia/appcast"
+	"github.com/abemedia/appcast/pkg/os"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -11,13 +12,13 @@ func TestConfigGetOptions(t *testing.T) {
 	c := &appcast.Config{
 		Settings: []appcast.Rule{
 			{
-				OS: appcast.MacOS,
+				OS: os.MacOS,
 				Settings: &appcast.Settings{
 					MinimumSystemVersion: "10.13.0",
 				},
 			},
 			{
-				OS: appcast.Windows64,
+				OS: os.Windows64,
 				Settings: &appcast.Settings{
 					InstallerArguments: "/passive",
 				},
@@ -45,26 +46,26 @@ func TestConfigGetOptions(t *testing.T) {
 
 	tests := []struct {
 		version string
-		os      appcast.OS
+		os      os.OS
 		want    *appcast.Settings
 	}{
 		{
 			version: "1.0.0",
-			os:      appcast.Windows64,
+			os:      os.Windows64,
 			want: &appcast.Settings{
 				InstallerArguments: "/passive",
 			},
 		},
 		{
 			version: "1.0.0",
-			os:      appcast.MacOS,
+			os:      os.MacOS,
 			want: &appcast.Settings{
 				MinimumSystemVersion: "10.13.0",
 			},
 		},
 		{
 			version: "1.1.1",
-			os:      appcast.Windows64,
+			os:      os.Windows64,
 			want: &appcast.Settings{
 				InstallerArguments:       "/passive",
 				MinimumAutoupdateVersion: "1.0.0",
@@ -73,7 +74,7 @@ func TestConfigGetOptions(t *testing.T) {
 		},
 		{
 			version: "1.2.1",
-			os:      appcast.Windows,
+			os:      os.Windows,
 			want: &appcast.Settings{
 				MinimumAutoupdateVersion:   "1.0.0",
 				CriticalUpdateBelowVersion: "1.1.0",

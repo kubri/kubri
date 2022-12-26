@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast"
+	"github.com/abemedia/appcast/pkg/os"
 	"github.com/abemedia/appcast/pkg/sparkle"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/source/blob/memory"
@@ -30,13 +31,13 @@ func TestFeed(t *testing.T) {
 		Source:      s,
 		Settings: []appcast.Rule{
 			{
-				OS: appcast.Windows,
+				OS: os.Windows,
 				Settings: &appcast.Settings{
 					InstallerArguments: "/passive",
 				},
 			},
 			{
-				OS: appcast.MacOS,
+				OS: os.MacOS,
 				Settings: &appcast.Settings{
 					MinimumSystemVersion: "10.13.0",
 				},

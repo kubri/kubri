@@ -1,9 +1,6 @@
 package appcast
 
 //nolint:gochecknoglobals
-var (
-	GetSettings = getSettings
-	DetectOS    = detectOS
-)
+var GetSettings = getSettings
 
 type Signatures = signatures
