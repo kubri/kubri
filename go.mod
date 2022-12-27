@@ -2,6 +2,10 @@ module github.com/abemedia/appcast
 
 go 1.19
 
+// See https://github.com/testcontainers/testcontainers-go/releases/tag/v0.17.0
+// TODO: Remove once Docker 22.06 is out.
+replace github.com/docker/docker => github.com/docker/docker v20.10.3-0.20221201081640-bb2eab21c6db+incompatible // 22.06 branch
+
 require (
 	github.com/dlclark/regexp2 v1.7.0
 	github.com/docker/go-connections v0.4.0
@@ -36,7 +40,6 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v0.4.0 // indirect
 	github.com/Microsoft/go-winio v0.5.2 // indirect
-	github.com/Microsoft/hcsshim v0.9.5 // indirect
 	github.com/aws/aws-sdk-go v1.44.68 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.16.8 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.3 // indirect
@@ -58,7 +61,6 @@ require (
 	github.com/aws/smithy-go v1.12.0 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.0 // indirect
-	github.com/containerd/cgroups v1.0.4 // indirect
 	github.com/containerd/containerd v1.6.12 // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker v20.10.20+incompatible // indirect
@@ -76,10 +78,11 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
-	github.com/moby/sys/mount v0.3.3 // indirect
-	github.com/moby/sys/mountinfo v0.6.2 // indirect
+	github.com/moby/patternmatcher v0.5.0 // indirect
+	github.com/moby/sys/sequential v0.5.0 // indirect
 	github.com/moby/term v0.0.0-20221128092401-c43b287e0e0f // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
