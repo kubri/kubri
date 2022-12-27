@@ -85,3 +85,8 @@ issues:
     - linters:
         - lll
       source: '^\s*//'
+
+      # TODO: Remove once Docker 22.06 is out.
+    - linters:
+        - gomoddirectives
+      text: 'replacement are not allowed: github.com/docker/docker'
