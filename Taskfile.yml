@@ -32,6 +32,7 @@ tasks:
     aliases: [b]
     sources:
       - ./**/*.go
+      - ./go.(mod|sum)
     generates:
       - ./appcast
     cmds:
@@ -42,6 +43,7 @@ tasks:
     aliases: [l]
     sources:
       - './**/*.go'
+      - ./go.(mod|sum)
       - .golangci.yml
     cmds:
       - golangci-lint run
@@ -57,5 +59,6 @@ tasks:
     aliases: [i]
     sources:
       - './**/*.go'
+      - ./go.(mod|sum)
     cmds:
       - go install ./cmd/appcast
