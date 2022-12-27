@@ -2,6 +2,7 @@
 package local
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -23,8 +24,8 @@ func New(c source.Config) (*source.Source, error) {
 	return &source.Source{Provider: &localSource{path: c.Repo, root: root}}, nil
 }
 
-func (s *localSource) ListReleases() ([]*source.Release, error) {
-	r, err := s.GetRelease("v0.0.0")
+func (s *localSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
+	r, err := s.GetRelease(ctx, "v0.0.0")
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +33,7 @@ func (s *localSource) ListReleases() ([]*source.Release, error) {
 	return []*source.Release{r}, nil
 }
 
-func (s *localSource) GetRelease(version string) (*source.Release, error) {
+func (s *localSource) GetRelease(ctx context.Context, version string) (*source.Release, error) {
 	files, err := getFiles(s.path)
 	if err != nil {
 		return nil, err
@@ -45,6 +46,10 @@ func (s *localSource) GetRelease(version string) (*source.Release, error) {
 	}
 
 	for _, path := range files {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+
 		f, err := os.Stat(path)
 		if err != nil {
 			return nil, err
@@ -65,11 +70,11 @@ func (s *localSource) GetRelease(version string) (*source.Release, error) {
 	return r, nil
 }
 
-func (s *localSource) UploadAsset(_, name string, data []byte) error {
+func (s *localSource) UploadAsset(_ context.Context, _, name string, data []byte) error {
 	return os.WriteFile(filepath.Join(s.root, name), data, os.ModePerm)
 }
 
-func (s *localSource) DownloadAsset(_, name string) ([]byte, error) {
+func (s *localSource) DownloadAsset(_ context.Context, _, name string) ([]byte, error) {
 	path := filepath.Join(s.root, name)
 	if _, err := os.Stat(path); err == nil {
 		return os.ReadFile(path)

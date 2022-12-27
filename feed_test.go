@@ -1,6 +1,7 @@
 package appcast_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -15,14 +16,15 @@ import (
 
 func TestFeed(t *testing.T) {
 	data := []byte("test")
+	ctx := context.Background()
 
 	s, _ := memory.New(source.Config{})
-	s.UploadAsset("v1.0.0", "README.md", data)
-	s.UploadAsset("v1.0.0", "test.dmg", data)
-	s.UploadAsset("v1.0.0", "test_64-bit.msi", data)
-	s.UploadAsset("v1.0.0", "test_32-bit.exe", data)
-	s.UploadAsset("v1.0.0-alpha1", "test.dmg", data)
-	s.UploadAsset("v1.0.0-alpha1", "test_64-bit.msi", data)
+	s.UploadAsset(ctx, "v1.0.0", "README.md", data)
+	s.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
+	s.UploadAsset(ctx, "v1.0.0", "test_64-bit.msi", data)
+	s.UploadAsset(ctx, "v1.0.0", "test_32-bit.exe", data)
+	s.UploadAsset(ctx, "v1.0.0-alpha1", "test.dmg", data)
+	s.UploadAsset(ctx, "v1.0.0-alpha1", "test_64-bit.msi", data)
 
 	c := &appcast.Config{
 		Title:       "test",
@@ -99,7 +101,7 @@ func TestFeed(t *testing.T) {
 		},
 	}
 
-	got, err := appcast.Feed(c)
+	got, err := appcast.Feed(ctx, c)
 	if err != nil {
 		t.Fatal(err)
 	}

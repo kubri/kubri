@@ -42,8 +42,8 @@ func New(c source.Config) (*source.Source, error) {
 	return &source.Source{Provider: s}, nil
 }
 
-func (s *githubSource) ListReleases() ([]*source.Release, error) {
-	releases, _, err := s.client.Repositories.ListReleases(context.Background(), s.org, s.repo, nil)
+func (s *githubSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
+	releases, _, err := s.client.Repositories.ListReleases(ctx, s.org, s.repo, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +56,8 @@ func (s *githubSource) ListReleases() ([]*source.Release, error) {
 	return r, nil
 }
 
-func (s *githubSource) GetRelease(version string) (*source.Release, error) {
-	r, _, err := s.client.Repositories.GetReleaseByTag(context.Background(), s.org, s.repo, version)
+func (s *githubSource) GetRelease(ctx context.Context, version string) (*source.Release, error) {
+	r, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.org, s.repo, version)
 	if err != nil {
 		return nil, err
 	}
@@ -86,8 +86,7 @@ func parseRelease(release *github.RepositoryRelease) *source.Release {
 	return r
 }
 
-func (s *githubSource) UploadAsset(version, name string, data []byte) error {
-	ctx := context.Background()
+func (s *githubSource) UploadAsset(ctx context.Context, version, name string, data []byte) error {
 	release, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.org, s.repo, version)
 	if err != nil {
 		return err
@@ -104,8 +103,7 @@ func (s *githubSource) UploadAsset(version, name string, data []byte) error {
 	return err
 }
 
-func (s *githubSource) DownloadAsset(version, name string) ([]byte, error) {
-	ctx := context.Background()
+func (s *githubSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
 	release, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.org, s.repo, version)
 	if err != nil {
 		return nil, err
@@ -118,16 +116,23 @@ func (s *githubSource) DownloadAsset(version, name string) ([]byte, error) {
 				return nil, err
 			}
 
-			if u != "" {
-				res, err := http.Get(u) //nolint:bodyclose // false positive
-				if err != nil {
-					return nil, err
-				}
-				r = res.Body
+			if r != nil {
+				defer r.Close()
+				return io.ReadAll(r)
 			}
 
-			defer r.Close()
-			return io.ReadAll(r)
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+			if err != nil {
+				return nil, err
+			}
+
+			res, err := http.DefaultClient.Do(req)
+			if err != nil {
+				return nil, err
+			}
+
+			defer res.Body.Close()
+			return io.ReadAll(res.Body)
 		}
 	}
 

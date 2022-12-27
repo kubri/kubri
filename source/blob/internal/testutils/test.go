@@ -2,6 +2,7 @@ package testutils
 
 import (
 	"bytes"
+	"context"
 	"testing"
 	"time"
 
@@ -49,11 +50,12 @@ func getExpected() []*source.Release {
 
 func TestBlob(t *testing.T, s *source.Source, makeURL func(version, asset string) string) {
 	data := []byte("test\n")
+	ctx := context.Background()
 
 	want := getExpected()
 	for _, release := range want {
 		for _, asset := range release.Assets {
-			_ = s.UploadAsset(release.Version, asset.Name, data)
+			_ = s.UploadAsset(ctx, release.Version, asset.Name, data)
 			asset.URL = makeURL(release.Version, asset.Name)
 		}
 	}
@@ -63,7 +65,7 @@ func TestBlob(t *testing.T, s *source.Source, makeURL func(version, asset string
 	t.Run("ListReleases", func(t *testing.T) {
 		t.Helper()
 
-		got, err := s.ListReleases(nil)
+		got, err := s.ListReleases(ctx, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -76,7 +78,7 @@ func TestBlob(t *testing.T, s *source.Source, makeURL func(version, asset string
 	t.Run("GetRelease", func(t *testing.T) {
 		t.Helper()
 
-		got, err := s.GetRelease(want[0].Version)
+		got, err := s.GetRelease(ctx, want[0].Version)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -89,7 +91,7 @@ func TestBlob(t *testing.T, s *source.Source, makeURL func(version, asset string
 	t.Run("UploadAsset", func(t *testing.T) {
 		t.Helper()
 
-		err := s.UploadAsset(want[0].Version, "test.txt", data)
+		err := s.UploadAsset(ctx, want[0].Version, "test.txt", data)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -98,7 +100,7 @@ func TestBlob(t *testing.T, s *source.Source, makeURL func(version, asset string
 	t.Run("DownloadAsset", func(t *testing.T) {
 		t.Helper()
 
-		b, err := s.DownloadAsset(want[0].Version, "test.txt")
+		b, err := s.DownloadAsset(ctx, want[0].Version, "test.txt")
 		if err != nil {
 			t.Fatal(err)
 		}

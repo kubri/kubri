@@ -34,7 +34,6 @@ linters:
     - maligned # deprecated
     - nosnakecase # deprecated
     - nlreturn
-    - noctx # TODO: turn on and fix
     - paralleltest
     - scopelint # deprecated
     - structcheck # deprecated

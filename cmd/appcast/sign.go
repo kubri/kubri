@@ -33,7 +33,7 @@ func signCmd() *cobra.Command {
 				return err
 			}
 
-			return appcast.Sign(c)
+			return appcast.Sign(appContext(), c)
 		},
 	}
 

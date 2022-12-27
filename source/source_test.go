@@ -1,6 +1,7 @@
 package source_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/abemedia/appcast/source"
@@ -11,7 +12,7 @@ type fakeSource struct {
 	source.Config
 }
 
-func (*fakeSource) ListReleases() ([]*source.Release, error) {
+func (*fakeSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
 	return []*source.Release{
 		{Version: "v0.9.0"},
 		{Version: "v1.0.0-pre"},
@@ -19,15 +20,15 @@ func (*fakeSource) ListReleases() ([]*source.Release, error) {
 	}, nil
 }
 
-func (*fakeSource) GetRelease(version string) (*source.Release, error) {
+func (*fakeSource) GetRelease(ctx context.Context, version string) (*source.Release, error) {
 	return &source.Release{Version: version}, nil
 }
 
-func (*fakeSource) UploadAsset(version, name string, data []byte) error {
+func (*fakeSource) UploadAsset(ctx context.Context, version, name string, data []byte) error {
 	return nil
 }
 
-func (*fakeSource) DownloadAsset(version, name string) ([]byte, error) {
+func (*fakeSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
 	return nil, nil
 }
 
@@ -49,23 +50,24 @@ func TestSource(t *testing.T) {
 	}
 
 	r := (&source.Source{&fakeSource{}})
+	ctx := context.Background()
 
 	t.Run("ListReleases", func(t *testing.T) {
-		got, _ := r.ListReleases(nil)
+		got, _ := r.ListReleases(ctx, nil)
 		if diff := cmp.Diff(want, got); diff != "" {
 			t.Error(diff)
 		}
 	})
 
 	t.Run("ListReleasesConstraint", func(t *testing.T) {
-		got, _ := r.ListReleases(&source.ListOptions{Constraint: "v1"})
+		got, _ := r.ListReleases(ctx, &source.ListOptions{Constraint: "v1"})
 		if diff := cmp.Diff(want[:1], got); diff != "" {
 			t.Error(diff)
 		}
 	})
 
 	t.Run("GetRelease", func(t *testing.T) {
-		got, _ := r.GetRelease(want[0].Version)
+		got, _ := r.GetRelease(ctx, want[0].Version)
 		if diff := cmp.Diff(want[0], got); diff != "" {
 			t.Error(diff)
 		}

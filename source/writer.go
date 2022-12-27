@@ -2,6 +2,7 @@ package source
 
 import (
 	"bytes"
+	"context"
 	"io"
 )
 
@@ -26,5 +27,5 @@ func (w *Writer) Write(p []byte) (int, error) {
 }
 
 func (w *Writer) Close() error {
-	return w.s.UploadAsset(w.version, w.filename, w.buf.Bytes())
+	return w.s.UploadAsset(context.Background(), w.version, w.filename, w.buf.Bytes())
 }

@@ -1,6 +1,7 @@
 package source
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -55,10 +56,10 @@ type Asset struct {
 }
 
 type Provider interface {
-	GetRelease(version string) (*Release, error)
-	ListReleases() ([]*Release, error)
-	DownloadAsset(version, name string) ([]byte, error)
-	UploadAsset(version, name string, data []byte) error
+	GetRelease(ctx context.Context, version string) (*Release, error)
+	ListReleases(ctx context.Context) ([]*Release, error)
+	DownloadAsset(ctx context.Context, version, name string) ([]byte, error)
+	UploadAsset(ctx context.Context, version, name string, data []byte) error
 }
 
 type Source struct {
@@ -69,7 +70,7 @@ type ListOptions struct {
 	Constraint string
 }
 
-func (s *Source) ListReleases(opt *ListOptions) ([]*Release, error) {
+func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release, error) {
 	var constraint version.Constraints
 	if opt != nil && opt.Constraint != "" {
 		c, err := version.NewConstraint(opt.Constraint)
@@ -79,7 +80,7 @@ func (s *Source) ListReleases(opt *ListOptions) ([]*Release, error) {
 		constraint = c
 	}
 
-	releases, err := s.Provider.ListReleases()
+	releases, err := s.Provider.ListReleases(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -105,8 +106,8 @@ func (s *Source) ListReleases(opt *ListOptions) ([]*Release, error) {
 	return releases, nil
 }
 
-func (s *Source) GetRelease(version string) (*Release, error) {
-	r, err := s.Provider.GetRelease(version)
+func (s *Source) GetRelease(ctx context.Context, version string) (*Release, error) {
+	r, err := s.Provider.GetRelease(ctx, version)
 	if err != nil {
 		return nil, err
 	}

@@ -36,9 +36,8 @@ func New(url, prefix, baseURL string) (*source.Source, error) {
 	return &source.Source{Provider: s}, nil
 }
 
-func (s *blobSource) ListReleases() ([]*source.Release, error) {
+func (s *blobSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
 	releases := []*source.Release{}
-	ctx := context.Background()
 	iter := s.bucket.List(&blob.ListOptions{Prefix: s.prefix, Delimiter: "/"})
 
 	for {
@@ -54,7 +53,7 @@ func (s *blobSource) ListReleases() ([]*source.Release, error) {
 			continue
 		}
 
-		r, err := s.GetRelease(path.Base(object.Key))
+		r, err := s.GetRelease(ctx, path.Base(object.Key))
 		if err != nil && err != source.ErrReleaseNotFound {
 			return nil, err
 		}
@@ -67,9 +66,7 @@ func (s *blobSource) ListReleases() ([]*source.Release, error) {
 	return releases, nil
 }
 
-func (s *blobSource) GetRelease(version string) (*source.Release, error) {
-	ctx := context.Background()
-
+func (s *blobSource) GetRelease(ctx context.Context, version string) (*source.Release, error) {
 	r := source.Release{Version: version}
 
 	iter := s.bucket.List(&blob.ListOptions{Prefix: path.Join(s.prefix, version) + "/", Delimiter: "/"})
@@ -116,11 +113,11 @@ func (s *blobSource) GetRelease(version string) (*source.Release, error) {
 	return &r, nil
 }
 
-func (s *blobSource) UploadAsset(version, name string, data []byte) error {
+func (s *blobSource) UploadAsset(ctx context.Context, version, name string, data []byte) error {
 	opt := &blob.WriterOptions{ContentType: mime.TypeByExtension(path.Ext(name))}
-	return s.bucket.WriteAll(context.Background(), path.Join(s.prefix, version, name), data, opt)
+	return s.bucket.WriteAll(ctx, path.Join(s.prefix, version, name), data, opt)
 }
 
-func (s *blobSource) DownloadAsset(version, name string) ([]byte, error) {
-	return s.bucket.ReadAll(context.Background(), path.Join(s.prefix, version, name))
+func (s *blobSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
+	return s.bucket.ReadAll(ctx, path.Join(s.prefix, version, name))
 }

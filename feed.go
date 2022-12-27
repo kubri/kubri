@@ -2,6 +2,7 @@ package appcast
 
 import (
 	"bytes"
+	"context"
 	"log"
 	"path/filepath"
 	"sort"
@@ -15,8 +16,8 @@ import (
 )
 
 // Feed generates an appcast feed.
-func Feed(c *Config) (*sparkle.Feed, error) {
-	releases, err := c.Source.ListReleases(nil)
+func Feed(ctx context.Context, c *Config) (*sparkle.Feed, error) {
+	releases, err := c.Source.ListReleases(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +31,7 @@ func Feed(c *Config) (*sparkle.Feed, error) {
 			continue
 		}
 
-		item, err := releaseToSparkleItem(c, release)
+		item, err := releaseToSparkleItem(ctx, c, release)
 		if err != nil {
 			log.Printf("Skipping %s: %s", release.Version, err)
 			continue
@@ -56,8 +57,8 @@ func Feed(c *Config) (*sparkle.Feed, error) {
 	return s, nil
 }
 
-func releaseToSparkleItem(c *Config, release *source.Release) ([]sparkle.Item, error) {
-	signatures, err := getSignatures(c, release)
+func releaseToSparkleItem(ctx context.Context, c *Config, release *source.Release) ([]sparkle.Item, error) {
+	signatures, err := getSignatures(ctx, c, release)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +149,7 @@ func getCriticalUpdate(version string) *sparkle.CriticalUpdate {
 	return nil
 }
 
-func getSignatures(c *Config, release *source.Release) (signatures, error) {
+func getSignatures(ctx context.Context, c *Config, release *source.Release) (signatures, error) {
 	sig := signatures{}
 
 	s := getAsset(release.Assets, "signatures.txt")
@@ -156,7 +157,7 @@ func getSignatures(c *Config, release *source.Release) (signatures, error) {
 		return sig, nil
 	}
 
-	b, err := c.Source.DownloadAsset(release.Version, s.Name)
+	b, err := c.Source.DownloadAsset(ctx, release.Version, s.Name)
 	if err != nil {
 		return nil, err
 	}
