@@ -49,7 +49,7 @@ func TestSource(t *testing.T) {
 		},
 	}
 
-	r := (&source.Source{&fakeSource{}})
+	r := source.New(&fakeSource{})
 	ctx := context.Background()
 
 	t.Run("ListReleases", func(t *testing.T) {
@@ -76,7 +76,7 @@ func TestSource(t *testing.T) {
 
 func TestSourceUnmarshal(t *testing.T) {
 	source.Register("fake", func(c source.Config) (*source.Source, error) {
-		return &source.Source{&fakeSource{c}}, nil
+		return source.New(&fakeSource{c}), nil
 	})
 
 	t.Setenv("FAKE_TOKEN", "fake")
@@ -85,8 +85,8 @@ func TestSourceUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	want := &source.Source{&fakeSource{source.Config{Repo: "user/repo", Token: "fake"}}}
-	if diff := cmp.Diff(want, s); diff != "" {
+	want := source.New(&fakeSource{source.Config{Repo: "user/repo", Token: "fake"}})
+	if diff := cmp.Diff(want, s, cmp.AllowUnexported(source.Source{})); diff != "" {
 		t.Error(diff)
 	}
 }

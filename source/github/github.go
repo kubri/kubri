@@ -39,7 +39,7 @@ func New(c source.Config) (*source.Source, error) {
 		repo:   repo,
 	}
 
-	return &source.Source{Provider: s}, nil
+	return source.New(s), nil
 }
 
 func (s *githubSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
