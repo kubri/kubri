@@ -70,8 +70,10 @@ func TestGithub(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	ctx := context.Background()
+
 	t.Run("ListReleases", func(t *testing.T) {
-		got, err := s.ListReleases(nil)
+		got, err := s.ListReleases(ctx, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -82,7 +84,7 @@ func TestGithub(t *testing.T) {
 	})
 
 	t.Run("GetRelease", func(t *testing.T) {
-		got, err := s.GetRelease(want[0].Version)
+		got, err := s.GetRelease(ctx, want[0].Version)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -98,7 +100,7 @@ func TestGithub(t *testing.T) {
 		if _, ok := os.LookupEnv("GITHUB_TOKEN"); !ok {
 			t.Skip("missing GITHUB_TOKEN")
 		}
-		err := s.UploadAsset(want[0].Version, "test.txt", data)
+		err := s.UploadAsset(ctx, want[0].Version, "test.txt", data)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -108,7 +110,7 @@ func TestGithub(t *testing.T) {
 		if _, ok := os.LookupEnv("GITHUB_TOKEN"); !ok {
 			t.Skip("missing GITHUB_TOKEN")
 		}
-		b, err := s.DownloadAsset(want[0].Version, "test.txt")
+		b, err := s.DownloadAsset(ctx, want[0].Version, "test.txt")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -123,7 +125,6 @@ func TestGithub(t *testing.T) {
 			return
 		}
 
-		ctx := context.Background()
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")})
 		client := gh.NewClient(oauth2.NewClient(ctx, ts))
 		release, _, _ := client.Repositories.GetReleaseByTag(ctx, "abemedia", "appcast-test", want[0].Version)

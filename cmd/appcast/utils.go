@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/pem"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
 
@@ -52,4 +54,21 @@ func readKey[T any](path string, unmarshaler func([]byte) (T, error)) (T, error)
 	}
 	block, _ := pem.Decode(b)
 	return unmarshaler(block.Bytes)
+}
+
+// appContext returns a context that is cancelled on CTRL+C.
+func appContext() context.Context {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	go func() {
+		<-c
+		cancel()
+		<-c
+		os.Exit(1)
+	}()
+
+	return ctx
 }

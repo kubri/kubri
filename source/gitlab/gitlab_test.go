@@ -2,6 +2,7 @@ package gitlab_test
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"testing"
 	"time"
@@ -68,8 +69,10 @@ func TestGitlab(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	ctx := context.Background()
+
 	t.Run("ListReleases", func(t *testing.T) {
-		got, err := s.ListReleases(nil)
+		got, err := s.ListReleases(ctx, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -80,7 +83,7 @@ func TestGitlab(t *testing.T) {
 	})
 
 	t.Run("GetRelease", func(t *testing.T) {
-		got, err := s.GetRelease(want[0].Version)
+		got, err := s.GetRelease(ctx, want[0].Version)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -96,7 +99,7 @@ func TestGitlab(t *testing.T) {
 		if _, ok := os.LookupEnv("GITLAB_TOKEN"); !ok {
 			t.Skip("missing GITLAB_TOKEN")
 		}
-		err := s.UploadAsset(want[0].Version, "test.txt", data)
+		err := s.UploadAsset(ctx, want[0].Version, "test.txt", data)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -106,7 +109,7 @@ func TestGitlab(t *testing.T) {
 		if _, ok := os.LookupEnv("GITLAB_TOKEN"); !ok {
 			t.Skip("missing GITLAB_TOKEN")
 		}
-		b, err := s.DownloadAsset(want[0].Version, "test.txt")
+		b, err := s.DownloadAsset(ctx, want[0].Version, "test.txt")
 		if err != nil {
 			t.Fatal(err)
 		}

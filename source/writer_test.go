@@ -2,6 +2,7 @@ package source_test
 
 import (
 	"bytes"
+	"context"
 	"testing"
 
 	"github.com/abemedia/appcast/source"
@@ -27,7 +28,7 @@ func TestWriter(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b, err := s.DownloadAsset("v1.0.0", "test.txt")
+	b, err := s.DownloadAsset(context.Background(), "v1.0.0", "test.txt")
 	if err != nil {
 		t.Fatal(err)
 	}

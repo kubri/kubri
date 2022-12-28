@@ -2,6 +2,7 @@ package gitlab
 
 import (
 	"bytes"
+	"context"
 	"log"
 	"net/http"
 	"path"
@@ -31,30 +32,30 @@ func New(c source.Config) (*source.Source, error) {
 	return &source.Source{Provider: s}, nil
 }
 
-func (s *gitlabSource) ListReleases() ([]*source.Release, error) {
-	releases, _, err := s.client.Releases.ListReleases(s.repo, nil)
+func (s *gitlabSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
+	releases, _, err := s.client.Releases.ListReleases(s.repo, nil, gitlab.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
 
 	r := make([]*source.Release, 0, len(releases))
 	for _, release := range releases {
-		r = append(r, s.parseRelease(release))
+		r = append(r, s.parseRelease(ctx, release))
 	}
 
 	return r, nil
 }
 
-func (s *gitlabSource) GetRelease(version string) (*source.Release, error) {
-	r, _, err := s.client.Releases.GetRelease(s.repo, version)
+func (s *gitlabSource) GetRelease(ctx context.Context, version string) (*source.Release, error) {
+	r, _, err := s.client.Releases.GetRelease(s.repo, version, gitlab.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
 
-	return s.parseRelease(r), nil
+	return s.parseRelease(ctx, r), nil
 }
 
-func (s *gitlabSource) parseRelease(release *gitlab.Release) *source.Release {
+func (s *gitlabSource) parseRelease(ctx context.Context, release *gitlab.Release) *source.Release {
 	r := &source.Release{
 		Name:        release.Name,
 		Description: release.Description,
@@ -64,7 +65,7 @@ func (s *gitlabSource) parseRelease(release *gitlab.Release) *source.Release {
 	}
 
 	for _, l := range release.Assets.Links {
-		size, err := s.getSize(l.URL)
+		size, err := s.getSize(ctx, l.URL)
 		if err != nil {
 			log.Printf("failed to get size for %s: %s\n", l.Name, err)
 		}
@@ -79,8 +80,8 @@ func (s *gitlabSource) parseRelease(release *gitlab.Release) *source.Release {
 	return r
 }
 
-func (s *gitlabSource) UploadAsset(version, name string, data []byte) error {
-	file, _, err := s.client.Projects.UploadFile(s.repo, bytes.NewReader(data), name)
+func (s *gitlabSource) UploadAsset(ctx context.Context, version, name string, data []byte) error {
+	file, _, err := s.client.Projects.UploadFile(s.repo, bytes.NewReader(data), name, gitlab.WithContext(ctx))
 	if err != nil {
 		return err
 	}
@@ -89,15 +90,13 @@ func (s *gitlabSource) UploadAsset(version, name string, data []byte) error {
 	u.Path = path.Join(s.repo, file.URL)
 	url := u.String()
 
-	_, _, err = s.client.ReleaseLinks.CreateReleaseLink(s.repo, version, &gitlab.CreateReleaseLinkOptions{
-		Name: &name,
-		URL:  &url,
-	})
+	opt := &gitlab.CreateReleaseLinkOptions{Name: &name, URL: &url}
+	_, _, err = s.client.ReleaseLinks.CreateReleaseLink(s.repo, version, opt, gitlab.WithContext(ctx))
 
 	return err
 }
 
-func (s *gitlabSource) DownloadAsset(version, name string) ([]byte, error) {
+func (s *gitlabSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
 	links, _, err := s.client.ReleaseLinks.ListReleaseLinks(s.repo, version, nil)
 	if err != nil {
 		return nil, err
@@ -111,7 +110,7 @@ func (s *gitlabSource) DownloadAsset(version, name string) ([]byte, error) {
 			}
 
 			var buf bytes.Buffer
-			_, err = s.client.Do(req, &buf)
+			_, err = s.client.Do(req.WithContext(ctx), &buf)
 			if err != nil {
 				return nil, err
 			}
@@ -123,13 +122,13 @@ func (s *gitlabSource) DownloadAsset(version, name string) ([]byte, error) {
 	return nil, source.ErrAssetNotFound
 }
 
-func (s *gitlabSource) getSize(url string) (int, error) {
+func (s *gitlabSource) getSize(ctx context.Context, url string) (int, error) {
 	req, err := retryablehttp.NewRequest(http.MethodHead, url, nil)
 	if err != nil {
 		return 0, err
 	}
 
-	r, err := s.client.Do(req, nil)
+	r, err := s.client.Do(req.WithContext(ctx), nil)
 	if err != nil {
 		return 0, err
 	}

@@ -45,7 +45,7 @@ func feedCmd() *cobra.Command {
 				return err
 			}
 
-			feed, err := appcast.Feed(c)
+			feed, err := appcast.Feed(appContext(), c)
 			if err != nil {
 				return err
 			}

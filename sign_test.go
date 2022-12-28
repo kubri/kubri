@@ -1,6 +1,7 @@
 package appcast_test
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/pem"
 	"os"
@@ -17,12 +18,13 @@ import (
 func TestSign(t *testing.T) {
 	data := []byte("test")
 	versions := []string{"v1.0.0", "v1.1.0"}
+	ctx := context.Background()
 
 	s, _ := memory.New(source.Config{})
 	for _, v := range versions {
-		s.UploadAsset(v, "README.md", data)
-		s.UploadAsset(v, "test.dmg", data)
-		s.UploadAsset(v, "test_64-bit.msi", data)
+		s.UploadAsset(ctx, v, "README.md", data)
+		s.UploadAsset(ctx, v, "test.dmg", data)
+		s.UploadAsset(ctx, v, "test_64-bit.msi", data)
 	}
 
 	dsaKey, _ := dsa.NewPrivateKey()
@@ -34,12 +36,12 @@ func TestSign(t *testing.T) {
 		Ed25519Key: edKey,
 	}
 
-	if err := appcast.Sign(opt); err != nil {
+	if err := appcast.Sign(ctx, opt); err != nil {
 		t.Fatal(err)
 	}
 
 	for _, v := range versions {
-		b, _ := s.DownloadAsset(v, "signatures.txt")
+		b, _ := s.DownloadAsset(ctx, v, "signatures.txt")
 		sigs := appcast.Signatures{}
 		sigs.UnmarshalText(b)
 
@@ -60,10 +62,11 @@ func TestSign(t *testing.T) {
 func TestSignSingleRelease(t *testing.T) {
 	data := []byte("test")
 	versions := []string{"v1.0.0", "v1.1.0"}
+	ctx := context.Background()
 
 	s, _ := memory.New(source.Config{})
 	for _, v := range versions {
-		s.UploadAsset(v, "test.dmg", data)
+		s.UploadAsset(ctx, v, "test.dmg", data)
 	}
 
 	edKey, _ := ed25519.NewPrivateKey()
@@ -74,16 +77,16 @@ func TestSignSingleRelease(t *testing.T) {
 		Ed25519Key: edKey,
 	}
 
-	if err := appcast.Sign(opt); err != nil {
+	if err := appcast.Sign(ctx, opt); err != nil {
 		t.Fatal(err)
 	}
 
-	_, err := s.DownloadAsset("v1.0.0", "signatures.txt")
+	_, err := s.DownloadAsset(ctx, "v1.0.0", "signatures.txt")
 	if err == nil {
 		t.Error("should only sign specified release")
 	}
 
-	b, _ := s.DownloadAsset("v1.1.0", "signatures.txt")
+	b, _ := s.DownloadAsset(ctx, "v1.1.0", "signatures.txt")
 	sigs := appcast.Signatures{}
 	sigs.UnmarshalText(b)
 

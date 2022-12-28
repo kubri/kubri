@@ -1,6 +1,7 @@
 package appcast
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"log"
@@ -21,22 +22,22 @@ type SignOptions struct {
 }
 
 // Sign signs update packages and uploads the signatures to the source.
-func Sign(opt *SignOptions) error {
+func Sign(ctx context.Context, opt *SignOptions) error {
 	if opt.Version != "" && strings.HasPrefix(opt.Version, semver.Canonical(opt.Version)) {
-		release, err := opt.Source.GetRelease(opt.Version)
+		release, err := opt.Source.GetRelease(ctx, opt.Version)
 		if err != nil {
 			return err
 		}
-		return signRelease(opt, release)
+		return signRelease(ctx, opt, release)
 	}
 
-	releases, err := opt.Source.ListReleases(&source.ListOptions{Constraint: opt.Version})
+	releases, err := opt.Source.ListReleases(ctx, &source.ListOptions{Constraint: opt.Version})
 	if err != nil {
 		return err
 	}
 
 	for _, release := range releases {
-		err := signRelease(opt, release)
+		err := signRelease(ctx, opt, release)
 		if err != nil {
 			return err
 		}
@@ -45,7 +46,7 @@ func Sign(opt *SignOptions) error {
 	return nil
 }
 
-func signRelease(opt *SignOptions, release *source.Release) error {
+func signRelease(ctx context.Context, opt *SignOptions, release *source.Release) error {
 	if getAsset(release.Assets, "signatures.txt") != nil {
 		return nil
 	}
@@ -60,7 +61,7 @@ func signRelease(opt *SignOptions, release *source.Release) error {
 
 		log.Printf("Signing asset %s (%s)\n", asset.Name, release.Version)
 
-		b, err := opt.Source.DownloadAsset(release.Version, asset.Name)
+		b, err := opt.Source.DownloadAsset(ctx, release.Version, asset.Name)
 		if err != nil {
 			return err
 		}
@@ -84,7 +85,7 @@ func signRelease(opt *SignOptions, release *source.Release) error {
 		return err
 	}
 
-	return opt.Source.UploadAsset(release.Version, "signatures.txt", b)
+	return opt.Source.UploadAsset(ctx, release.Version, "signatures.txt", b)
 }
 
 func getAlgo(path string) (string, error) {
