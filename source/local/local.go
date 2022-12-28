@@ -21,7 +21,7 @@ func New(c source.Config) (*source.Source, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &source.Source{Provider: &localSource{path: c.Repo, root: root}}, nil
+	return source.New(&localSource{path: c.Repo, root: root}), nil
 }
 
 func (s *localSource) ListReleases(ctx context.Context) ([]*source.Release, error) {

@@ -33,7 +33,7 @@ func New(url, prefix, baseURL string) (*source.Source, error) {
 		baseURL: baseURL,
 	}
 
-	return &source.Source{Provider: s}, nil
+	return source.New(s), nil
 }
 
 func (s *blobSource) ListReleases(ctx context.Context) ([]*source.Release, error) {

@@ -55,7 +55,7 @@ type Asset struct {
 	Size int
 }
 
-type Provider interface {
+type Driver interface {
 	GetRelease(ctx context.Context, version string) (*Release, error)
 	ListReleases(ctx context.Context) ([]*Release, error)
 	DownloadAsset(ctx context.Context, version, name string) ([]byte, error)
@@ -63,7 +63,11 @@ type Provider interface {
 }
 
 type Source struct {
-	Provider
+	s Driver
+}
+
+func New(driver Driver) *Source {
+	return &Source{s: driver}
 }
 
 type ListOptions struct {
@@ -71,6 +75,10 @@ type ListOptions struct {
 }
 
 func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release, error) {
+	if s == nil || s.s == nil {
+		return nil, ErrMissingSource
+	}
+
 	var constraint version.Constraints
 	if opt != nil && opt.Constraint != "" {
 		c, err := version.NewConstraint(opt.Constraint)
@@ -80,7 +88,7 @@ func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release
 		constraint = c
 	}
 
-	releases, err := s.Provider.ListReleases(ctx)
+	releases, err := s.s.ListReleases(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +115,11 @@ func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release
 }
 
 func (s *Source) GetRelease(ctx context.Context, version string) (*Release, error) {
-	r, err := s.Provider.GetRelease(ctx, version)
+	if s == nil || s.s == nil {
+		return nil, ErrMissingSource
+	}
+
+	r, err := s.s.GetRelease(ctx, version)
 	if err != nil {
 		return nil, err
 	}
@@ -115,6 +127,22 @@ func (s *Source) GetRelease(ctx context.Context, version string) (*Release, erro
 	processRelease(r)
 
 	return r, nil
+}
+
+func (s *Source) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
+	if s == nil || s.s == nil {
+		return nil, ErrMissingSource
+	}
+
+	return s.s.DownloadAsset(ctx, version, name)
+}
+
+func (s *Source) UploadAsset(ctx context.Context, version, name string, data []byte) error {
+	if s == nil || s.s == nil {
+		return ErrMissingSource
+	}
+
+	return s.s.UploadAsset(ctx, version, name, data)
 }
 
 func (s *Source) UnmarshalText(b []byte) error {
@@ -136,7 +164,7 @@ func (s *Source) UnmarshalText(b []byte) error {
 		return err
 	}
 
-	s.Provider = source.Provider
+	s.s = source.s
 
 	return nil
 }
