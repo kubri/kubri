@@ -1,23 +1,15 @@
 package memory_test
 
 import (
-	"path/filepath"
+	"path"
 	"testing"
 
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/blob/internal/testutils"
-	"github.com/abemedia/appcast/source/blob/memory"
+	"github.com/abemedia/appcast/source/blob/internal/test"
+	_ "github.com/abemedia/appcast/source/blob/memory"
 )
 
 func TestMemory(t *testing.T) {
-	s, err := memory.New(source.Config{Repo: "test/test"})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	makeURL := func(version, asset string) string {
-		return "mem://" + filepath.Join(version, asset)
-	}
-
-	testutils.TestBlob(t, s, makeURL)
+	test.Run(t, "mem://", func(version, asset string) string {
+		return "mem://" + path.Join(version, asset)
+	})
 }

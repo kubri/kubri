@@ -1,4 +1,4 @@
-// Package memory is an in-memory simulator of a source backend for use in tests.
+// Package memory is an in-memory simulator of a blob source for use in tests.
 package memory
 
 import (

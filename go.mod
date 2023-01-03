@@ -20,6 +20,7 @@ require (
 	github.com/testcontainers/testcontainers-go v0.17.0
 	github.com/xanzy/go-gitlab v0.77.0
 	gocloud.dev v0.27.0
+	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/mod v0.7.0
 	golang.org/x/oauth2 v0.3.0
 	gopkg.in/yaml.v3 v3.0.1

@@ -115,7 +115,6 @@ func (s *githubSource) DownloadAsset(ctx context.Context, version, name string) 
 			if err != nil {
 				return nil, err
 			}
-
 			if r != nil {
 				defer r.Close()
 				return io.ReadAll(r)
@@ -125,12 +124,10 @@ func (s *githubSource) DownloadAsset(ctx context.Context, version, name string) 
 			if err != nil {
 				return nil, err
 			}
-
 			res, err := http.DefaultClient.Do(req)
 			if err != nil {
 				return nil, err
 			}
-
 			defer res.Body.Close()
 			return io.ReadAll(res.Body)
 		}

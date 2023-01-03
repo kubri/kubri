@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/gitlab"
+	_ "github.com/abemedia/appcast/source/gitlab"
 	"github.com/google/go-cmp/cmp"
-	gl "github.com/xanzy/go-gitlab"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestGitlab(t *testing.T) {
@@ -64,7 +64,7 @@ func TestGitlab(t *testing.T) {
 		},
 	}
 
-	s, err := gitlab.New(source.Config{Repo: "abemedia/appcast-test", Token: os.Getenv("GITLAB_TOKEN")})
+	s, err := source.Open("gitlab://abemedia/appcast-test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestGitlab(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("ListReleases", func(t *testing.T) {
-		got, err := s.ListReleases(ctx, nil)
+		got, err := s.ListReleases(ctx, &source.ListOptions{Prerelease: true})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -124,7 +124,7 @@ func TestGitlab(t *testing.T) {
 			return
 		}
 
-		client, _ := gl.NewClient(os.Getenv("GITLAB_TOKEN"))
+		client, _ := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"))
 		links, _, _ := client.ReleaseLinks.ListReleaseLinks("abemedia/appcast-test", want[0].Version, nil)
 
 		for _, link := range links {

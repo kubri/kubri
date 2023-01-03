@@ -1,38 +1,20 @@
 package s3_test
 
 import (
-	"path/filepath"
+	"path"
 	"testing"
 
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/blob/internal/testutils"
-	"github.com/abemedia/appcast/source/blob/s3"
-	"github.com/testcontainers/testcontainers-go/wait"
+	"github.com/abemedia/appcast/internal/emulator"
+	"github.com/abemedia/appcast/source/blob/internal/test"
+	_ "github.com/abemedia/appcast/source/blob/s3"
 )
 
-func TestBlobS3(t *testing.T) {
-	host := testutils.TestContainer(t, testutils.Container{
-		Image: "adobe/s3mock:latest",
-		Port:  9090,
-		Env:   map[string]string{"initialBuckets": "bucket"},
-		Wait:  wait.ForHTTP("/").WithPort("9090").WithStatusCodeMatcher(nil),
+func TestS3(t *testing.T) {
+	host := emulator.S3(t, "bucket")
+	repo := "bucket/downloads/test"
+	url := "s3://" + repo + "?endpoint=" + host + "&disableSSL=true&s3ForcePathStyle=true"
+
+	test.Run(t, url, func(version, asset string) string {
+		return "http://" + host + "/" + path.Join(repo, version, asset)
 	})
-
-	t.Setenv("AWS_ACCESS_KEY_ID", "test")
-	t.Setenv("AWS_SECRET_ACCESS_KEY", "test")
-	t.Setenv("AWS_REGION", "us-east-1")
-
-	dir := "downloads/test"
-	repo := "bucket/" + dir
-
-	s, err := s3.New(source.Config{Repo: repo + "?endpoint=" + host + "&disableSSL=true&s3ForcePathStyle=true"})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	makeURL := func(version, asset string) string {
-		return "http://" + host + "/" + filepath.Join(repo, version, asset)
-	}
-
-	testutils.TestBlob(t, s, makeURL)
 }

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/local"
+	_ "github.com/abemedia/appcast/source/local"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -112,7 +112,7 @@ func TestLocal(t *testing.T) {
 				}
 			}
 
-			s, err := local.New(source.Config{Repo: test.path})
+			s, err := source.Open("local://" + test.path)
 			if err != nil {
 				t.Fatal(err)
 			}
