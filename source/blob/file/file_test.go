@@ -4,21 +4,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/blob/file"
-	"github.com/abemedia/appcast/source/blob/internal/testutils"
+	_ "github.com/abemedia/appcast/source/blob/file"
+	"github.com/abemedia/appcast/source/blob/internal/test"
 )
 
-func TestBlobFile(t *testing.T) {
+func TestFile(t *testing.T) {
 	dir := t.TempDir()
-	s, err := file.New(source.Config{Repo: dir})
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	makeURL := func(version, asset string) string {
+	test.Run(t, "file://"+dir, func(version, asset string) string {
 		return "file://" + filepath.Join(dir, version, asset)
-	}
-
-	testutils.TestBlob(t, s, makeURL)
+	})
 }

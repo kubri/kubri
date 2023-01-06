@@ -8,10 +8,15 @@ env:
 dotenv:
   - .env
 
+vars:
+  GIT_COMMIT:
+    sh: git log -n 1 --format="%h (%ci)"
+
 tasks:
   default:
     desc: Runs the default tasks
     cmds:
+      - task: init
       - task: mod
       - task: build
       - task: lint
@@ -36,7 +41,7 @@ tasks:
     generates:
       - ./appcast
     cmds:
-      - go build ./cmd/appcast
+      - go build
 
   lint:
     desc: Runs golangci-lint
@@ -61,4 +66,4 @@ tasks:
       - './**/*.go'
       - ./go.(mod|sum)
     cmds:
-      - go install ./cmd/appcast
+      - go install -ldflags="-X 'main.version={{.GIT_COMMIT}}'"

@@ -22,10 +22,10 @@ type Config struct {
 type Factory = func(Config) (*Source, error)
 
 //nolint:gochecknoglobals
-var sources = map[string]Factory{}
+var providers = map[string]Factory{}
 
 func Register(scheme string, factory Factory) {
-	sources[scheme] = factory
+	providers[scheme] = factory
 }
 
 type Release struct {
@@ -35,18 +35,6 @@ type Release struct {
 	Version     string
 	Prerelease  bool
 	Assets      []*Asset
-}
-
-type ByVersion []*Release
-
-func (vs ByVersion) Len() int      { return len(vs) }
-func (vs ByVersion) Swap(i, j int) { vs[i], vs[j] = vs[j], vs[i] }
-func (vs ByVersion) Less(i, j int) bool {
-	cmp := semver.Compare(vs[i].Version, vs[j].Version)
-	if cmp != 0 {
-		return cmp > 0
-	}
-	return vs[i].Version > vs[j].Version
 }
 
 type Asset struct {
@@ -70,8 +58,29 @@ func New(driver Driver) *Source {
 	return &Source{s: driver}
 }
 
+func Open(url string) (*Source, error) {
+	provider, repo, ok := strings.Cut(url, "://")
+	if !ok {
+		return nil, fmt.Errorf("invalid source URL: %s", url)
+	}
+
+	factory, ok := providers[provider]
+	if !ok {
+		return nil, fmt.Errorf("unsupported source: %s", provider)
+	}
+
+	return factory(Config{
+		Repo:  repo,
+		Token: os.Getenv(strings.ToUpper(provider) + "_TOKEN"),
+	})
+}
+
 type ListOptions struct {
-	Constraint string
+	// Version constraint e.g. 'v1.2.4', 'v1', '>= v1.1.0, < v2.1'
+	Version string
+
+	// Include pre-releases
+	Prerelease bool
 }
 
 func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release, error) {
@@ -80,8 +89,8 @@ func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release
 	}
 
 	var constraint version.Constraints
-	if opt != nil && opt.Constraint != "" {
-		c, err := version.NewConstraint(opt.Constraint)
+	if opt != nil && opt.Version != "" && opt.Version != "latest" {
+		c, err := version.NewConstraint(opt.Version)
 		if err != nil {
 			return nil, err
 		}
@@ -101,6 +110,12 @@ func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release
 		}
 
 		if !constraint.Check(v) {
+			log.Println("Skipping version:", r.Version)
+			return false
+		}
+
+		if (opt == nil || !opt.Prerelease) && v.Prerelease() != "" {
+			log.Println("Skipping prerelease:", r.Version)
 			return false
 		}
 
@@ -110,6 +125,10 @@ func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release
 	})
 
 	sort.Sort(ByVersion(releases))
+
+	if opt != nil && opt.Version == "latest" {
+		return releases[:1], nil
+	}
 
 	return releases, nil
 }
@@ -143,30 +162,6 @@ func (s *Source) UploadAsset(ctx context.Context, version, name string, data []b
 	}
 
 	return s.s.UploadAsset(ctx, version, name, data)
-}
-
-func (s *Source) UnmarshalText(b []byte) error {
-	provider, repo, ok := strings.Cut(string(b), "://")
-	if !ok {
-		return fmt.Errorf("invalid source URL: %s", b)
-	}
-
-	factory, ok := sources[provider]
-	if !ok {
-		return fmt.Errorf("unsupported source: %s", provider)
-	}
-
-	source, err := factory(Config{
-		Repo:  repo,
-		Token: os.Getenv(strings.ToUpper(provider) + "_TOKEN"),
-	})
-	if err != nil {
-		return err
-	}
-
-	s.s = source.s
-
-	return nil
 }
 
 func processRelease(r *Release) {

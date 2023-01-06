@@ -25,6 +25,7 @@ linters:
     - exhaustive
     - exhaustivestruct # deprecated
     - exhaustruct
+    - gci
     - godox
     - goerr113 # TODO: turn on and fix
     - golint # deprecated
@@ -56,6 +57,7 @@ linters-settings:
       - G107
       - G204
       - G401
+      - G501
       - G505
   govet:
     enable-all: true
