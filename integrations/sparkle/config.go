@@ -10,24 +10,25 @@ import (
 )
 
 type Settings struct {
-	InstallerArguments                string `yaml:"installerArguments"`
-	MinimumSystemVersion              string `yaml:"minimumSystemVersion"`
-	MinimumAutoupdateVersion          string `yaml:"minimumAutoupdateVersion"`
-	IgnoreSkippedUpgradesBelowVersion string `yaml:"ignoreSkippedUpgradesBelowVersion"`
-	CriticalUpdate                    bool   `yaml:"criticalUpdate"`
-	CriticalUpdateBelowVersion        string `yaml:"criticalUpdateBelowVersion"`
+	InstallerArguments                string
+	MinimumSystemVersion              string
+	MinimumAutoupdateVersion          string
+	IgnoreSkippedUpgradesBelowVersion string
+	CriticalUpdate                    bool
+	CriticalUpdateBelowVersion        string
 }
 
 type Rule struct {
-	OS        OS     `yaml:"os"`
-	Version   string `yaml:"version"`
-	*Settings `yaml:",inline"`
+	OS      OS
+	Version string
+	*Settings
 }
 
 type Config struct {
 	Title       string
 	Description string
 	URL         string
+	DetectOS    func(string) OS
 
 	Source     *source.Source
 	Target     target.Target

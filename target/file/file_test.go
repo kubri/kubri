@@ -3,7 +3,7 @@ package file_test
 import (
 	"testing"
 
-	_ "github.com/abemedia/appcast/target/blob/file"
+	_ "github.com/abemedia/appcast/target/file"
 	"github.com/abemedia/appcast/target/internal/test"
 )
 

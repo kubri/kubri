@@ -21,6 +21,8 @@ func Run(t *testing.T, url string) {
 	data := []byte("test")
 
 	t.Run("NewWriter", func(t *testing.T) {
+		t.Helper()
+
 		w, err := s.NewWriter(ctx, "folder/file")
 		if err != nil {
 			t.Fatal(err)
@@ -36,6 +38,8 @@ func Run(t *testing.T, url string) {
 	})
 
 	t.Run("NewReader", func(t *testing.T) {
+		t.Helper()
+
 		r, err := s.NewReader(ctx, "folder/file")
 		if err != nil {
 			t.Fatal(err)
@@ -56,6 +60,8 @@ func Run(t *testing.T, url string) {
 	})
 
 	t.Run("Sub", func(t *testing.T) {
+		t.Helper()
+
 		sub := s.Sub("folder")
 
 		if _, err := sub.NewReader(ctx, "file"); err != nil {

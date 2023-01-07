@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"github.com/abemedia/appcast/integrations/sparkle"
-	"github.com/abemedia/appcast/pkg/config"
+	"github.com/abemedia/appcast/pkg/pipe"
 	"github.com/spf13/cobra"
 
 	// Import source & target providers.
@@ -11,6 +10,7 @@ import (
 	_ "github.com/abemedia/appcast/source/gitlab"
 	_ "github.com/abemedia/appcast/source/local"
 	_ "github.com/abemedia/appcast/target/blob"
+	_ "github.com/abemedia/appcast/target/file"
 )
 
 func buildCmd() *cobra.Command {
@@ -21,21 +21,11 @@ func buildCmd() *cobra.Command {
 		Short:   "Build appcast feed",
 		Aliases: []string{"b"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			c, err := config.Load(configPath)
+			p, err := pipe.Load(configPath)
 			if err != nil {
 				return err
 			}
-
-			sparkleConfig, err := config.GetSparkle(c)
-			if err != nil {
-				return err
-			}
-			err = sparkle.Build(cmd.Context(), sparkleConfig)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return p.Run(cmd.Context())
 		},
 	}
 

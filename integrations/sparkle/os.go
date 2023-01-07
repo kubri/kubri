@@ -3,8 +3,7 @@ package sparkle
 import (
 	"errors"
 	"fmt"
-	"path/filepath"
-	"strings"
+	"path"
 
 	"github.com/dlclark/regexp2"
 )
@@ -73,15 +72,14 @@ var (
 )
 
 func DetectOS(name string) OS {
-	s := strings.ToLower(name)
-	ext := filepath.Ext(s)
+	ext := path.Ext(name)
 	switch ext {
 	case "":
 	case ".dmg", ".pkg", ".mpkg":
 		return MacOS
 	case ".exe", ".msi", ".msix", ".msixbundle", ".appx", ".appxbundle", ".appinstaller":
-		is64, _ := reWin64.MatchString(s)
-		is32, _ := reWin32.MatchString(s)
+		is64, _ := reWin64.MatchString(name)
+		is32, _ := reWin32.MatchString(name)
 		switch {
 		case is64 == is32:
 		case is64:
