@@ -7,6 +7,7 @@ go 1.19
 replace github.com/docker/docker => github.com/docker/docker v20.10.3-0.20221201081640-bb2eab21c6db+incompatible // 22.06 branch
 
 require (
+	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 	github.com/dlclark/regexp2 v1.7.0
 	github.com/docker/go-connections v0.4.0
 	github.com/fullstorydev/emulators/storage v0.0.0-20221201134230-39d0d46cb7ba
@@ -15,9 +16,12 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/hashicorp/go-version v1.6.0
 	github.com/imdario/mergo v0.3.13
+	github.com/joho/godotenv v1.3.0
+	github.com/klauspost/compress v1.15.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/testcontainers/testcontainers-go v0.17.0
+	github.com/ulikunitz/xz v0.5.11
 	github.com/xanzy/go-gitlab v0.77.0
 	gocloud.dev v0.27.0
 	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
@@ -79,7 +83,6 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/klauspost/compress v1.15.1 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/moby/patternmatcher v0.5.0 // indirect

@@ -5,8 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/xml"
-	"log"
-	"path/filepath"
+	"path"
 	"strings"
 	"time"
 
@@ -104,9 +103,12 @@ func createReleaseItems(ctx context.Context, c *Config, release *source.Release)
 
 	items := make([]Item, 0, len(release.Assets))
 	for _, asset := range release.Assets {
-		os := DetectOS(asset.Name)
+		detect := c.DetectOS
+		if detect == nil {
+			detect = DetectOS
+		}
+		os := detect(asset.Name)
 		if os == Unknown {
-			log.Printf("Skipping asset %s (%s): unsupported file extension\n", asset.Name, release.Version)
 			continue
 		}
 
@@ -172,7 +174,7 @@ func signAsset(ctx context.Context, c *Config, v string, os OS, a *source.Asset)
 }
 
 func getFileType(s string) string {
-	ext := filepath.Ext(s)
+	ext := path.Ext(s)
 	switch ext {
 	default:
 		return "application/octet-stream"

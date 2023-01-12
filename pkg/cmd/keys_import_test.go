@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/rand"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -15,10 +14,10 @@ import (
 
 func TestKeysImportCmd(t *testing.T) {
 	tests := [][]string{
-		{"keys", "import", "dsa", path.Join(t.TempDir(), "test")},
-		{"keys", "import", "ed25519", path.Join(t.TempDir(), "test")},
-		{"keys", "import", "dsa", path.Join(t.TempDir(), "test"), "--force"},
-		{"keys", "import", "ed25519", path.Join(t.TempDir(), "test"), "--force"},
+		{"keys", "import", "dsa", filepath.Join(t.TempDir(), "test")},
+		{"keys", "import", "ed25519", filepath.Join(t.TempDir(), "test")},
+		{"keys", "import", "dsa", filepath.Join(t.TempDir(), "test"), "--force"},
+		{"keys", "import", "ed25519", filepath.Join(t.TempDir(), "test"), "--force"},
 	}
 
 	capture(t, os.Stderr)

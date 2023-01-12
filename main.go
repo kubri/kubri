@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/abemedia/appcast/pkg/cmd"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 var version = "dev"

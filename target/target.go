@@ -12,8 +12,7 @@ import (
 
 type Factory = func(source.Config) (Target, error)
 
-//nolint:gochecknoglobals
-var providers = map[string]Factory{}
+var providers = map[string]Factory{} //nolint:gochecknoglobals
 
 func Register(scheme string, factory Factory) {
 	providers[scheme] = factory

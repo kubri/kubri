@@ -66,6 +66,11 @@ linters-settings:
   nolintlint:
     allow-leading-space: false
     require-specific: true
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        yaml: kebab
 
 issues:
   fix: true

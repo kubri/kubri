@@ -21,8 +21,7 @@ type Config struct {
 
 type Factory = func(Config) (*Source, error)
 
-//nolint:gochecknoglobals
-var providers = map[string]Factory{}
+var providers = map[string]Factory{} //nolint:gochecknoglobals
 
 func Register(scheme string, factory Factory) {
 	providers[scheme] = factory

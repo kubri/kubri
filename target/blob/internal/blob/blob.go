@@ -5,7 +5,6 @@ import (
 	"io"
 	"mime"
 	"path"
-	"strings"
 
 	"github.com/abemedia/appcast/target"
 	"gocloud.dev/blob"
@@ -23,7 +22,7 @@ func New(url, prefix string) (target.Target, error) {
 	}
 
 	if prefix != "" {
-		prefix = strings.Trim(prefix, "/") + "/"
+		prefix = path.Clean(prefix)
 	}
 
 	return &blobTarget{bucket: b, prefix: prefix}, nil
@@ -39,7 +38,5 @@ func (s *blobTarget) NewReader(ctx context.Context, filename string) (io.ReadClo
 }
 
 func (s *blobTarget) Sub(dir string) target.Target {
-	sub := *s
-	sub.prefix += strings.Trim(dir, "/") + "/"
-	return &sub
+	return &blobTarget{bucket: s.bucket, prefix: path.Join(s.prefix, dir)}
 }
