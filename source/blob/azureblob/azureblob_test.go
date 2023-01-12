@@ -1,6 +1,7 @@
 package azureblob_test
 
 import (
+	"net/url"
 	"path"
 	"testing"
 
@@ -11,9 +12,9 @@ import (
 
 func TestAzureblob(t *testing.T) {
 	host := emulator.AzureBlob(t, "bucket")
-	repo := "bucket/downloads/test"
+	repo := "downloads/test"
 
-	test.Run(t, "azblob://"+repo, func(version, asset string) string {
-		return "http://" + host + "/devstoreaccount1/" + path.Join(repo, version, asset)
+	test.Run(t, "azblob://bucket/"+repo, func(version, asset string) string {
+		return "http://" + host + "/devstoreaccount1/bucket/" + url.PathEscape(path.Join(repo, version, asset))
 	})
 }

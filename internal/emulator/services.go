@@ -20,16 +20,18 @@ func AzureBlob(t *testing.T, bucket string) string {
 	})
 
 	t.Setenv("AZURE_STORAGE_ACCOUNT", "devstoreaccount1")
-	t.Setenv("AZURE_STORAGE_KEY", "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==") //nolint:lll
+	t.Setenv("AZURE_STORAGE_KEY",
+		"Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==")
 	t.Setenv("AZURE_STORAGE_DOMAIN", host)
 	t.Setenv("AZURE_STORAGE_PROTOCOL", "http")
 
-	client, err := azblob.NewDefaultServiceClient(azblob.ServiceURL("http://" + host + "/devstoreaccount1"))
+	client, err := azblob.NewDefaultClient(
+		azblob.ServiceURL("http://"+host+"/devstoreaccount1"), azblob.ContainerName(bucket))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	_, err = client.CreateContainer(context.Background(), bucket, nil)
+	_, err = client.Create(context.Background(), nil)
 	if err != nil {
 		log.Fatal(err)
 	}
