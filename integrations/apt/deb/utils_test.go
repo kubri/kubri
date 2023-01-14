@@ -1,9 +1,6 @@
 package deb_test
 
-import (
-	"encoding"
-	"time"
-)
+import "time"
 
 type stringer struct {
 	S string
@@ -17,15 +14,7 @@ type marshaler struct {
 	S string
 }
 
-var (
-	_ encoding.TextMarshaler   = (*marshaler)(nil)
-	_ encoding.TextUnmarshaler = (*marshaler)(nil)
-)
-
 func (s *marshaler) MarshalText() ([]byte, error) {
-	if s == nil {
-		return nil, nil
-	}
 	return []byte(s.S), nil
 }
 

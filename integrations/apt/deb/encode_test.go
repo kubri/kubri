@@ -82,7 +82,7 @@ Date: Tue, 10 Jan 2023 19:04:25 UTC
 `,
 		},
 		{
-			msg: "multi-line string starting with emoty line",
+			msg: "multi-line string starting with empty line",
 			in: record{
 				String: "\nfoo\nbar",
 			},
