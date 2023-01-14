@@ -1,7 +1,8 @@
 builds:
-  - main: ./cmd/appcast
-    targets:
+  - targets:
       - go_first_class
+    flags:
+      - -trimpath
 
 archives:
   - format: binary
