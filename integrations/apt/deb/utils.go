@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unsafe"
 )
 
 //nolint:gochecknoglobals
@@ -13,7 +14,6 @@ var (
 	bufPool = sync.Pool{New: func() any { return bytes.NewBuffer(make([]byte, 1024)) }}
 
 	colon = []byte(":")
-	dot   = []byte(".")
 	space = []byte(" ")
 	nl    = []byte("\n")
 
@@ -42,8 +42,12 @@ func trim(s []byte) []byte {
 		i++
 	}
 	n := len(s)
-	for n > i && (s[n-1] == ' ' || s[n-1] == '\t' || s[n-1] == '\n') {
+	for n > i && (s[n-1] == ' ' || s[n-1] == '\t' || s[n-1] == '\n' || s[n-1] == '\r') {
 		n--
 	}
 	return s[i:n]
+}
+
+func btoa(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
 }

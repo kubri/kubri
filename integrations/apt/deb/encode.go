@@ -101,16 +101,20 @@ func newStringerEncoder(typ reflect.Type) (encoder, error) {
 }
 
 func newMarshalerEncoder(typ reflect.Type) (encoder, error) {
+	ptr := typ.Kind() == reflect.Pointer
 	return func(w io.Writer, v reflect.Value) error {
+		if ptr && v.IsNil() {
+			return nil
+		}
 		b, err := v.Interface().(encoding.TextMarshaler).MarshalText()
 		if err != nil {
 			return err
 		}
-		if len(b) > 0 {
-			_, err := w.Write(b)
-			return err
+		if len(b) == 0 {
+			return nil
 		}
-		return nil
+		_, err = w.Write(b)
+		return err
 	}, nil
 }
 

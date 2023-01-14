@@ -112,12 +112,19 @@ func BenchmarkUnmarshal(b *testing.B) {
 		Int       int
 	}
 
-	in := []byte(`String: test1
+	in := []byte(`String: foo
+ bar
 Hex: 01020304
 Int: 1
+
+String: foo
+ bar
+Hex: 01020304
+Int: 1
+
 `)
 
-	var v record
+	var v []record
 
 	for i := 0; i < b.N; i++ {
 		deb.Unmarshal(in, &v)

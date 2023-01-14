@@ -16,16 +16,16 @@ import (
 
 var decoders sync.Map //nolint:gochecknoglobals
 
-type decoder func(io.Reader, reflect.Value) error
+type decoder func(*bufio.Reader, reflect.Value) error
 
 func Unmarshal(b []byte, v any) error {
 	return NewDecoder(bytes.NewReader(b)).Decode(v)
 }
 
-type Decoder struct{ r io.Reader }
+type Decoder struct{ r *bufio.Reader }
 
 func NewDecoder(r io.Reader) *Decoder {
-	return &Decoder{r}
+	return &Decoder{bufio.NewReader(r)}
 }
 
 func (d *Decoder) Decode(v any) error {
@@ -48,10 +48,7 @@ func (d *Decoder) Decode(v any) error {
 		return err
 	}
 	decoders.Store(typ, dec)
-	if err = dec(d.r, val); err != nil && err != io.EOF {
-		return err
-	}
-	return nil
+	return dec(d.r, val)
 }
 
 //nolint:gochecknoglobals
@@ -92,8 +89,8 @@ func newDecoder(typ reflect.Type) (decoder, error) {
 func newUnmarshalerDecoder(typ reflect.Type) (decoder, error) {
 	isPtr := typ.Kind() == reflect.Pointer
 
-	return func(r io.Reader, v reflect.Value) error {
-		b, err := io.ReadAll(r)
+	return func(r *bufio.Reader, v reflect.Value) error {
+		b, err := readline(r)
 		if err != nil {
 			return err
 		}
@@ -116,7 +113,7 @@ func newPtrDecoder(typ reflect.Type) (decoder, error) {
 	if err != nil {
 		return nil, err
 	}
-	return func(r io.Reader, v reflect.Value) error {
+	return func(r *bufio.Reader, v reflect.Value) error {
 		if v.IsNil() {
 			v.Set(reflect.New(typ))
 		}
@@ -124,7 +121,6 @@ func newPtrDecoder(typ reflect.Type) (decoder, error) {
 	}, nil
 }
 
-//nolint:gocognit,funlen
 func newSliceDecoder(typ reflect.Type) (decoder, error) {
 	typ = typ.Elem()
 	dec, err := newDecoder(typ)
@@ -132,69 +128,28 @@ func newSliceDecoder(typ reflect.Type) (decoder, error) {
 		return nil, err
 	}
 
-	return func(r io.Reader, v reflect.Value) error {
+	return func(r *bufio.Reader, v reflect.Value) error {
 		v.SetLen(0)
 
-		buf := bufPool.Get().(*bytes.Buffer) //nolint:forcetypeassert
-		buf.Reset()
-		defer bufPool.Put(buf)
-
-		next := make([]byte, 1)
-		br := false
-
-		parse := func() error {
+		for {
+			for {
+				b, err := r.ReadByte()
+				if err == io.EOF {
+					return nil
+				}
+				if err != nil {
+					return err
+				}
+				if b != '\n' && b != '\r' {
+					_ = r.UnreadByte()
+					break
+				}
+			}
 			elem := reflect.New(typ).Elem()
-			if err = dec(buf, elem); err != nil && err != io.EOF {
+			if err := dec(r, elem); err != nil {
 				return err
 			}
 			v.Set(reflect.Append(v, elem))
-			buf.Reset()
-			return nil
-		}
-
-		for {
-			_, err := r.Read(next)
-			if err == io.EOF && buf.Len() > 0 {
-				if err = parse(); err != nil {
-					return err
-				}
-				return io.EOF
-			}
-			if err != nil {
-				return err
-			}
-
-		SWITCH:
-			switch next[0] {
-			case '\r':
-				continue
-			case '\n':
-				if br { //nolint:nestif
-					if err = parse(); err != nil {
-						return err
-					}
-					// Keep reading until we get the next item.
-					for {
-						_, err := r.Read(next)
-						if err != nil {
-							return err
-						}
-						if c := next[0]; c != '\n' && c != '\r' {
-							goto SWITCH
-						}
-					}
-				} else {
-					br = true
-					if _, err := buf.Write(next); err != nil {
-						return err
-					}
-				}
-			default:
-				br = false
-				if _, err := buf.Write(next); err != nil {
-					return err
-				}
-			}
 		}
 	}, nil
 }
@@ -216,51 +171,39 @@ func newStructDecoder(typ reflect.Type) (decoder, error) {
 			return nil, err
 		}
 
-		decoders[name] = func(r io.Reader, v reflect.Value) error {
+		decoders[name] = func(r *bufio.Reader, v reflect.Value) error {
 			return dec(r, v.Field(i))
 		}
 	}
 
-	return func(r io.Reader, v reflect.Value) error {
-		rl := unmarshaler{bufio.NewReader(r)}
-
-		buf := bufPool.Get().(*bytes.Buffer) //nolint:forcetypeassert
-		buf.Reset()
-		defer bufPool.Put(buf)
-
+	return func(r *bufio.Reader, v reflect.Value) error {
 		for {
-			line, err := rl.ReadLine()
+			if c, err := r.Peek(1); err == io.EOF || c[0] == '\n' || c[0] == '\r' {
+				return nil
+			}
+			b, err := r.ReadSlice(':')
 			if err != nil {
 				return err
 			}
-			if len(line) == 0 || bytes.Equal(line, nl) {
-				return io.EOF
+			if i := bytes.IndexByte(b, '\n'); i != -1 {
+				return fmt.Errorf("invalid line: %q", b[:i])
 			}
-			key, val, ok := bytes.Cut(line, colon)
-			if !ok {
-				return errors.New("invalid line: " + string(line))
-			}
-
-			if dec := decoders[string(trim(key))]; dec != nil {
-				if _, err = buf.Write(trim(val)); err != nil {
+			if dec := decoders[btoa(trim(b)[:len(b)-1])]; dec != nil {
+				if err := dec(r, v); err != nil {
 					return err
 				}
-				if err = dec(buf, v); err != nil {
-					return err
-				}
-				buf.Reset()
 			}
 		}
 	}, nil
 }
 
 func newDateDecoder(typ reflect.Type) (decoder, error) {
-	return func(r io.Reader, v reflect.Value) error {
-		b, err := io.ReadAll(r)
+	return func(r *bufio.Reader, v reflect.Value) error {
+		b, err := r.ReadSlice('\n')
 		if err != nil {
 			return err
 		}
-		t, err := time.Parse(time.RFC1123, string(b))
+		t, err := time.Parse(time.RFC1123, btoa(trim(b)))
 		if err != nil {
 			return err
 		}
@@ -273,12 +216,12 @@ func newDateDecoder(typ reflect.Type) (decoder, error) {
 
 func newIntDecoder(typ reflect.Type) (decoder, error) {
 	bits := typ.Bits()
-	return func(r io.Reader, v reflect.Value) error {
-		b, err := io.ReadAll(r)
+	return func(r *bufio.Reader, v reflect.Value) error {
+		b, err := r.ReadSlice('\n')
 		if err != nil {
 			return err
 		}
-		i, err := strconv.ParseInt(string(b), 10, bits)
+		i, err := strconv.ParseInt(btoa(trim(b)), 10, bits)
 		if err != nil {
 			return err
 		}
@@ -289,12 +232,12 @@ func newIntDecoder(typ reflect.Type) (decoder, error) {
 
 func newUintDecoder(typ reflect.Type) (decoder, error) {
 	bits := typ.Bits()
-	return func(r io.Reader, v reflect.Value) error {
-		b, err := io.ReadAll(r)
+	return func(r *bufio.Reader, v reflect.Value) error {
+		b, err := r.ReadSlice('\n')
 		if err != nil {
 			return err
 		}
-		i, err := strconv.ParseUint(string(b), 10, bits)
+		i, err := strconv.ParseUint(btoa(trim(b)), 10, bits)
 		if err != nil {
 			return err
 		}
@@ -305,12 +248,12 @@ func newUintDecoder(typ reflect.Type) (decoder, error) {
 
 func newFloatDecoder(typ reflect.Type) (decoder, error) {
 	bits := typ.Bits()
-	return func(r io.Reader, v reflect.Value) error {
-		b, err := io.ReadAll(r)
+	return func(r *bufio.Reader, v reflect.Value) error {
+		b, err := r.ReadSlice('\n')
 		if err != nil {
 			return err
 		}
-		i, err := strconv.ParseFloat(string(b), bits)
+		i, err := strconv.ParseFloat(btoa(trim(b)), bits)
 		if err != nil {
 			return err
 		}
@@ -320,8 +263,8 @@ func newFloatDecoder(typ reflect.Type) (decoder, error) {
 }
 
 func newStringDecoder(typ reflect.Type) (decoder, error) {
-	return func(r io.Reader, v reflect.Value) error {
-		b, err := io.ReadAll(r)
+	return func(r *bufio.Reader, v reflect.Value) error {
+		b, err := readline(r)
 		if err != nil {
 			return err
 		}
@@ -332,13 +275,12 @@ func newStringDecoder(typ reflect.Type) (decoder, error) {
 
 func newByteArrayDecoder(typ reflect.Type) (decoder, error) {
 	size := typ.Len()
-	return func(r io.Reader, v reflect.Value) error {
-		b, err := io.ReadAll(r)
+	return func(r *bufio.Reader, v reflect.Value) error {
+		b, err := r.ReadSlice('\n')
 		if err != nil {
 			return err
 		}
-
-		if _, err = hex.Decode(b, b); err != nil {
+		if _, err = hex.Decode(b, trim(b)); err != nil {
 			return err
 		}
 		for i := 0; i < size; i++ {
@@ -348,36 +290,32 @@ func newByteArrayDecoder(typ reflect.Type) (decoder, error) {
 	}, nil
 }
 
-type unmarshaler struct{ r *bufio.Reader }
+func readline(r *bufio.Reader) ([]byte, error) {
+	buf := bufPool.Get().(*bytes.Buffer) //nolint:forcetypeassert
+	buf.Reset()
+	defer bufPool.Put(buf)
 
-func (u *unmarshaler) ReadLine() ([]byte, error) {
-	b, err := u.r.ReadBytes('\n')
+	l, err := r.ReadSlice('\n')
 	if err != nil {
 		return nil, err
 	}
 
+	buf.Write(trim(l))
+
 	for {
-		p, err := u.r.Peek(1)
-		if err != nil || p[0] != ' ' && p[0] != '\t' {
+		p, err := r.Peek(1)
+		if err == io.EOF || p[0] != ' ' && p[0] != '\t' {
 			break
 		}
-
-		l, err := u.r.ReadBytes('\n')
+		l, err = r.ReadSlice('\n')
 		if err != nil {
 			return nil, err
 		}
-
-		if l = trim(l); len(l) == 0 {
-			break
-		}
-
-		if bytes.Equal(dot, l) {
-			b = append(b, '\n')
-		} else {
-			b = append(b, l...)
-			b = append(b, '\n')
+		_ = buf.WriteByte('\n')
+		if l = trim(l); len(l) != 1 || l[0] != '.' {
+			buf.Write(l)
 		}
 	}
 
-	return b, nil //nolint:nilerr
+	return buf.Bytes(), nil
 }
