@@ -17,12 +17,12 @@ import (
 
 type githubSource struct {
 	client *github.Client
-	org    string
+	owner  string
 	repo   string
 }
 
 func New(c source.Config) (*source.Source, error) {
-	org, repo, ok := strings.Cut(c.Repo, "/")
+	owner, repo, ok := strings.Cut(c.Repo, "/")
 	if !ok {
 		return nil, fmt.Errorf("invalid repo: %s", c.Repo)
 	}
@@ -35,7 +35,7 @@ func New(c source.Config) (*source.Source, error) {
 
 	s := &githubSource{
 		client: github.NewClient(client),
-		org:    org,
+		owner:  owner,
 		repo:   repo,
 	}
 
@@ -43,7 +43,7 @@ func New(c source.Config) (*source.Source, error) {
 }
 
 func (s *githubSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
-	releases, _, err := s.client.Repositories.ListReleases(ctx, s.org, s.repo, nil)
+	releases, _, err := s.client.Repositories.ListReleases(ctx, s.owner, s.repo, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (s *githubSource) ListReleases(ctx context.Context) ([]*source.Release, err
 }
 
 func (s *githubSource) GetRelease(ctx context.Context, version string) (*source.Release, error) {
-	r, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.org, s.repo, version)
+	r, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.owner, s.repo, version)
 	if err != nil {
 		return nil, err
 	}
@@ -87,12 +87,12 @@ func parseRelease(release *github.RepositoryRelease) *source.Release {
 }
 
 func (s *githubSource) UploadAsset(ctx context.Context, version, name string, data []byte) error {
-	release, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.org, s.repo, version)
+	release, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.owner, s.repo, version)
 	if err != nil {
 		return err
 	}
 
-	u := fmt.Sprintf("repos/%s/%s/releases/%d/assets?name=%s", s.org, s.repo, release.GetID(), name)
+	u := fmt.Sprintf("repos/%s/%s/releases/%d/assets?name=%s", s.owner, s.repo, release.GetID(), name)
 	mediaType := mime.TypeByExtension(path.Ext(name))
 	req, err := s.client.NewUploadRequest(u, bytes.NewReader(data), int64(len(data)), mediaType)
 	if err != nil {
@@ -104,14 +104,14 @@ func (s *githubSource) UploadAsset(ctx context.Context, version, name string, da
 }
 
 func (s *githubSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
-	release, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.org, s.repo, version)
+	release, _, err := s.client.Repositories.GetReleaseByTag(ctx, s.owner, s.repo, version)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, asset := range release.Assets {
 		if asset.GetName() == name {
-			r, u, err := s.client.Repositories.DownloadReleaseAsset(ctx, s.org, s.repo, asset.GetID())
+			r, u, err := s.client.Repositories.DownloadReleaseAsset(ctx, s.owner, s.repo, asset.GetID())
 			if err != nil {
 				return nil, err
 			}
