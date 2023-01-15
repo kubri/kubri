@@ -9,6 +9,7 @@ import (
 	"github.com/abemedia/appcast/target"
 )
 
+//nolint:funlen
 func Run(t *testing.T, url string) {
 	t.Helper()
 
@@ -20,7 +21,24 @@ func Run(t *testing.T, url string) {
 	ctx := context.Background()
 	data := []byte("test")
 
-	t.Run("NewWriter", func(t *testing.T) {
+	t.Run("NewWriter_Create", func(t *testing.T) {
+		t.Helper()
+
+		w, err := s.NewWriter(ctx, "folder/file")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if _, err = w.Write([]byte("foo")); err != nil {
+			t.Fatal(err)
+		}
+
+		if err = w.Close(); err != nil {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("NewWriter_Update", func(t *testing.T) {
 		t.Helper()
 
 		w, err := s.NewWriter(ctx, "folder/file")

@@ -11,6 +11,7 @@ import (
 	_ "github.com/abemedia/appcast/source/local"
 	_ "github.com/abemedia/appcast/target/blob"
 	_ "github.com/abemedia/appcast/target/file"
+	_ "github.com/abemedia/appcast/target/github"
 )
 
 func buildCmd() *cobra.Command {
