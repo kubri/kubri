@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/source"
-	_ "github.com/abemedia/appcast/source/local"
+	"github.com/abemedia/appcast/source/local"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -28,8 +28,8 @@ func TestLocal(t *testing.T) {
 			path: filepath.Join(dir, "dir"),
 			want: []*source.Release{
 				{
-					Name:    "v0.0.0",
-					Version: "v0.0.0",
+					Name:    "v1.0.0",
+					Version: "v1.0.0",
 					Date:    time.Now(),
 					Assets: []*source.Asset{
 						{
@@ -56,8 +56,8 @@ func TestLocal(t *testing.T) {
 			path: filepath.Join(dir, "glob", "*", "*"),
 			want: []*source.Release{
 				{
-					Name:    "v0.0.0",
-					Version: "v0.0.0",
+					Name:    "v1.0.0",
+					Version: "v1.0.0",
 					Date:    time.Now(),
 					Assets: []*source.Asset{
 						{
@@ -84,8 +84,8 @@ func TestLocal(t *testing.T) {
 			path: filepath.Join(dir, "file", "test.dmg"),
 			want: []*source.Release{
 				{
-					Name:    "v0.0.0",
-					Version: "v0.0.0",
+					Name:    "v1.0.0",
+					Version: "v1.0.0",
 					Date:    time.Now(),
 					Assets: []*source.Asset{
 						{
@@ -112,7 +112,7 @@ func TestLocal(t *testing.T) {
 				}
 			}
 
-			s, err := source.Open("local://" + test.path)
+			s, err := local.New(local.Config{Path: test.path, Version: "v1.0.0"})
 			if err != nil {
 				t.Fatal(err)
 			}

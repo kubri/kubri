@@ -7,9 +7,8 @@ import (
 	_ "gocloud.dev/blob/memblob" // blob driver
 )
 
-func New(c source.Config) (*source.Source, error) {
+type Config struct{}
+
+func New(c Config) (*source.Source, error) {
 	return blob.New("mem://", "", "mem:/")
 }
-
-//nolint:gochecknoinits
-func init() { source.Register("mem", New) }

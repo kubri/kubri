@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/source"
-	_ "github.com/abemedia/appcast/source/github"
+	"github.com/abemedia/appcast/source/github"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-github/github"
+	gh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
@@ -65,7 +65,7 @@ func TestGithub(t *testing.T) {
 		},
 	}
 
-	s, err := source.Open("github://abemedia/appcast-test")
+	s, err := github.New(github.Config{Owner: "abemedia", Repo: "appcast-test"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +126,7 @@ func TestGithub(t *testing.T) {
 		}
 
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")})
-		client := github.NewClient(oauth2.NewClient(ctx, ts))
+		client := gh.NewClient(oauth2.NewClient(ctx, ts))
 		release, _, _ := client.Repositories.GetReleaseByTag(ctx, "abemedia", "appcast-test", want[0].Version)
 
 		for _, asset := range release.Assets {

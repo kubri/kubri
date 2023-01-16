@@ -5,13 +5,16 @@ import (
 	"os"
 	"testing"
 
-	_ "github.com/abemedia/appcast/target/github"
+	"github.com/abemedia/appcast/target/github"
 	"github.com/abemedia/appcast/target/internal/test"
-	"github.com/google/go-github/github"
+	gh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
 func TestGithub(t *testing.T) {
+	owner := "abemedia"
+	repo := "appcast-test"
+
 	token, ok := os.LookupEnv("GITHUB_TOKEN")
 	if !ok {
 		t.Skip("Missing environment variable: GITHUB_TOKEN")
@@ -20,21 +23,34 @@ func TestGithub(t *testing.T) {
 	t.Cleanup(func() {
 		ctx := context.Background()
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-		client := github.NewClient(oauth2.NewClient(ctx, ts))
+		client := gh.NewClient(oauth2.NewClient(ctx, ts))
 
-		file, _, _, err := client.Repositories.GetContents(ctx, "abemedia", "appcast-test", "folder/file", nil)
+		file, _, _, err := client.Repositories.GetContents(ctx, owner, repo, "folder/file", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		_, _, err = client.Repositories.DeleteFile(ctx, "abemedia", "appcast-test", "folder/file", &github.RepositoryContentFileOptions{
-			Message: github.String("Delete folder/file"),
-			SHA:     file.SHA,
-		})
+		opt := &gh.RepositoryContentFileOptions{Message: gh.String("Delete folder/file"), SHA: file.SHA}
+		_, _, err = client.Repositories.DeleteFile(ctx, owner, repo, "folder/file", opt)
 		if err != nil {
 			t.Fatal(err)
 		}
 	})
 
-	test.Run(t, "github://abemedia/appcast-test")
+	tgt, err := github.New(github.Config{Owner: owner, Repo: repo})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Run(t, tgt)
+
+	_, err = github.New(github.Config{Owner: owner, Repo: repo, Branch: "foo"})
+	if err == nil {
+		t.Fatal("should fail for invalid branch")
+	}
+
+	_, err = github.New(github.Config{Owner: owner, Repo: "foo"})
+	if err == nil {
+		t.Fatal("should fail for invalid repo")
+	}
 }

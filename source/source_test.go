@@ -8,9 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-type fakeSource struct {
-	source.Config
-}
+type fakeSource struct{}
 
 func (*fakeSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
 	return []*source.Release{
@@ -31,23 +29,6 @@ func (*fakeSource) UploadAsset(ctx context.Context, version, name string, data [
 
 func (*fakeSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
 	return nil, nil
-}
-
-func TestOpen(t *testing.T) {
-	source.Register("fake", func(c source.Config) (*source.Source, error) {
-		return source.New(&fakeSource{c}), nil
-	})
-
-	t.Setenv("FAKE_TOKEN", "fake")
-	s, err := source.Open("fake://user/repo")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	want := source.New(&fakeSource{source.Config{Repo: "user/repo", Token: "fake"}})
-	if diff := cmp.Diff(want, s, cmp.AllowUnexported(source.Source{})); diff != "" {
-		t.Error(diff)
-	}
 }
 
 func TestSource(t *testing.T) {

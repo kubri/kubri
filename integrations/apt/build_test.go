@@ -8,10 +8,8 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/source"
-	_ "github.com/abemedia/appcast/source/blob/file"
-	"github.com/abemedia/appcast/target"
-	_ "github.com/abemedia/appcast/target/blob/memory"
+	"github.com/abemedia/appcast/source/blob/file"
+	"github.com/abemedia/appcast/target/blob/memory"
 	"github.com/google/go-cmp/cmp"
 	"github.com/klauspost/compress/gzip"
 )
@@ -85,12 +83,12 @@ Description: This is a test.
 		"dists/stable/main/binary-i386/Release":     "Archive: stable\nSuite: stable\nArchitecture: i386\nComponent: main\n",
 	}
 
-	src, err := source.Open("file://../../testdata")
+	src, err := file.New(file.Config{Path: "../../testdata"})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	tgt, err := target.Open("mem://")
+	tgt, err := memory.New(memory.Config{})
 	if err != nil {
 		t.Fatal(err)
 	}

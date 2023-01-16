@@ -5,6 +5,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"strconv"
 
@@ -13,21 +14,26 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+type Config struct {
+	Owner string
+	Repo  string
+}
+
 type gitlabSource struct {
 	client *gitlab.Client
 	repo   string
 }
 
-func New(c source.Config) (*source.Source, error) {
-	s := new(gitlabSource)
-
-	client, err := gitlab.NewClient(c.Token)
+func New(c Config) (*source.Source, error) {
+	client, err := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"))
 	if err != nil {
 		return nil, err
 	}
 
-	s.client = client
-	s.repo = c.Repo
+	s := &gitlabSource{
+		client: client,
+		repo:   c.Owner + "/" + c.Repo,
+	}
 
 	return source.New(s), nil
 }
@@ -135,6 +141,3 @@ func (s *gitlabSource) getSize(ctx context.Context, url string) (int, error) {
 
 	return strconv.Atoi(r.Header.Get("Content-Length"))
 }
-
-//nolint:gochecknoinits
-func init() { source.Register("gitlab", New) }

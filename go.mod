@@ -18,6 +18,7 @@ require (
 	github.com/imdario/mergo v0.3.13
 	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/compress v1.15.14
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/testcontainers/testcontainers-go v0.17.0

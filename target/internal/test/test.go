@@ -10,13 +10,8 @@ import (
 )
 
 //nolint:funlen
-func Run(t *testing.T, url string) {
+func Run(t *testing.T, tgt target.Target) {
 	t.Helper()
-
-	s, err := target.Open(url)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	ctx := context.Background()
 	data := []byte("test")
@@ -24,7 +19,7 @@ func Run(t *testing.T, url string) {
 	t.Run("NewWriter_Create", func(t *testing.T) {
 		t.Helper()
 
-		w, err := s.NewWriter(ctx, "folder/file")
+		w, err := tgt.NewWriter(ctx, "folder/file")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -41,7 +36,7 @@ func Run(t *testing.T, url string) {
 	t.Run("NewWriter_Update", func(t *testing.T) {
 		t.Helper()
 
-		w, err := s.NewWriter(ctx, "folder/file")
+		w, err := tgt.NewWriter(ctx, "folder/file")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -58,7 +53,7 @@ func Run(t *testing.T, url string) {
 	t.Run("NewReader", func(t *testing.T) {
 		t.Helper()
 
-		r, err := s.NewReader(ctx, "folder/file")
+		r, err := tgt.NewReader(ctx, "folder/file")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -80,7 +75,7 @@ func Run(t *testing.T, url string) {
 	t.Run("Sub", func(t *testing.T) {
 		t.Helper()
 
-		sub := s.Sub("folder")
+		sub := tgt.Sub("folder")
 
 		if _, err := sub.NewReader(ctx, "file"); err != nil {
 			t.Fatal(err)
