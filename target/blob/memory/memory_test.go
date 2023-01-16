@@ -3,10 +3,15 @@ package memory_test
 import (
 	"testing"
 
-	_ "github.com/abemedia/appcast/target/blob/memory"
+	"github.com/abemedia/appcast/target/blob/memory"
 	"github.com/abemedia/appcast/target/internal/test"
 )
 
 func TestMemory(t *testing.T) {
-	test.Run(t, "mem://")
+	tgt, err := memory.New(memory.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Run(t, tgt)
 }

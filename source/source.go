@@ -2,30 +2,14 @@ package source
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"os"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/abemedia/appcast/pkg/slices"
 	"github.com/hashicorp/go-version"
 	"golang.org/x/mod/semver"
 )
-
-type Config struct {
-	Token string
-	Repo  string
-}
-
-type Factory = func(Config) (*Source, error)
-
-var providers = map[string]Factory{} //nolint:gochecknoglobals
-
-func Register(scheme string, factory Factory) {
-	providers[scheme] = factory
-}
 
 type Release struct {
 	Name        string
@@ -55,23 +39,6 @@ type Source struct {
 
 func New(driver Driver) *Source {
 	return &Source{s: driver}
-}
-
-func Open(url string) (*Source, error) {
-	provider, repo, ok := strings.Cut(url, "://")
-	if !ok {
-		return nil, fmt.Errorf("invalid source URL: %s", url)
-	}
-
-	factory, ok := providers[provider]
-	if !ok {
-		return nil, fmt.Errorf("unsupported source: %s", provider)
-	}
-
-	return factory(Config{
-		Repo:  repo,
-		Token: os.Getenv(strings.ToUpper(provider) + "_TOKEN"),
-	})
 }
 
 type ListOptions struct {

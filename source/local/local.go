@@ -11,21 +11,27 @@ import (
 	"github.com/abemedia/appcast/source"
 )
 
-type localSource struct {
-	path string
-	root string
+type Config struct {
+	Path    string
+	Version string
 }
 
-func New(c source.Config) (*source.Source, error) {
-	root, err := getRoot(c.Repo)
+type localSource struct {
+	path    string
+	root    string
+	version string
+}
+
+func New(c Config) (*source.Source, error) {
+	root, err := getRoot(c.Path)
 	if err != nil {
 		return nil, err
 	}
-	return source.New(&localSource{path: c.Repo, root: root}), nil
+	return source.New(&localSource{path: c.Path, root: root, version: c.Version}), nil
 }
 
 func (s *localSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
-	r, err := s.GetRelease(ctx, "v0.0.0")
+	r, err := s.GetRelease(ctx, s.version)
 	if err != nil {
 		return nil, err
 	}
@@ -139,6 +145,3 @@ func getRoot(path string) (string, error) {
 
 	return path, nil
 }
-
-//nolint:gochecknoinits
-func init() { source.Register("local", New) }

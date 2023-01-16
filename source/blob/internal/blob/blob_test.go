@@ -5,11 +5,16 @@ import (
 	"testing"
 
 	"github.com/abemedia/appcast/source/blob/internal/test"
-	_ "github.com/abemedia/appcast/source/blob/memory"
+	"github.com/abemedia/appcast/source/blob/memory"
 )
 
 func TestBlob(t *testing.T) {
-	test.Run(t, "mem://", func(version, asset string) string {
+	s, err := memory.New(memory.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Run(t, s, func(version, asset string) string {
 		return "mem://" + path.Join(version, asset)
 	})
 }

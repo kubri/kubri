@@ -7,13 +7,18 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"os"
 	"path"
-	"strings"
 
 	"github.com/abemedia/appcast/source"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
+
+type Config struct {
+	Owner string
+	Repo  string
+}
 
 type githubSource struct {
 	client *github.Client
@@ -21,22 +26,17 @@ type githubSource struct {
 	repo   string
 }
 
-func New(c source.Config) (*source.Source, error) {
-	owner, repo, ok := strings.Cut(c.Repo, "/")
-	if !ok {
-		return nil, fmt.Errorf("invalid repo: %s", c.Repo)
-	}
-
+func New(c Config) (*source.Source, error) {
 	var client *http.Client
-	if c.Token != "" {
-		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: c.Token})
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 		client = oauth2.NewClient(context.Background(), ts)
 	}
 
 	s := &githubSource{
 		client: github.NewClient(client),
-		owner:  owner,
-		repo:   repo,
+		owner:  c.Owner,
+		repo:   c.Repo,
 	}
 
 	return source.New(s), nil
@@ -135,6 +135,3 @@ func (s *githubSource) DownloadAsset(ctx context.Context, version, name string) 
 
 	return nil, source.ErrAssetNotFound
 }
-
-//nolint:gochecknoinits
-func init() { source.Register("github", New) }

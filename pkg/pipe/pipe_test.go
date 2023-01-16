@@ -12,20 +12,20 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/pipe"
-	"github.com/abemedia/appcast/source"
-	_ "github.com/abemedia/appcast/source/blob/memory"
-	"github.com/abemedia/appcast/target"
-	_ "github.com/abemedia/appcast/target/blob/memory"
+	fileSource "github.com/abemedia/appcast/source/blob/file"
+	fileTarget "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestPipe(t *testing.T) {
-	src, err := source.Open("mem://")
+	dir := t.TempDir()
+
+	src, err := fileSource.New(fileSource.Config{Path: dir})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	tgt, err := target.Open("mem://")
+	tgt, err := fileTarget.New(fileTarget.Config{Path: dir})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,9 +42,11 @@ func TestPipe(t *testing.T) {
 title: test
 description: test
 source:
-  repo: mem://
+  type: file
+  path: ` + dir + `
 target:
-  repo: mem://
+  type: file
+  path: ` + dir + `
 apt:
   disabled: true
 sparkle:
@@ -57,9 +59,11 @@ sparkle:
 title: test
 description: test
 source:
-  repo: mem://
+  type: file
+  path: ` + dir + `
 target:
-  repo: mem://
+  type: file
+  path: ` + dir + `
 `,
 			want: &pipe.Pipe{
 				Apt: &apt.Config{
@@ -80,13 +84,17 @@ target:
 			in: `
 title: test
 description: test
+version: latest
 source:
-  repo: mem://
-  version: latest
+  type: file
+  path: ` + dir + `
 target:
-  repo: mem://
-  flat: true
+  type: file
+  path: ` + dir + `
+apt:
+  folder: .
 sparkle:
+  folder: .
   filename: updates.xml
   title: foo
   description: bar

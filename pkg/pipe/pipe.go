@@ -14,19 +14,14 @@ import (
 )
 
 type config struct {
-	Title       string `yaml:"title"`
-	Description string `yaml:"description"`
-	Source      struct {
-		Repo       string `yaml:"repo"`
-		Prerelease bool   `yaml:"prerelease"`
-		Version    string `yaml:"version"`
-	} `yaml:"source"`
-	Target struct {
-		Repo string `yaml:"repo"`
-		Flat bool   `yaml:"flat"`
-	} `yaml:"target"`
-	Apt     aptConfig     `yaml:"apt"`
-	Sparkle sparkleConfig `yaml:"sparkle"`
+	Title       string        `yaml:"title"`
+	Description string        `yaml:"description"`
+	Version     string        `yaml:"version"`
+	Prerelease  bool          `yaml:"prerelease"`
+	Source      sourceConfig  `yaml:"source"`
+	Target      targetConfig  `yaml:"target"`
+	Apt         aptConfig     `yaml:"apt"`
+	Sparkle     sparkleConfig `yaml:"sparkle"`
 
 	source *source.Source
 	target target.Target
@@ -62,10 +57,10 @@ func Load(path string) (*Pipe, error) {
 	if err = yaml.Unmarshal(b, c); err != nil {
 		return nil, err
 	}
-	if c.source, err = source.Open(c.Source.Repo); err != nil {
+	if c.source, err = getSource(c.Source); err != nil {
 		return nil, err
 	}
-	if c.target, err = target.Open(c.Target.Repo); err != nil {
+	if c.target, err = getTarget(c.Target); err != nil {
 		return nil, err
 	}
 

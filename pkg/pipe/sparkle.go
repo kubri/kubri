@@ -12,6 +12,7 @@ import (
 
 type sparkleConfig struct {
 	Disabled    bool                  `yaml:"disabled"`
+	Folder      string                `yaml:"folder"`
 	Title       string                `yaml:"title"`
 	Description string                `yaml:"description"`
 	Filename    string                `yaml:"filename"`
@@ -31,9 +32,9 @@ type sparkleConfig struct {
 }
 
 func getSparkle(c *config) (*sparkle.Config, error) {
-	tgt := c.target
-	if !c.Target.Flat {
-		tgt = tgt.Sub("sparkle")
+	dir := c.Sparkle.Folder
+	if dir == "" {
+		dir = "sparkle"
 	}
 
 	var dsaKey *dsa.PrivateKey
@@ -80,11 +81,11 @@ func getSparkle(c *config) (*sparkle.Config, error) {
 		Description: fallback(c.Sparkle.Description, c.Description),
 		FileName:    fallback(c.Sparkle.Filename, "sparkle.xml"),
 		Source:      c.source,
-		Target:      tgt,
+		Target:      c.target.Sub(dir),
 		DSAKey:      dsaKey,
 		Ed25519Key:  edKey,
-		Version:     c.Source.Version,
-		Prerelease:  c.Source.Prerelease,
+		Version:     c.Version,
+		Prerelease:  c.Prerelease,
 		Settings:    params,
 		DetectOS:    detectOS,
 	}, nil

@@ -12,13 +12,8 @@ import (
 )
 
 //nolint:funlen
-func Run(t *testing.T, url string, makeURL func(version, asset string) string) {
+func Run(t *testing.T, s *source.Source, makeURL func(version, asset string) string) {
 	t.Helper()
-
-	s, err := source.Open(url)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	data := []byte("test\n")
 	ctx := context.Background()

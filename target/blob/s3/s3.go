@@ -3,21 +3,30 @@ package s3
 import (
 	"net/url"
 
-	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
 	"github.com/abemedia/appcast/target/blob/internal/blob"
 	_ "gocloud.dev/blob/s3blob" // blob driver
 )
 
-func New(c source.Config) (target.Target, error) {
-	u, err := url.Parse("s3://" + c.Repo)
-	if err != nil {
-		return nil, err
-	}
-	prefix := u.Path
-	u.Path = ""
-	return blob.New(u.String(), prefix)
+type Config struct {
+	Bucket     string
+	Folder     string
+	Endpoint   string
+	Region     string
+	DisableSSL bool
 }
 
-//nolint:gochecknoinits
-func init() { target.Register("s3", New) }
+func New(c Config) (target.Target, error) {
+	q := url.Values{}
+	if c.Region != "" {
+		q.Add("region", c.Region)
+	}
+	if c.DisableSSL {
+		q.Add("disableSSL", "true")
+	}
+	if c.Endpoint != "" {
+		q.Add("endpoint", c.Endpoint)
+		q.Add("s3ForcePathStyle", "true")
+	}
+	return blob.New("s3://"+c.Bucket+"?"+q.Encode(), c.Folder)
+}

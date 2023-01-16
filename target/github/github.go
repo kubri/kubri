@@ -3,52 +3,74 @@ package github
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
-	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
+type Config struct {
+	Owner  string
+	Repo   string
+	Branch string
+	Folder string
+}
+
 type githubTarget struct {
-	client *github.Client
+	client *github.RepositoriesService
 	owner  string
 	repo   string
+	branch string
 	path   string
 }
 
-func New(c source.Config) (target.Target, error) {
-	owner, repo, ok := strings.Cut(c.Repo, "/")
-	if !ok {
-		return nil, fmt.Errorf("invalid repo: %s", c.Repo)
+func New(c Config) (target.Target, error) {
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")})
+	client := github.NewClient(oauth2.NewClient(ctx, ts)).Repositories
+
+	// Ensure config is valid.
+	if c.Branch == "" {
+		_, _, err := client.Get(ctx, c.Owner, c.Repo)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		_, _, err := client.GetBranch(ctx, c.Owner, c.Repo, c.Branch)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	var client *http.Client
-	if c.Token != "" {
-		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: c.Token})
-		client = oauth2.NewClient(context.Background(), ts)
+	t := &githubTarget{
+		client: client,
+		owner:  c.Owner,
+		repo:   c.Repo,
+		branch: c.Branch,
+		path:   c.Folder,
 	}
 
-	s := &githubTarget{
-		client: github.NewClient(client),
-		owner:  owner,
-		repo:   repo,
-	}
-	return s, nil
+	return t, nil
 }
 
 func (t *githubTarget) NewWriter(ctx context.Context, filename string) (io.WriteCloser, error) {
-	return &fileWriter{t: t, ctx: ctx, path: path.Join(t.path, filename)}, nil
+	w := &fileWriter{
+		t:    t,
+		ctx:  ctx,
+		path: path.Join(t.path, filename),
+	}
+	return w, nil
 }
 
 func (t *githubTarget) NewReader(ctx context.Context, filename string) (io.ReadCloser, error) {
-	file, _, _, err := t.client.Repositories.GetContents(ctx, t.owner, t.repo, path.Join(t.path, filename), nil)
+	opt := &github.RepositoryContentGetOptions{Ref: t.branch}
+	file, _, _, err := t.client.GetContents(ctx, t.owner, t.repo, path.Join(t.path, filename), opt)
 	if err != nil {
 		return nil, err
 	}
@@ -76,24 +98,25 @@ type fileWriter struct {
 }
 
 func (w *fileWriter) Close() error {
-	file, _, res, err := w.t.client.Repositories.GetContents(w.ctx, w.t.owner, w.t.repo, w.path, nil)
+	getOpt := &github.RepositoryContentGetOptions{Ref: w.t.branch}
+	file, _, res, err := w.t.client.GetContents(w.ctx, w.t.owner, w.t.repo, w.path, getOpt)
 	if err != nil && (res == nil || res.StatusCode != 404) {
 		return err
 	}
 
 	opt := &github.RepositoryContentFileOptions{Content: w.Bytes()}
+	if w.t.branch != "" {
+		opt.Branch = &w.t.branch
+	}
 
 	if res.StatusCode == http.StatusNotFound {
 		opt.Message = github.String("Create " + w.path)
-		_, _, err = w.t.client.Repositories.CreateFile(w.ctx, w.t.owner, w.t.repo, w.path, opt)
+		_, _, err = w.t.client.CreateFile(w.ctx, w.t.owner, w.t.repo, w.path, opt)
 	} else {
 		opt.Message = github.String("Update " + w.path)
 		opt.SHA = file.SHA
-		_, _, err = w.t.client.Repositories.UpdateFile(w.ctx, w.t.owner, w.t.repo, w.path, opt)
+		_, _, err = w.t.client.UpdateFile(w.ctx, w.t.owner, w.t.repo, w.path, opt)
 	}
 
 	return err
 }
-
-//nolint:gochecknoinits
-func init() { target.Register("github", New) }

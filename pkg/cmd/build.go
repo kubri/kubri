@@ -3,15 +3,6 @@ package cmd
 import (
 	"github.com/abemedia/appcast/pkg/pipe"
 	"github.com/spf13/cobra"
-
-	// Import source & target providers.
-	_ "github.com/abemedia/appcast/source/blob"
-	_ "github.com/abemedia/appcast/source/github"
-	_ "github.com/abemedia/appcast/source/gitlab"
-	_ "github.com/abemedia/appcast/source/local"
-	_ "github.com/abemedia/appcast/target/blob"
-	_ "github.com/abemedia/appcast/target/file"
-	_ "github.com/abemedia/appcast/target/github"
 )
 
 func buildCmd() *cobra.Command {

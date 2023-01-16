@@ -8,14 +8,15 @@ import (
 	_ "gocloud.dev/blob/fileblob" // blob driver
 )
 
-func New(c source.Config) (*source.Source, error) {
-	path, err := filepath.Abs(c.Repo)
+type Config struct {
+	Path string
+}
+
+func New(c Config) (*source.Source, error) {
+	path, err := filepath.Abs(c.Path)
 	if err != nil {
 		return nil, err
 	}
 	url := "file://" + path
 	return blob.New(url, "", url)
 }
-
-//nolint:gochecknoinits
-func init() { source.Register("file", New) }

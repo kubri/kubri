@@ -7,9 +7,8 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/sparkle"
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/blob/memory"
-	target "github.com/abemedia/appcast/target/blob/memory"
+	memSource "github.com/abemedia/appcast/source/blob/memory"
+	memTarget "github.com/abemedia/appcast/target/blob/memory"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -17,7 +16,7 @@ func TestBuild(t *testing.T) {
 	data := []byte("test")
 	ctx := context.Background()
 
-	src, _ := memory.New(source.Config{})
+	src, _ := memSource.New(memSource.Config{})
 	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
 	src.UploadAsset(ctx, "v1.0.0", "test_64-bit.msi", data)
 	src.UploadAsset(ctx, "v1.0.0", "test_32-bit.exe", data)
@@ -25,10 +24,7 @@ func TestBuild(t *testing.T) {
 	src.UploadAsset(ctx, "v1.1.0", "test_64-bit.msi", data)
 	src.UploadAsset(ctx, "v1.1.0", "test_32-bit.exe", data)
 
-	tgt, err := target.New(source.Config{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	tgt, _ := memTarget.New(memTarget.Config{})
 
 	w, err := tgt.NewWriter(ctx, "sparkle.xml")
 	if err != nil {

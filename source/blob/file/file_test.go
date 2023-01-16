@@ -4,14 +4,19 @@ import (
 	"path/filepath"
 	"testing"
 
-	_ "github.com/abemedia/appcast/source/blob/file"
+	"github.com/abemedia/appcast/source/blob/file"
 	"github.com/abemedia/appcast/source/blob/internal/test"
 )
 
 func TestFile(t *testing.T) {
-	dir := t.TempDir()
+	path := t.TempDir()
 
-	test.Run(t, "file://"+dir, func(version, asset string) string {
-		return "file://" + filepath.Join(dir, version, asset)
+	s, err := file.New(file.Config{Path: path})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Run(t, s, func(version, asset string) string {
+		return "file://" + filepath.Join(path, version, asset)
 	})
 }
