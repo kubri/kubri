@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/pkg/slices"
-	"github.com/hashicorp/go-version"
+	"github.com/abemedia/appcast/pkg/version"
 	"golang.org/x/mod/semver"
 )
 
@@ -69,30 +69,28 @@ func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release
 	}
 
 	releases = slices.Filter(releases, func(r *Release) bool {
-		v, err := version.NewSemver(r.Version)
-		if err != nil {
+		if !semver.IsValid(r.Version) {
 			log.Println("Skipping invalid version:", r.Version)
 			return false
 		}
 
-		if !constraint.Check(v) {
-			log.Println("Skipping version:", r.Version)
+		if !constraint.Check(r.Version) {
+			log.Println("Skipping excluded version:", r.Version)
 			return false
 		}
 
-		if (opt == nil || !opt.Prerelease) && v.Prerelease() != "" {
+		if (opt == nil || !opt.Prerelease) && semver.Prerelease(r.Version) != "" {
 			log.Println("Skipping prerelease:", r.Version)
 			return false
 		}
 
 		processRelease(r)
-
 		return true
 	})
 
 	sort.Sort(ByVersion(releases))
 
-	if opt != nil && opt.Version == "latest" {
+	if opt != nil && opt.Version == "latest" && len(releases) != 0 {
 		return releases[:1], nil
 	}
 
