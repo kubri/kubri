@@ -54,7 +54,7 @@ func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release
 		return nil, ErrMissingSource
 	}
 
-	var constraint version.Constraints
+	var constraint version.Constraint
 	if opt != nil && opt.Version != "" && opt.Version != "latest" {
 		c, err := version.NewConstraint(opt.Version)
 		if err != nil {

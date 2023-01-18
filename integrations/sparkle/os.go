@@ -54,14 +54,12 @@ func (os *OS) UnmarshalText(text []byte) error {
 }
 
 func IsOS(os, target OS) bool {
-	if os == target {
+	switch target {
+	case os, Unknown:
 		return true
-	}
-
-	if target == Windows {
+	case Windows:
 		return os > Windows
 	}
-
 	return false
 }
 

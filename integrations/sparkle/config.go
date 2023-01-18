@@ -43,31 +43,12 @@ type Config struct {
 
 func getSettings(settings []Rule, v string, os OS) (*Settings, error) {
 	opt := &Settings{}
-
 	for _, s := range settings {
-		if s.OS != Unknown && !IsOS(os, s.OS) {
-			continue
-		}
-
-		if s.Version != "" && v == "" {
-			continue
-		}
-
-		if s.Version != "" {
-			constraints, err := version.NewConstraint(s.Version)
-			if err != nil {
+		if IsOS(os, s.OS) && version.Check(s.Version, v) {
+			if err := mergo.MergeWithOverwrite(opt, s.Settings); err != nil {
 				return nil, err
 			}
-
-			if !constraints.Check(v) {
-				continue
-			}
-		}
-
-		if err := mergo.MergeWithOverwrite(opt, s.Settings); err != nil {
-			return nil, err
 		}
 	}
-
 	return opt, nil
 }
