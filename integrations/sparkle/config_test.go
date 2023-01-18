@@ -35,7 +35,7 @@ func TestConfigGetOptions(t *testing.T) {
 				},
 			},
 			{
-				Version: "~> 1.2.0",
+				Version: "v1.2.1",
 				Settings: &sparkle.Settings{
 					CriticalUpdateBelowVersion: "1.1.0",
 					MinimumAutoupdateVersion:   "1.1.0",

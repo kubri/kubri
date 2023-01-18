@@ -3,9 +3,9 @@ package sparkle
 import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
+	"github.com/abemedia/appcast/pkg/version"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
-	"github.com/hashicorp/go-version"
 	"github.com/imdario/mergo"
 )
 
@@ -59,7 +59,7 @@ func getSettings(settings []Rule, v string, os OS) (*Settings, error) {
 				return nil, err
 			}
 
-			if !constraints.Check(version.Must(version.NewVersion(v))) {
+			if !constraints.Check(v) {
 				continue
 			}
 		}
