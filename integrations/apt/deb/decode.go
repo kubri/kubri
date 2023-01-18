@@ -88,6 +88,7 @@ func newDecoder(typ reflect.Type) (decoder, error) {
 
 func newUnmarshalerDecoder(typ reflect.Type) (decoder, error) {
 	isPtr := typ.Kind() == reflect.Pointer
+	typ = typ.Elem()
 
 	return func(r *bufio.Reader, v reflect.Value) error {
 		b, err := readline(r)
@@ -100,7 +101,7 @@ func newUnmarshalerDecoder(typ reflect.Type) (decoder, error) {
 		}
 
 		if isPtr && v.IsNil() {
-			v.Set(reflect.New(typ.Elem()))
+			v.Set(reflect.New(typ))
 		}
 
 		return v.Interface().(encoding.TextUnmarshaler).UnmarshalText(b) //nolint:forcetypeassert

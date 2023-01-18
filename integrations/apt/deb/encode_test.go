@@ -46,7 +46,7 @@ Date: Tue, 10 Jan 2023 19:04:25 UTC
 
 	tests := []struct {
 		msg  string
-		in   interface{}
+		in   any
 		want string
 	}{
 		{
