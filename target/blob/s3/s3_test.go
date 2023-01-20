@@ -21,5 +21,7 @@ func TestS3(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Run(t, tgt)
+	test.Run(t, tgt, func(asset string) string {
+		return "http://" + host + "/bucket/folder/" + asset
+	})
 }

@@ -3,6 +3,7 @@ package github_test
 import (
 	"context"
 	"os"
+	"path"
 	"testing"
 
 	"github.com/abemedia/appcast/target/github"
@@ -25,13 +26,13 @@ func TestGithub(t *testing.T) {
 		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 		client := gh.NewClient(oauth2.NewClient(ctx, ts))
 
-		file, _, _, err := client.Repositories.GetContents(ctx, owner, repo, "folder/file", nil)
+		file, _, _, err := client.Repositories.GetContents(ctx, owner, repo, "path/to/file", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		opt := &gh.RepositoryContentFileOptions{Message: gh.String("Delete folder/file"), SHA: file.SHA}
-		_, _, err = client.Repositories.DeleteFile(ctx, owner, repo, "folder/file", opt)
+		opt := &gh.RepositoryContentFileOptions{Message: gh.String("Delete path/to/file"), SHA: file.SHA}
+		_, _, err = client.Repositories.DeleteFile(ctx, owner, repo, "path/to/file", opt)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -42,7 +43,9 @@ func TestGithub(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Run(t, tgt)
+	test.Run(t, tgt, func(asset string) string {
+		return "https://raw.githubusercontent.com/" + path.Join(owner, repo, "master", asset)
+	})
 
 	_, err = github.New(github.Config{Owner: owner, Repo: repo, Branch: "foo"})
 	if err == nil {

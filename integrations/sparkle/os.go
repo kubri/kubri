@@ -75,7 +75,7 @@ func DetectOS(name string) OS {
 	case "":
 	case ".dmg", ".pkg", ".mpkg":
 		return MacOS
-	case ".exe", ".msi", ".msix", ".msixbundle", ".appx", ".appxbundle", ".appinstaller":
+	case ".exe", ".msi":
 		is64, _ := reWin64.MatchString(name)
 		is32, _ := reWin32.MatchString(name)
 		switch {

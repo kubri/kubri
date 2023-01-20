@@ -88,9 +88,13 @@ func (s *Source) ListReleases(ctx context.Context, opt *ListOptions) ([]*Release
 		return true
 	})
 
+	if len(releases) == 0 {
+		return nil, ErrNoReleaseFound
+	}
+
 	sort.Sort(ByVersion(releases))
 
-	if opt != nil && opt.Version == "latest" && len(releases) != 0 {
+	if opt != nil && opt.Version == "latest" {
 		return releases[:1], nil
 	}
 

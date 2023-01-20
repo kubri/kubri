@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/abemedia/appcast/integrations/appinstaller"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/sparkle"
 	"github.com/abemedia/appcast/source"
@@ -14,26 +15,33 @@ import (
 )
 
 type config struct {
-	Title       string        `yaml:"title"`
-	Description string        `yaml:"description"`
-	Version     string        `yaml:"version"`
-	Prerelease  bool          `yaml:"prerelease"`
-	Source      sourceConfig  `yaml:"source"`
-	Target      targetConfig  `yaml:"target"`
-	Apt         aptConfig     `yaml:"apt"`
-	Sparkle     sparkleConfig `yaml:"sparkle"`
+	Title        string             `yaml:"title"`
+	Description  string             `yaml:"description"`
+	Version      string             `yaml:"version"`
+	Prerelease   bool               `yaml:"prerelease"`
+	Source       sourceConfig       `yaml:"source"`
+	Target       targetConfig       `yaml:"target"`
+	Apt          aptConfig          `yaml:"apt"`
+	Sparkle      sparkleConfig      `yaml:"sparkle"`
+	Appinstaller appinstallerConfig `yaml:"appinstaller"`
 
 	source *source.Source
 	target target.Target
 }
 
 type Pipe struct {
-	Apt     *apt.Config
-	Sparkle *sparkle.Config
+	Appinstaller *appinstaller.Config
+	Apt          *apt.Config
+	Sparkle      *sparkle.Config
 }
 
 func (p *Pipe) Run(ctx context.Context) error {
 	var err error
+	if p.Appinstaller != nil {
+		if err = appinstaller.Build(ctx, p.Appinstaller); err != nil {
+			return err
+		}
+	}
 	if p.Apt != nil {
 		if err = apt.Build(ctx, p.Apt); err != nil {
 			return err
@@ -65,6 +73,9 @@ func Load(path string) (*Pipe, error) {
 	}
 
 	var p Pipe
+	if !c.Appinstaller.Disabled {
+		p.Appinstaller = getAppinstaller(c)
+	}
 	if !c.Apt.Disabled {
 		p.Apt = getApt(c)
 	}

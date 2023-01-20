@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/abemedia/appcast/integrations/appinstaller"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/sparkle"
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
@@ -47,6 +48,8 @@ source:
 target:
   type: file
   path: ` + dir + `
+appinstaller:
+  disabled: true
 apt:
   disabled: true
 sparkle:
@@ -66,6 +69,10 @@ target:
   path: ` + dir + `
 `,
 			want: &pipe.Pipe{
+				Appinstaller: &appinstaller.Config{
+					Source: src,
+					Target: tgt.Sub("appinstaller"),
+				},
 				Apt: &apt.Config{
 					Source: src,
 					Target: tgt.Sub("apt"),
@@ -91,6 +98,13 @@ source:
 target:
   type: file
   path: ` + dir + `
+appinstaller:
+  folder: .
+  hours-between-update-checks: 12
+  update-blocks-activation: true
+  show-prompt: true
+  automatic-background-task: true
+  force-update-from-any-version: true	
 apt:
   folder: .
 sparkle:
@@ -112,6 +126,16 @@ sparkle:
       ignore-skipped-upgrades-below-version: '1.1.0'
 `,
 			want: &pipe.Pipe{
+				Appinstaller: &appinstaller.Config{
+					Source:                    src,
+					Target:                    tgt,
+					Version:                   "latest",
+					HoursBetweenUpdateChecks:  12,
+					UpdateBlocksActivation:    true,
+					ShowPrompt:                true,
+					AutomaticBackgroundTask:   true,
+					ForceUpdateFromAnyVersion: true,
+				},
 				Apt: &apt.Config{
 					Source:  src,
 					Target:  tgt,

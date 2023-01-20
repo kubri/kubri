@@ -37,10 +37,11 @@ func New(c Config) (target.Target, error) {
 
 	// Ensure config is valid.
 	if c.Branch == "" {
-		_, _, err := client.Get(ctx, c.Owner, c.Repo)
+		repo, _, err := client.Get(ctx, c.Owner, c.Repo)
 		if err != nil {
 			return nil, err
 		}
+		c.Branch = *repo.DefaultBranch
 	} else {
 		_, _, err := client.GetBranch(ctx, c.Owner, c.Repo, c.Branch)
 		if err != nil {
@@ -87,6 +88,10 @@ func (t *githubTarget) Sub(dir string) target.Target {
 	sub := *t
 	sub.path = filepath.Join(t.path, dir)
 	return &sub
+}
+
+func (t *githubTarget) URL(ctx context.Context, filename string) (string, error) {
+	return "https://raw.githubusercontent.com/" + path.Join(t.owner, t.repo, t.branch, t.path, filename), nil
 }
 
 type fileWriter struct {

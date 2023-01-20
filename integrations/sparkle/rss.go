@@ -33,13 +33,14 @@ func (r *RSS) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 
-	r.Channels = r.Channels[:0]
+	r.Channels = make([]Channel, 0, len(data))
 	for _, item := range data {
 		channel := Channel{
 			Title:       item.Title,
 			Link:        item.Link,
 			Description: item.Description,
 			Language:    item.Language,
+			Items:       make([]Item, 0, len(item.Items)),
 		}
 
 		for _, item := range item.Items {
