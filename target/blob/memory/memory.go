@@ -10,5 +10,5 @@ import (
 type Config struct{}
 
 func New(c Config) (target.Target, error) {
-	return blob.New("mem://", "")
+	return blob.New("mem://", "", "mem:/")
 }

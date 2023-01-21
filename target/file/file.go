@@ -44,3 +44,7 @@ func (s *fileTarget) NewReader(ctx context.Context, filename string) (io.ReadClo
 func (s *fileTarget) Sub(dir string) target.Target {
 	return &fileTarget{path: filepath.Join(s.path, dir)}
 }
+
+func (s *fileTarget) URL(ctx context.Context, filename string) (string, error) {
+	return "file://" + filepath.Join(s.path, filename), nil
+}

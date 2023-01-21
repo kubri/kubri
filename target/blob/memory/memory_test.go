@@ -13,5 +13,7 @@ func TestMemory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Run(t, tgt)
+	test.Run(t, tgt, func(asset string) string {
+		return "mem://" + asset
+	})
 }

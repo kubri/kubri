@@ -12,5 +12,5 @@ type Config struct {
 }
 
 func New(c Config) (target.Target, error) {
-	return blob.New("azblob://"+c.Bucket, c.Folder)
+	return blob.New("azblob://"+c.Bucket, c.Folder, "")
 }

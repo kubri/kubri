@@ -28,5 +28,5 @@ func New(c Config) (target.Target, error) {
 		q.Add("endpoint", c.Endpoint)
 		q.Add("s3ForcePathStyle", "true")
 	}
-	return blob.New("s3://"+c.Bucket+"?"+q.Encode(), c.Folder)
+	return blob.New("s3://"+c.Bucket+"?"+q.Encode(), c.Folder, "")
 }

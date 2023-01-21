@@ -54,7 +54,7 @@ func (s *blobSource) ListReleases(ctx context.Context) ([]*source.Release, error
 		}
 
 		r, err := s.GetRelease(ctx, path.Base(object.Key))
-		if err != nil && err != source.ErrReleaseNotFound {
+		if err != nil && err != source.ErrNoReleaseFound {
 			return nil, err
 		}
 
@@ -107,7 +107,7 @@ func (s *blobSource) GetRelease(ctx context.Context, version string) (*source.Re
 	}
 
 	if len(r.Assets) == 0 {
-		return nil, source.ErrReleaseNotFound
+		return nil, source.ErrNoReleaseFound
 	}
 
 	return &r, nil

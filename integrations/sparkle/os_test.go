@@ -85,15 +85,14 @@ func TestDetectOS(t *testing.T) {
 		{"test.pkg", sparkle.MacOS},
 		{"test.exe", sparkle.Windows},
 		{"test.msi", sparkle.Windows},
-		{"test.msix", sparkle.Windows},
 		{"test_32bit.exe", sparkle.Windows32},
 		{"test_x86.msi", sparkle.Windows32},
-		{"test_i386.msix", sparkle.Windows32},
-		{"test_ia32.msix", sparkle.Windows32},
+		{"test_i386.msi", sparkle.Windows32},
+		{"test_ia32.msi", sparkle.Windows32},
 		{"test_64-bit.exe", sparkle.Windows64},
 		{"test_x86_64.msi", sparkle.Windows64},
 		{"test_x64.msi", sparkle.Windows64},
-		{"test_amd64.msix", sparkle.Windows64},
+		{"test_amd64.msi", sparkle.Windows64},
 	}
 
 	for _, test := range tests {

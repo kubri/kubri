@@ -16,5 +16,7 @@ func TestGCS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Run(t, tgt)
+	test.Run(t, tgt, func(asset string) string {
+		return "https://storage.googleapis.com/bucket/folder/" + asset
+	})
 }
