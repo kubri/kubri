@@ -8,7 +8,7 @@ replace github.com/docker/docker => github.com/docker/docker v20.10.3-0.20221201
 
 require (
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
-	github.com/dlclark/regexp2 v1.7.0
+	github.com/dlclark/regexp2 v1.8.0
 	github.com/docker/go-connections v0.4.0
 	github.com/fullstorydev/emulators/storage v0.0.0-20221201134230-39d0d46cb7ba
 	github.com/google/go-cmp v0.5.9
