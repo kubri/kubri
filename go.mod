@@ -25,7 +25,7 @@ require (
 	github.com/xanzy/go-gitlab v0.79.0
 	gocloud.dev v0.28.0
 	golang.org/x/exp v0.0.0-20230111222715-75897c7a292a
-	golang.org/x/mod v0.7.0
+	golang.org/x/mod v0.8.0
 	golang.org/x/oauth2 v0.4.0
 	gopkg.in/yaml.v3 v3.0.1
 )
