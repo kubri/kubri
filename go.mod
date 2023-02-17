@@ -22,7 +22,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/testcontainers/testcontainers-go v0.17.0
 	github.com/ulikunitz/xz v0.5.11
-	github.com/xanzy/go-gitlab v0.79.0
+	github.com/xanzy/go-gitlab v0.80.2
 	gocloud.dev v0.28.0
 	golang.org/x/exp v0.0.0-20230111222715-75897c7a292a
 	golang.org/x/mod v0.7.0
