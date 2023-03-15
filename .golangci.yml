@@ -33,6 +33,7 @@ linters:
     - interfacer # deprecated
     - ireturn # false positive on returning generic
     - maligned # deprecated
+    - musttag
     - nosnakecase # deprecated
     - nlreturn
     - paralleltest
