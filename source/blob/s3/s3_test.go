@@ -15,6 +15,7 @@ func TestS3(t *testing.T) {
 	s, err := s3.New(s3.Config{
 		Bucket:     "bucket",
 		Folder:     "folder",
+		Region:     "us-east-1",
 		Endpoint:   host,
 		DisableSSL: true,
 	})

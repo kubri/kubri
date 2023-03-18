@@ -8,9 +8,11 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-type fakeSource struct{}
+type fakeSource struct {
+	assets map[[2]string][]byte
+}
 
-func (*fakeSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
+func (*fakeSource) ListReleases(context.Context) ([]*source.Release, error) {
 	return []*source.Release{
 		{Version: "foo"},
 		{Version: "v0.9.0"},
@@ -19,16 +21,20 @@ func (*fakeSource) ListReleases(ctx context.Context) ([]*source.Release, error) 
 	}, nil
 }
 
-func (*fakeSource) GetRelease(ctx context.Context, version string) (*source.Release, error) {
+func (*fakeSource) GetRelease(_ context.Context, version string) (*source.Release, error) {
 	return &source.Release{Version: version}, nil
 }
 
-func (*fakeSource) UploadAsset(ctx context.Context, version, name string, data []byte) error {
+func (s *fakeSource) UploadAsset(_ context.Context, version, name string, data []byte) error {
+	s.assets[[2]string{version, name}] = data
 	return nil
 }
 
-func (*fakeSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
-	return nil, nil
+func (s *fakeSource) DownloadAsset(_ context.Context, version, name string) ([]byte, error) {
+	if b, ok := s.assets[[2]string{version, name}]; ok {
+		return b, nil
+	}
+	return nil, source.ErrAssetNotFound
 }
 
 func TestSource(t *testing.T) {
@@ -48,7 +54,7 @@ func TestSource(t *testing.T) {
 		},
 	}
 
-	s := source.New(&fakeSource{})
+	s := source.New(&fakeSource{map[[2]string][]byte{}})
 	ctx := context.Background()
 
 	t.Run("ListReleases", func(t *testing.T) {
@@ -74,6 +80,23 @@ func TestSource(t *testing.T) {
 	t.Run("GetRelease", func(t *testing.T) {
 		got, _ := s.GetRelease(ctx, want[0].Version)
 		if diff := cmp.Diff(want[0], got); diff != "" {
+			t.Error(diff)
+		}
+	})
+
+	t.Run("UploadAsset", func(t *testing.T) {
+		err := s.UploadAsset(ctx, want[0].Version, "test", []byte("test"))
+		if err != nil {
+			t.Error(err)
+		}
+	})
+
+	t.Run("DownloadAsset", func(t *testing.T) {
+		got, err := s.DownloadAsset(ctx, want[0].Version, "test")
+		if err != nil {
+			t.Error(err)
+		}
+		if diff := cmp.Diff("test", string(got)); diff != "" {
 			t.Error(diff)
 		}
 	})

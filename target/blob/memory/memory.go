@@ -9,6 +9,6 @@ import (
 
 type Config struct{}
 
-func New(c Config) (target.Target, error) {
+func New(Config) (target.Target, error) {
 	return blob.New("mem://", "", "mem:/")
 }

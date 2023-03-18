@@ -6,7 +6,7 @@ type RSS struct {
 	Channels []Channel `xml:"channel"`
 }
 
-func (r *RSS) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+func (r *RSS) MarshalXML(enc *xml.Encoder, _ xml.StartElement) error {
 	err := enc.EncodeToken(xml.StartElement{
 		Name: xml.Name{Local: "rss"},
 		Attr: []xml.Attr{
@@ -27,7 +27,7 @@ func (r *RSS) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
 	return enc.EncodeToken(xml.EndElement{Name: xml.Name{Local: "rss"}})
 }
 
-func (r *RSS) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
+func (r *RSS) UnmarshalXML(dec *xml.Decoder, _ xml.StartElement) error {
 	var data []unmarshalRSS
 	if err := dec.Decode(&data); err != nil {
 		return err

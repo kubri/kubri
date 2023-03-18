@@ -90,7 +90,7 @@ func (t *githubTarget) Sub(dir string) target.Target {
 	return &sub
 }
 
-func (t *githubTarget) URL(ctx context.Context, filename string) (string, error) {
+func (t *githubTarget) URL(_ context.Context, filename string) (string, error) {
 	return "https://raw.githubusercontent.com/" + path.Join(t.owner, t.repo, t.branch, t.path, filename), nil
 }
 

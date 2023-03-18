@@ -115,11 +115,7 @@ func releaseArch(p []*Package, suite, arch, root string) error {
 	if err := writeFile(filepath.Join(dir, "Packages"), p); err != nil {
 		return err
 	}
-	if err := writeFile(filepath.Join(dir, "Packages.gz"), p); err != nil {
-		return err
-	}
-
-	return nil
+	return writeFile(filepath.Join(dir, "Packages.gz"), p)
 }
 
 func writeFile(path string, v any) error {
