@@ -116,10 +116,7 @@ func TestSource(t *testing.T) {
 			// Ignore all function fields.
 			cmp.FilterPath(func(p cmp.Path) bool {
 				sf, ok := p.Index(-1).(cmp.StructField)
-				if !ok {
-					return false
-				}
-				return sf.Type().Kind() == reflect.Func
+				return ok && sf.Type().Kind() == reflect.Func
 			}, cmp.Ignore()),
 
 			// Ignore azblob policies as they are not comparable.
