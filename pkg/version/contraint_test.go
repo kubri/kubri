@@ -71,3 +71,21 @@ func TestConstraint(t *testing.T) {
 		}
 	}
 }
+
+func TestConstraintError(t *testing.T) {
+	tests := []string{
+		"a",
+		"!1",
+		// TODO: Implement validation and enable tests below.
+		// "va",
+		// "1a",
+		// "=a",
+	}
+
+	for _, v := range tests {
+		_, err := version.NewConstraint(v)
+		if err == nil {
+			t.Errorf("%q should return error", v)
+		}
+	}
+}
