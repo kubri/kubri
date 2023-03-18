@@ -31,7 +31,10 @@ jobs:
           skip-pkg-cache: true
           skip-build-cache: true
 
-      - run: go test -v ./...
+      - run: go test -v ./... -coverprofile=coverage.out
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
