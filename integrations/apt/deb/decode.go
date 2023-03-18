@@ -198,7 +198,7 @@ func newStructDecoder(typ reflect.Type) (decoder, error) {
 	}, nil
 }
 
-func newDateDecoder(typ reflect.Type) (decoder, error) {
+func newDateDecoder(reflect.Type) (decoder, error) {
 	return func(r *bufio.Reader, v reflect.Value) error {
 		b, err := r.ReadSlice('\n')
 		if err != nil {
@@ -263,7 +263,7 @@ func newFloatDecoder(typ reflect.Type) (decoder, error) {
 	}, nil
 }
 
-func newStringDecoder(typ reflect.Type) (decoder, error) {
+func newStringDecoder(reflect.Type) (decoder, error) {
 	return func(r *bufio.Reader, v reflect.Value) error {
 		b, err := readline(r)
 		if err != nil {

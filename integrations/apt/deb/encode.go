@@ -89,7 +89,7 @@ func newEncoder(typ reflect.Type) (encoder, error) {
 	return nil, fmt.Errorf("unsupported type: %s", typ)
 }
 
-func newStringerEncoder(typ reflect.Type) (encoder, error) {
+func newStringerEncoder(reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
 		s := v.Interface().(fmt.Stringer).String() //nolint:forcetypeassert
 		if len(s) > 0 {
@@ -216,7 +216,7 @@ func newStructEncoder(typ reflect.Type) (encoder, error) {
 	}, nil
 }
 
-func newDateEncoder(typ reflect.Type) (encoder, error) {
+func newDateEncoder(reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
 		t := v.Interface().(time.Time) //nolint:forcetypeassert
 		if t.IsZero() {
@@ -227,7 +227,7 @@ func newDateEncoder(typ reflect.Type) (encoder, error) {
 	}, nil
 }
 
-func newIntEncoder(typ reflect.Type) (encoder, error) {
+func newIntEncoder(reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
 		i := v.Int()
 		if i == 0 {
@@ -238,7 +238,7 @@ func newIntEncoder(typ reflect.Type) (encoder, error) {
 	}, nil
 }
 
-func newUintEncoder(typ reflect.Type) (encoder, error) {
+func newUintEncoder(reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
 		i := v.Uint()
 		if i == 0 {
@@ -280,7 +280,7 @@ func newByteArrayEncoder(typ reflect.Type) (encoder, error) {
 	}, nil
 }
 
-func newStringEncoder(typ reflect.Type) (encoder, error) {
+func newStringEncoder(reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
 		in := []byte(v.String())
 
