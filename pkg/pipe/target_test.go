@@ -49,6 +49,7 @@ func TestTarget(t *testing.T) {
 				"folder": "test",
 			},
 			want: func() (target.Target, error) {
+				t.Setenv("STORAGE_EMULATOR_HOST", "test")
 				return gcs.New(gcs.Config{Bucket: "test", Folder: "test"})
 			},
 		},

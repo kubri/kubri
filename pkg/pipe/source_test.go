@@ -50,6 +50,7 @@ func TestSource(t *testing.T) {
 				"folder": "test",
 			},
 			want: func() (*source.Source, error) {
+				t.Setenv("STORAGE_EMULATOR_HOST", "test")
 				return gcs.New(gcs.Config{Bucket: "test", Folder: "test"})
 			},
 		},
