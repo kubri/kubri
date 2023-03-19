@@ -10,26 +10,26 @@ import (
 	"github.com/ulikunitz/xz/lzma"
 )
 
-func compress(ext string) func(io.WriteCloser) (io.WriteCloser, error) {
+func compress(ext string) func(io.Writer) (io.WriteCloser, error) {
 	switch ext {
 	case ".gz":
-		return func(r io.WriteCloser) (io.WriteCloser, error) {
+		return func(r io.Writer) (io.WriteCloser, error) {
 			return gzip.NewWriter(r), nil
 		}
 	case ".xz":
-		return func(r io.WriteCloser) (io.WriteCloser, error) {
+		return func(r io.Writer) (io.WriteCloser, error) {
 			return xz.NewWriter(r)
 		}
 	case ".lzma":
-		return func(r io.WriteCloser) (io.WriteCloser, error) {
+		return func(r io.Writer) (io.WriteCloser, error) {
 			return lzma.NewWriter(r)
 		}
 	case ".zst":
-		return func(r io.WriteCloser) (io.WriteCloser, error) {
+		return func(r io.Writer) (io.WriteCloser, error) {
 			return zstd.NewWriter(r)
 		}
 	default:
-		return func(r io.WriteCloser) (io.WriteCloser, error) {
+		return func(r io.Writer) (io.WriteCloser, error) {
 			return writeCloser{r}, nil
 		}
 	}
