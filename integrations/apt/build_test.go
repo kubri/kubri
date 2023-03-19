@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/source/blob/file"
-	"github.com/abemedia/appcast/target/blob/memory"
+	"github.com/abemedia/appcast/internal/testtarget"
+	"github.com/abemedia/appcast/source/file"
 	"github.com/google/go-cmp/cmp"
 	"github.com/klauspost/compress/gzip"
 )
@@ -88,10 +88,7 @@ Description: This is a test.
 		t.Fatal(err)
 	}
 
-	tgt, err := memory.New(memory.Config{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	tgt := testtarget.New()
 
 	c := &apt.Config{
 		Source: src,

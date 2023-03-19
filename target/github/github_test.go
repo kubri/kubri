@@ -6,8 +6,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/target/github"
-	"github.com/abemedia/appcast/target/internal/test"
 	gh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
@@ -43,7 +43,7 @@ func TestGithub(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Run(t, tgt, func(asset string) string {
+	test.Target(t, tgt, func(asset string) string {
 		return "https://raw.githubusercontent.com/" + path.Join(owner, repo, "master", asset)
 	})
 

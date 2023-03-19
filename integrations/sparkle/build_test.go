@@ -7,24 +7,34 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/sparkle"
-	memSource "github.com/abemedia/appcast/source/blob/memory"
-	memTarget "github.com/abemedia/appcast/target/blob/memory"
+	"github.com/abemedia/appcast/internal/testsource"
+	"github.com/abemedia/appcast/internal/testtarget"
+	"github.com/abemedia/appcast/source"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestBuild(t *testing.T) {
-	data := []byte("test")
 	ctx := context.Background()
-
-	src, _ := memSource.New(memSource.Config{})
+	data := []byte("test")
+	ts := time.Now().UTC()
+	src := testsource.New([]*source.Release{
+		{
+			Version: "v1.0.0",
+			Date:    ts,
+		},
+		{
+			Version: "v1.1.0",
+			Date:    ts,
+		},
+	})
 	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.0.0", "test_64-bit.msi", data)
 	src.UploadAsset(ctx, "v1.0.0", "test_32-bit.exe", data)
+	src.UploadAsset(ctx, "v1.0.0", "test_64-bit.msi", data)
 	src.UploadAsset(ctx, "v1.1.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.1.0", "test_64-bit.msi", data)
 	src.UploadAsset(ctx, "v1.1.0", "test_32-bit.exe", data)
+	src.UploadAsset(ctx, "v1.1.0", "test_64-bit.msi", data)
 
-	tgt, _ := memTarget.New(memTarget.Config{})
+	tgt := testtarget.New()
 
 	w, err := tgt.NewWriter(ctx, "sparkle.xml")
 	if err != nil {
@@ -37,7 +47,7 @@ func TestBuild(t *testing.T) {
 			<title>v1.0.0</title>
 			<pubDate>Mon, 02 Jan 2006 15:04:05 +0000</pubDate>
 			<sparkle:version>1.0.0</sparkle:version>
-			<enclosure url="mem://v1.0.0/test.dmg" sparkle:os="macos" sparkle:version="1.0.0" sparkle:edSignature="test" sparkle:minimumSystemVersion="10.13.0" length="4" type="application/x-apple-diskimage" />
+			<enclosure url="https://example.com/v1.0.0/test.dmg" sparkle:os="macos" sparkle:version="1.0.0" sparkle:edSignature="test" sparkle:minimumSystemVersion="10.13.0" length="4" type="application/x-apple-diskimage" />
 		</item>
 		<item>
 			<title>v1.0.0</title>
@@ -46,7 +56,7 @@ func TestBuild(t *testing.T) {
 			<sparkle:tags>
 				<sparkle:criticalUpdate />
 			</sparkle:tags>
-			<enclosure url="mem://v1.0.0/test_32-bit.exe" sparkle:os="windows-x86" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/vnd.microsoft.portable-executable" />
+			<enclosure url="https://example.com/v1.0.0/test_32-bit.exe" sparkle:os="windows-x86" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/vnd.microsoft.portable-executable" />
 		</item>
 		<item>
 			<title>v1.0.0</title>
@@ -55,7 +65,7 @@ func TestBuild(t *testing.T) {
 			<sparkle:tags>
 				<sparkle:criticalUpdate />
 			</sparkle:tags>
-			<enclosure url="mem://v1.0.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
+			<enclosure url="https://example.com/v1.0.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
 		</item>
 	</channel>
 </rss>`))
@@ -98,7 +108,7 @@ func TestBuild(t *testing.T) {
 		},
 	}
 
-	pubDate := time.Now().UTC().Format(time.RFC1123)
+	pubDate := ts.Format(time.RFC1123)
 
 	want := `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -113,7 +123,7 @@ func TestBuild(t *testing.T) {
 			<sparkle:criticalUpdate sparkle:version="1.0.0" />
 			<sparkle:minimumAutoupdateVersion>1.0.0</sparkle:minimumAutoupdateVersion>
 			<sparkle:ignoreSkippedUpgradesBelowVersion>1.0.0</sparkle:ignoreSkippedUpgradesBelowVersion>
-			<enclosure url="mem://v1.1.0/test.dmg" sparkle:os="macos" sparkle:version="1.1.0" sparkle:minimumSystemVersion="10.13.0" length="4" type="application/x-apple-diskimage" />
+			<enclosure url="https://example.com/v1.1.0/test.dmg" sparkle:os="macos" sparkle:version="1.1.0" sparkle:minimumSystemVersion="10.13.0" length="4" type="application/x-apple-diskimage" />
 		</item>
 		<item>
 			<title>v1.1.0</title>
@@ -122,7 +132,7 @@ func TestBuild(t *testing.T) {
 			<sparkle:criticalUpdate sparkle:version="1.0.0" />
 			<sparkle:minimumAutoupdateVersion>1.0.0</sparkle:minimumAutoupdateVersion>
 			<sparkle:ignoreSkippedUpgradesBelowVersion>1.0.0</sparkle:ignoreSkippedUpgradesBelowVersion>
-			<enclosure url="mem://v1.1.0/test_32-bit.exe" sparkle:os="windows-x86" sparkle:version="1.1.0" sparkle:installerArguments="/passive" length="4" type="application/vnd.microsoft.portable-executable" />
+			<enclosure url="https://example.com/v1.1.0/test_32-bit.exe" sparkle:os="windows-x86" sparkle:version="1.1.0" sparkle:installerArguments="/passive" length="4" type="application/vnd.microsoft.portable-executable" />
 		</item>
 		<item>
 			<title>v1.1.0</title>
@@ -131,22 +141,13 @@ func TestBuild(t *testing.T) {
 			<sparkle:criticalUpdate sparkle:version="1.0.0" />
 			<sparkle:minimumAutoupdateVersion>1.0.0</sparkle:minimumAutoupdateVersion>
 			<sparkle:ignoreSkippedUpgradesBelowVersion>1.0.0</sparkle:ignoreSkippedUpgradesBelowVersion>
-			<enclosure url="mem://v1.1.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.1.0" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
+			<enclosure url="https://example.com/v1.1.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.1.0" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
 		</item>
 		<item>
 			<title>v1.0.0</title>
 			<pubDate>Mon, 02 Jan 2006 15:04:05 +0000</pubDate>
 			<sparkle:version>1.0.0</sparkle:version>
-			<enclosure url="mem://v1.0.0/test.dmg" sparkle:os="macos" sparkle:version="1.0.0" sparkle:edSignature="test" sparkle:minimumSystemVersion="10.13.0" length="4" type="application/x-apple-diskimage" />
-		</item>
-		<item>
-			<title>v1.0.0</title>
-			<pubDate>Mon, 02 Jan 2006 15:04:05 +0000</pubDate>
-			<sparkle:version>1.0.0</sparkle:version>
-			<sparkle:tags>
-				<sparkle:criticalUpdate />
-			</sparkle:tags>
-			<enclosure url="mem://v1.0.0/test_32-bit.exe" sparkle:os="windows-x86" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/vnd.microsoft.portable-executable" />
+			<enclosure url="https://example.com/v1.0.0/test.dmg" sparkle:os="macos" sparkle:version="1.0.0" sparkle:edSignature="test" sparkle:minimumSystemVersion="10.13.0" length="4" type="application/x-apple-diskimage" />
 		</item>
 		<item>
 			<title>v1.0.0</title>
@@ -155,7 +156,16 @@ func TestBuild(t *testing.T) {
 			<sparkle:tags>
 				<sparkle:criticalUpdate />
 			</sparkle:tags>
-			<enclosure url="mem://v1.0.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
+			<enclosure url="https://example.com/v1.0.0/test_32-bit.exe" sparkle:os="windows-x86" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/vnd.microsoft.portable-executable" />
+		</item>
+		<item>
+			<title>v1.0.0</title>
+			<pubDate>Mon, 02 Jan 2006 15:04:05 +0000</pubDate>
+			<sparkle:version>1.0.0</sparkle:version>
+			<sparkle:tags>
+				<sparkle:criticalUpdate />
+			</sparkle:tags>
+			<enclosure url="https://example.com/v1.0.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
 		</item>
 	</channel>
 </rss>`
