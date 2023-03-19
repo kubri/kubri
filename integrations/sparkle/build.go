@@ -1,7 +1,6 @@
 package sparkle
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/xml"
@@ -12,6 +11,7 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/source"
+	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/russross/blackfriday/v2"
 )
 
@@ -97,8 +97,9 @@ func newRSS(title, description, url string, items []Item) *RSS {
 func createReleaseItems(ctx context.Context, c *Config, release *source.Release) ([]Item, error) {
 	var description *CdataString
 	if release.Description != "" {
-		htmlDescription := blackfriday.Run([]byte(release.Description))
-		description = &CdataString{Value: string(bytes.TrimSpace(htmlDescription))}
+		desc := string(blackfriday.Run([]byte(release.Description)))
+		desc = strings.TrimSpace(xmlfmt.FormatXML(desc, "\t\t\t\t", "\t"))
+		description = &CdataString{Value: "\n\t\t\t\t" + desc + "\n\t\t\t"}
 	}
 
 	items := make([]Item, 0, len(release.Assets))

@@ -12,6 +12,7 @@ require (
 	github.com/dlclark/regexp2 v1.8.1
 	github.com/docker/go-connections v0.4.0
 	github.com/fullstorydev/emulators/storage v0.0.0-20221201134230-39d0d46cb7ba
+	github.com/go-xmlfmt/xmlfmt v1.1.2
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/hashicorp/go-retryablehttp v0.7.2
