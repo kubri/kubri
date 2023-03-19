@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/blob/azureblob"
-	"github.com/abemedia/appcast/source/blob/file"
-	"github.com/abemedia/appcast/source/blob/gcs"
-	"github.com/abemedia/appcast/source/blob/s3"
+	"github.com/abemedia/appcast/source/azureblob"
+	"github.com/abemedia/appcast/source/file"
+	"github.com/abemedia/appcast/source/gcs"
 	"github.com/abemedia/appcast/source/github"
 	"github.com/abemedia/appcast/source/gitlab"
 	"github.com/abemedia/appcast/source/local"
+	"github.com/abemedia/appcast/source/s3"
 	"github.com/mitchellh/mapstructure"
 )
 

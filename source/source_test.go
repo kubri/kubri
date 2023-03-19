@@ -4,38 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/abemedia/appcast/internal/testsource"
 	"github.com/abemedia/appcast/source"
 	"github.com/google/go-cmp/cmp"
 )
-
-type fakeSource struct {
-	assets map[[2]string][]byte
-}
-
-func (*fakeSource) ListReleases(context.Context) ([]*source.Release, error) {
-	return []*source.Release{
-		{Version: "foo"},
-		{Version: "v0.9.0"},
-		{Version: "v1.1.0-pre"},
-		{Version: "v1.0.0"},
-	}, nil
-}
-
-func (*fakeSource) GetRelease(_ context.Context, version string) (*source.Release, error) {
-	return &source.Release{Version: version}, nil
-}
-
-func (s *fakeSource) UploadAsset(_ context.Context, version, name string, data []byte) error {
-	s.assets[[2]string{version, name}] = data
-	return nil
-}
-
-func (s *fakeSource) DownloadAsset(_ context.Context, version, name string) ([]byte, error) {
-	if b, ok := s.assets[[2]string{version, name}]; ok {
-		return b, nil
-	}
-	return nil, source.ErrAssetNotFound
-}
 
 func TestSource(t *testing.T) {
 	want := []*source.Release{
@@ -54,7 +26,13 @@ func TestSource(t *testing.T) {
 		},
 	}
 
-	s := source.New(&fakeSource{map[[2]string][]byte{}})
+	s := testsource.New([]*source.Release{
+		{Version: "foo"},
+		{Version: "v0.9.0"},
+		{Version: "v1.1.0-pre"},
+		{Version: "v1.0.0"},
+	})
+
 	ctx := context.Background()
 
 	t.Run("ListReleases", func(t *testing.T) {

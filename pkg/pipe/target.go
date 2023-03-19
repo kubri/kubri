@@ -4,11 +4,11 @@ import (
 	"fmt"
 
 	"github.com/abemedia/appcast/target"
-	"github.com/abemedia/appcast/target/blob/azureblob"
-	"github.com/abemedia/appcast/target/blob/gcs"
-	"github.com/abemedia/appcast/target/blob/s3"
+	"github.com/abemedia/appcast/target/azureblob"
 	"github.com/abemedia/appcast/target/file"
+	"github.com/abemedia/appcast/target/gcs"
 	"github.com/abemedia/appcast/target/github"
+	"github.com/abemedia/appcast/target/s3"
 	"github.com/mitchellh/mapstructure"
 )
 

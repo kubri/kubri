@@ -13,7 +13,7 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/pipe"
-	fileSource "github.com/abemedia/appcast/source/blob/file"
+	fileSource "github.com/abemedia/appcast/source/file"
 	fileTarget "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 )

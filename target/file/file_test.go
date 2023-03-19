@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/target/file"
-	"github.com/abemedia/appcast/target/internal/test"
 )
 
 func TestFile(t *testing.T) {
@@ -16,7 +16,7 @@ func TestFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	test.Run(t, tgt, func(asset string) string {
+	test.Target(t, tgt, func(asset string) string {
 		return "file://" + filepath.Join(path, asset)
 	})
 }
