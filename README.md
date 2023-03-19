@@ -1,6 +1,7 @@
 # AppCast
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/abemedia/appcast.svg)](https://pkg.go.dev/github.com/abemedia/appcast)
+[![Codecov](https://codecov.io/gh/abemedia/appcast/branch/master/graph/badge.svg)](https://codecov.io/gh/abemedia/appcast)
 
 A library and CLI tool for signing update packages and creating appcast XML for use with Sparkle.
 
