@@ -31,8 +31,10 @@ func TestRSSMarshalUnmarshal(t *testing.T) {
 					},
 				},
 				{
-					Title:          "v1.1.0",
-					Description:    &sparkle.CdataString{"Test"},
+					Title: "v1.1.0",
+					Description: &sparkle.CdataString{`
+						<h2>Test</h2>
+					`},
 					PubDate:        "Mon, 02 Jan 2007 15:04:05 +0000",
 					Version:        "1.1.0",
 					CriticalUpdate: &sparkle.CriticalUpdate{Version: "1.0.0"},

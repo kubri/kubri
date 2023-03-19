@@ -25,6 +25,9 @@ func TestBuild(t *testing.T) {
 		{
 			Version: "v1.1.0",
 			Date:    ts,
+			Description: `## New Features
+- Something
+- Something else`,
 		},
 	})
 	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
@@ -119,6 +122,13 @@ func TestBuild(t *testing.T) {
 		<item>
 			<title>v1.1.0</title>
 			<pubDate>` + pubDate + `</pubDate>
+			<description><![CDATA[
+				<h2>New Features</h2>
+				<ul>
+					<li>Something</li>
+					<li>Something else</li>
+				</ul>
+			]]></description>
 			<sparkle:version>1.1.0</sparkle:version>
 			<sparkle:criticalUpdate sparkle:version="1.0.0" />
 			<sparkle:minimumAutoupdateVersion>1.0.0</sparkle:minimumAutoupdateVersion>
@@ -128,6 +138,13 @@ func TestBuild(t *testing.T) {
 		<item>
 			<title>v1.1.0</title>
 			<pubDate>` + pubDate + `</pubDate>
+			<description><![CDATA[
+				<h2>New Features</h2>
+				<ul>
+					<li>Something</li>
+					<li>Something else</li>
+				</ul>
+			]]></description>
 			<sparkle:version>1.1.0</sparkle:version>
 			<sparkle:criticalUpdate sparkle:version="1.0.0" />
 			<sparkle:minimumAutoupdateVersion>1.0.0</sparkle:minimumAutoupdateVersion>
@@ -137,6 +154,13 @@ func TestBuild(t *testing.T) {
 		<item>
 			<title>v1.1.0</title>
 			<pubDate>` + pubDate + `</pubDate>
+			<description><![CDATA[
+				<h2>New Features</h2>
+				<ul>
+					<li>Something</li>
+					<li>Something else</li>
+				</ul>
+			]]></description>
 			<sparkle:version>1.1.0</sparkle:version>
 			<sparkle:criticalUpdate sparkle:version="1.0.0" />
 			<sparkle:minimumAutoupdateVersion>1.0.0</sparkle:minimumAutoupdateVersion>
