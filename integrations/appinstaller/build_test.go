@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/appinstaller"
-	fileSource "github.com/abemedia/appcast/source/blob/file"
+	fileSource "github.com/abemedia/appcast/source/file"
 	fileTarget "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 )
