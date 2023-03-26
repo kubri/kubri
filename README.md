@@ -3,7 +3,14 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/abemedia/appcast.svg)](https://pkg.go.dev/github.com/abemedia/appcast)
 [![Codecov](https://codecov.io/gh/abemedia/appcast/branch/master/graph/badge.svg)](https://codecov.io/gh/abemedia/appcast)
 
-A library and CLI tool for signing update packages and creating appcast XML for use with Sparkle.
+AppCast signs and publishes software for common package managers and software update frameworks.
+
+## Supported platforms
+
+- [APT](<https://en.wikipedia.org/wiki/APT_(software)>) (Debian, Ubuntu)
+- [App Installer](https://en.wikipedia.org/wiki/App_Installer) (Windows)
+- [Sparkle](https://sparkle-project.org/) (MacOS)
+- [WinSparkle](https://winsparkle.org/) (Windows)
 
 ## Installation
 
