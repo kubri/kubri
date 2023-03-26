@@ -2,6 +2,7 @@ package sparkle
 
 import (
 	"context"
+	"crypto/sha1"
 	"encoding/base64"
 	"encoding/xml"
 	"path"
@@ -165,7 +166,9 @@ func signAsset(ctx context.Context, c *Config, v string, os OS, a *source.Asset)
 		if err != nil {
 			return "", "", err
 		}
-		sig, err := dsa.Sign(c.DSAKey, b)
+		sum := sha1.Sum(b)
+		sum = sha1.Sum(sum[:])
+		sig, err := dsa.Sign(c.DSAKey, sum[:])
 		if err != nil {
 			return "", "", err
 		}

@@ -3,7 +3,6 @@ package dsa
 import (
 	"crypto/dsa"
 	"crypto/rand"
-	"crypto/sha1"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
@@ -23,22 +22,24 @@ type privateKey struct {
 	P, Q, G, Y, X *big.Int
 }
 
+type signature struct {
+	R, S *big.Int
+}
+
 func Sign(key *PrivateKey, data []byte) ([]byte, error) {
-	sum := sha1.Sum(data)
-	r, s, err := dsa.Sign(rand.Reader, key, sum[:])
+	r, s, err := dsa.Sign(rand.Reader, key, data)
 	if err != nil {
 		return nil, err
 	}
-	return asn1.Marshal(struct{ R, S *big.Int }{r, s})
+	return asn1.Marshal(signature{r, s})
 }
 
 func Verify(key *PublicKey, data, sig []byte) bool {
-	var s struct{ R, S *big.Int }
+	var s signature
 	if _, err := asn1.Unmarshal(sig, &s); err != nil {
 		return false
 	}
-	sum := sha1.Sum(data)
-	return dsa.Verify(key, sum[:], s.R, s.S)
+	return dsa.Verify(key, data, s.R, s.S)
 }
 
 func NewPrivateKey() (*PrivateKey, error) {
