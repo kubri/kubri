@@ -68,6 +68,22 @@ target:
   type: file
   path: ` + dir + `
 `,
+			want: &pipe.Pipe{},
+		},
+		{
+			in: `
+title: test
+description: test
+source:
+  type: file
+  path: ` + dir + `
+target:
+  type: file
+  path: ` + dir + `
+appinstaller: {}
+apt: {}
+sparkle: {}
+`,
 			want: &pipe.Pipe{
 				Appinstaller: &appinstaller.Config{
 					Source: src,
