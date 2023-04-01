@@ -11,7 +11,7 @@ import (
 func TestMarshal(t *testing.T) {
 	in := record{
 		String:    "test",
-		ByteArray: [4]byte{1, 2, 3, 4},
+		Hex:       [4]byte{1, 2, 3, 4},
 		Int:       1,
 		Int8:      1,
 		Int16:     1,
@@ -107,15 +107,15 @@ Date: Tue, 10 Jan 2023 19:04:25 UTC
 
 func BenchmarkMarshal(b *testing.B) {
 	type record struct {
-		String    string
-		ByteArray [4]byte `deb:"Hex"`
-		Int       int
+		String string
+		Hex    [4]byte
+		Int    int
 	}
 
 	v := record{
-		String:    "test",
-		ByteArray: [4]byte{1, 2, 3, 4},
-		Int:       1,
+		String: "test",
+		Hex:    [4]byte{1, 2, 3, 4},
+		Int:    1,
 	}
 
 	for i := 0; i < b.N; i++ {
