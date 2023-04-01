@@ -90,6 +90,34 @@ Date: Tue, 10 Jan 2023 19:04:25 UTC
 				String: "\nfoo\nbar",
 			},
 		},
+		{
+			msg: "empty values",
+			in: `String: 
+Hex: 
+Int: 
+Int8: 
+Int16: 
+Int32: 
+Uint: 
+Uint8: 
+Uint16: 
+Uint32: 
+Float32: 
+Float64: 
+Marshaler: 
+Date: 
+`,
+			want: record{},
+		},
+		{
+			msg: "unknown keys",
+			in: `Foo: bar
+String: test
+`,
+			want: record{
+				String: "test",
+			},
+		},
 	}
 
 	for _, test := range tests {

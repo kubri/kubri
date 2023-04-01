@@ -91,19 +91,13 @@ func newUnmarshalerDecoder(typ reflect.Type) (decoder, error) {
 	typ = typ.Elem()
 
 	return func(r *bufio.Reader, v reflect.Value) error {
-		b, err := readline(r)
-		if err != nil {
+		b, err := readlines(r)
+		if err != nil || len(b) == 0 {
 			return err
 		}
-
-		if len(b) == 0 {
-			return nil
-		}
-
 		if isPtr && v.IsNil() {
 			v.Set(reflect.New(typ))
 		}
-
 		return v.Interface().(encoding.TextUnmarshaler).UnmarshalText(b) //nolint:forcetypeassert
 	}, nil
 }
@@ -193,6 +187,8 @@ func newStructDecoder(typ reflect.Type) (decoder, error) {
 				if err := dec(r, v); err != nil {
 					return err
 				}
+			} else {
+				_, _ = readlines(r) // Discard value for unknown key.
 			}
 		}
 	}, nil
@@ -200,11 +196,11 @@ func newStructDecoder(typ reflect.Type) (decoder, error) {
 
 func newDateDecoder(reflect.Type) (decoder, error) {
 	return func(r *bufio.Reader, v reflect.Value) error {
-		b, err := r.ReadSlice('\n')
-		if err != nil {
+		b, err := readline(r)
+		if err != nil || len(b) == 0 {
 			return err
 		}
-		t, err := time.Parse(time.RFC1123, btoa(trim(b)))
+		t, err := time.Parse(time.RFC1123, btoa(b))
 		if err != nil {
 			return err
 		}
@@ -218,11 +214,11 @@ func newDateDecoder(reflect.Type) (decoder, error) {
 func newIntDecoder(typ reflect.Type) (decoder, error) {
 	bits := typ.Bits()
 	return func(r *bufio.Reader, v reflect.Value) error {
-		b, err := r.ReadSlice('\n')
-		if err != nil {
+		b, err := readline(r)
+		if err != nil || len(b) == 0 {
 			return err
 		}
-		i, err := strconv.ParseInt(btoa(trim(b)), 10, bits)
+		i, err := strconv.ParseInt(btoa(b), 10, bits)
 		if err != nil {
 			return err
 		}
@@ -234,11 +230,11 @@ func newIntDecoder(typ reflect.Type) (decoder, error) {
 func newUintDecoder(typ reflect.Type) (decoder, error) {
 	bits := typ.Bits()
 	return func(r *bufio.Reader, v reflect.Value) error {
-		b, err := r.ReadSlice('\n')
-		if err != nil {
+		b, err := readline(r)
+		if err != nil || len(b) == 0 {
 			return err
 		}
-		i, err := strconv.ParseUint(btoa(trim(b)), 10, bits)
+		i, err := strconv.ParseUint(btoa(b), 10, bits)
 		if err != nil {
 			return err
 		}
@@ -250,11 +246,11 @@ func newUintDecoder(typ reflect.Type) (decoder, error) {
 func newFloatDecoder(typ reflect.Type) (decoder, error) {
 	bits := typ.Bits()
 	return func(r *bufio.Reader, v reflect.Value) error {
-		b, err := r.ReadSlice('\n')
-		if err != nil {
+		b, err := readline(r)
+		if err != nil || len(b) == 0 {
 			return err
 		}
-		i, err := strconv.ParseFloat(btoa(trim(b)), bits)
+		i, err := strconv.ParseFloat(btoa(b), bits)
 		if err != nil {
 			return err
 		}
@@ -265,11 +261,11 @@ func newFloatDecoder(typ reflect.Type) (decoder, error) {
 
 func newStringDecoder(reflect.Type) (decoder, error) {
 	return func(r *bufio.Reader, v reflect.Value) error {
-		b, err := readline(r)
+		b, err := readlines(r)
 		if err != nil {
 			return err
 		}
-		v.SetString(string(b))
+		v.SetString(btoa(b))
 		return nil
 	}, nil
 }
@@ -277,21 +273,33 @@ func newStringDecoder(reflect.Type) (decoder, error) {
 func newByteArrayDecoder(typ reflect.Type) (decoder, error) {
 	size := typ.Len()
 	return func(r *bufio.Reader, v reflect.Value) error {
-		b, err := r.ReadSlice('\n')
-		if err != nil {
+		b, err := readline(r)
+		if err != nil || len(b) == 0 {
 			return err
 		}
-		if _, err = hex.Decode(b, trim(b)); err != nil {
+		if _, err = hex.Decode(b, b); err != nil {
 			return err
 		}
 		for i := 0; i < size; i++ {
-			v.Index(i).SetUint(uint64(b[i]))
+			if len(b) > i {
+				v.Index(i).SetUint(uint64(b[i]))
+			} else {
+				v.Index(i).SetUint(0)
+			}
 		}
 		return nil
 	}, nil
 }
 
 func readline(r *bufio.Reader) ([]byte, error) {
+	b, err := r.ReadSlice('\n')
+	if err != nil {
+		return nil, err
+	}
+	return trim(b), nil
+}
+
+func readlines(r *bufio.Reader) ([]byte, error) {
 	buf := bufPool.Get().(*bytes.Buffer) //nolint:forcetypeassert
 	buf.Reset()
 	defer bufPool.Put(buf)
@@ -318,5 +326,5 @@ func readline(r *bufio.Reader) ([]byte, error) {
 		}
 	}
 
-	return buf.Bytes(), nil
+	return append([]byte(nil), buf.Bytes()...), nil
 }
