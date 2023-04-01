@@ -28,7 +28,7 @@ Date: Tue, 10 Jan 2023 19:04:25 UTC
 
 	want := record{
 		String:    "test",
-		ByteArray: [4]byte{1, 2, 3, 4},
+		Hex:       [4]byte{1, 2, 3, 4},
 		Int:       1,
 		Int8:      1,
 		Int16:     1,
@@ -135,9 +135,9 @@ String: test
 
 func BenchmarkUnmarshal(b *testing.B) {
 	type record struct {
-		String    string
-		ByteArray [4]byte `deb:"Hex"`
-		Int       int
+		String string
+		Hex    [4]byte
+		Int    int
 	}
 
 	in := []byte(`String: foo

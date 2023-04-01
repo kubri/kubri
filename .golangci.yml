@@ -76,7 +76,7 @@ linters-settings:
       use-field-name: true
       rules:
         yaml: kebab
-        # deb: header # TODO: uncomment when golangci-lint 1.50.2 is released.
+        deb: header
 
 issues:
   fix: true
@@ -97,8 +97,3 @@ issues:
     - linters:
         - lll
       source: '^\s*//'
-
-      # TODO: Remove once Docker 22.06 is out.
-    - linters:
-        - gomoddirectives
-      text: 'replacement are not allowed: github.com/docker/docker'

@@ -25,7 +25,7 @@ func (s *marshaler) UnmarshalText(text []byte) error {
 
 type record struct {
 	String    string
-	ByteArray [4]byte `deb:"Hex"`
+	Hex       [4]byte
 	Int       int
 	Int8      int8
 	Int16     int16

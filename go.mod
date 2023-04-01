@@ -1,10 +1,6 @@
 module github.com/abemedia/appcast
 
-go 1.19
-
-// See https://github.com/testcontainers/testcontainers-go/releases/tag/v0.17.0
-// TODO: Remove once Docker 22.06 is out.
-replace github.com/docker/docker => github.com/docker/docker v20.10.3-0.20221201081640-bb2eab21c6db+incompatible // 22.06 branch
+go 1.20
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0
