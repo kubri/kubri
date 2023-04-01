@@ -3,6 +3,7 @@ package pipe
 import (
 	"context"
 	"errors"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -15,15 +16,15 @@ import (
 )
 
 type config struct {
-	Title        string             `yaml:"title"`
-	Description  string             `yaml:"description"`
-	Version      string             `yaml:"version"`
-	Prerelease   bool               `yaml:"prerelease"`
-	Source       sourceConfig       `yaml:"source"`
-	Target       targetConfig       `yaml:"target"`
-	Apt          aptConfig          `yaml:"apt"`
-	Sparkle      sparkleConfig      `yaml:"sparkle"`
-	Appinstaller appinstallerConfig `yaml:"appinstaller"`
+	Title        string              `yaml:"title"`
+	Description  string              `yaml:"description"`
+	Version      string              `yaml:"version"`
+	Prerelease   bool                `yaml:"prerelease"`
+	Source       sourceConfig        `yaml:"source"`
+	Target       targetConfig        `yaml:"target"`
+	Apt          *aptConfig          `yaml:"apt"`
+	Sparkle      *sparkleConfig      `yaml:"sparkle"`
+	Appinstaller *appinstallerConfig `yaml:"appinstaller"`
 
 	source *source.Source
 	target target.Target
@@ -38,16 +39,19 @@ type Pipe struct {
 func (p *Pipe) Run(ctx context.Context) error {
 	var err error
 	if p.Appinstaller != nil {
+		log.Print("Publishing App Installer packages...")
 		if err = appinstaller.Build(ctx, p.Appinstaller); err != nil {
 			return err
 		}
 	}
 	if p.Apt != nil {
+		log.Print("Publishing APT packages...")
 		if err = apt.Build(ctx, p.Apt); err != nil {
 			return err
 		}
 	}
 	if p.Sparkle != nil {
+		log.Print("Publishing Sparkle packages...")
 		if err = sparkle.Build(ctx, p.Sparkle); err != nil {
 			return err
 		}
@@ -73,13 +77,13 @@ func Load(path string) (*Pipe, error) {
 	}
 
 	var p Pipe
-	if !c.Appinstaller.Disabled {
+	if c.Appinstaller != nil && !c.Appinstaller.Disabled {
 		p.Appinstaller = getAppinstaller(c)
 	}
-	if !c.Apt.Disabled {
+	if c.Apt != nil && !c.Apt.Disabled {
 		p.Apt = getApt(c)
 	}
-	if !c.Sparkle.Disabled {
+	if c.Sparkle != nil && !c.Sparkle.Disabled {
 		if p.Sparkle, err = getSparkle(c); err != nil {
 			return nil, err
 		}
