@@ -2,6 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/abemedia/appcast.svg)](https://pkg.go.dev/github.com/abemedia/appcast)
 [![Codecov](https://codecov.io/gh/abemedia/appcast/branch/master/graph/badge.svg)](https://codecov.io/gh/abemedia/appcast)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fabemedia%2Fappcast.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fabemedia%2Fappcast?ref=badge_shield)
 
 AppCast signs and publishes software for common package managers and software update frameworks.
 
@@ -42,3 +43,7 @@ sudo yum install appcast
 ### Binary
 
 Download the latest binary from <https://github.com/abemedia/appcast/releases> and copy it to a folder in your `$PATH`.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fabemedia%2Fappcast.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fabemedia%2Fappcast?ref=badge_large)
