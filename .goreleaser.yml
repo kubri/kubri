@@ -3,15 +3,37 @@ builds:
       - go_first_class
     flags:
       - -trimpath
+    env:
+      - CGO_ENABLED=0
+
+universal_binaries:
+  - replace: false
 
 archives:
-  - format: binary
+  - name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- if eq .Os "darwin" }}MacOS{{- else }}{{- title .Os }}{{ end }}_
+      {{- if eq .Arch "amd64" }}x86_64
+        {{- else if eq .Arch "386" }}i386
+        {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    builds_info:
+      group: root
+      owner: root
+    files:
+      - README.md
+      - LICENSE
 
 nfpms:
   - id: packages
     file_name_template: '{{ .ConventionalFileName }}'
     homepage: https://github.com/abemedia/appcast
-    description: A CLI tool for signing update packages and creating appcast XML for use with Sparkle.
+    description: |-
+      AppCast signs and releases software for common package managers and
+      software update frameworks.
     maintainer: Adam Bouqdib <adam@abemedia.co.uk>
     license: MIT
     vendor: AppCast
@@ -26,6 +48,8 @@ nfpms:
       - src: build/linux/appcast.repo
         dst: /etc/yum.repos.d/appcast.repo
         packager: rpm
+      - src: LICENSE
+        dst: /usr/share/doc/appcast/copyright
 
 publishers:
   - name: fury.io
@@ -35,9 +59,6 @@ publishers:
       - FURY_TOKEN={{ .Env.FURY_TOKEN }}
     cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
 
-changelog:
-  skip: true
-
 brews:
   - tap:
       owner: abemedia
@@ -45,4 +66,9 @@ brews:
     license: MIT
     test: system "#{bin}/appcast version"
     folder: Formula
-    description: A CLI tool for signing update packages and creating appcast XML for use with Sparkle.
+    description: >-
+      AppCast signs and releases software for common package managers and
+      software update frameworks.
+
+changelog:
+  skip: true
