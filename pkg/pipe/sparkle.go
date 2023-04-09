@@ -79,14 +79,16 @@ func getSparkle(c *config) (*sparkle.Config, error) {
 	return &sparkle.Config{
 		Title:       fallback(c.Sparkle.Title, c.Title),
 		Description: fallback(c.Sparkle.Description, c.Description),
-		FileName:    fallback(c.Sparkle.Filename, "sparkle.xml"),
-		Source:      c.source,
-		Target:      c.target.Sub(dir),
+		FileName:    fallback(c.Sparkle.Filename, "appcast.xml"),
 		DSAKey:      dsaKey,
 		Ed25519Key:  edKey,
-		Version:     c.Version,
-		Prerelease:  c.Prerelease,
 		Settings:    params,
 		DetectOS:    detectOS,
+
+		Source:         c.source,
+		Target:         c.target.Sub(dir),
+		Version:        c.Version,
+		Prerelease:     c.Prerelease,
+		UploadPackages: c.UploadPackages,
 	}, nil
 }

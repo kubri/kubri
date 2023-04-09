@@ -23,14 +23,16 @@ func getAppinstaller(c *config) *appinstaller.Config {
 	}
 
 	return &appinstaller.Config{
-		Source:                    c.source,
-		Target:                    c.target.Sub(dir),
-		Version:                   c.Version,
-		Prerelease:                c.Prerelease,
 		HoursBetweenUpdateChecks:  c.Appinstaller.HoursBetweenUpdateChecks,
 		UpdateBlocksActivation:    c.Appinstaller.UpdateBlocksActivation,
 		ShowPrompt:                c.Appinstaller.ShowPrompt,
 		AutomaticBackgroundTask:   c.Appinstaller.AutomaticBackgroundTask,
 		ForceUpdateFromAnyVersion: c.Appinstaller.ForceUpdateFromAnyVersion,
+
+		Source:         c.source,
+		Target:         c.target.Sub(dir),
+		Version:        c.Version,
+		Prerelease:     c.Prerelease,
+		UploadPackages: c.UploadPackages,
 	}
 }

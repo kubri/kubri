@@ -14,6 +14,7 @@ import (
 	"github.com/abemedia/appcast/integrations/apt/deb"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
+	"golang.org/x/mod/semver"
 )
 
 type Config struct {
@@ -24,39 +25,31 @@ type Config struct {
 }
 
 func Build(ctx context.Context, c *Config) error {
+	pkgs := read(ctx, c)
+
+	version := c.Version
+	if v := getLatestVersion(pkgs); v != "" {
+		version = ">" + v + "," + version
+	}
+
 	releases, err := c.Source.ListReleases(ctx, &source.ListOptions{
-		Version:    c.Version,
+		Version:    version,
 		Prerelease: c.Prerelease,
 	})
+	if err == source.ErrNoReleaseFound {
+		return nil
+	}
 	if err != nil {
 		return err
 	}
 
-	cached := read(ctx, c)
-	var isNew bool
-	var items []*Package
-	for _, release := range releases {
-		for _, asset := range release.Assets {
-			if path.Ext(asset.Name) != ".deb" {
-				continue
-			}
-			if item, ok := cached[asset.Name]; ok {
-				items = append(items, item)
-				continue
-			}
-			isNew = true
-			item, err := getPackage(ctx, c, release.Version, asset.Name)
-			if err != nil {
-				return err
-			}
-			items = append(items, item)
-		}
+	p, err := getPackages(ctx, c, releases)
+	if err != nil || p == nil {
+		return err
 	}
-	if !isNew {
-		return nil // No new packages.
-	}
+	pkgs = append(p, pkgs...)
 
-	dir, err := release(items)
+	dir, err := release(pkgs)
 	if err != nil {
 		return err
 	}
@@ -67,11 +60,11 @@ func Build(ctx context.Context, c *Config) error {
 		if err != nil || d.IsDir() {
 			return err
 		}
-		w, err := c.Target.NewWriter(ctx, path)
+		b, err := fs.ReadFile(files, path)
 		if err != nil {
 			return err
 		}
-		b, err := fs.ReadFile(files, path)
+		w, err := c.Target.NewWriter(ctx, path)
 		if err != nil {
 			return err
 		}
@@ -80,6 +73,70 @@ func Build(ctx context.Context, c *Config) error {
 		}
 		return w.Close()
 	})
+}
+
+func read(ctx context.Context, c *Config) []*Package {
+	dist := "edge"
+	rd, err := c.Target.NewReader(ctx, "dists/edge/Release")
+	if err != nil {
+		dist = "stable"
+		rd, err = c.Target.NewReader(ctx, "dists/stable/Release")
+		if err != nil {
+			return nil
+		}
+	}
+	defer rd.Close()
+
+	r := &Releases{}
+	if err = deb.NewDecoder(rd).Decode(r); err != nil {
+		return nil
+	}
+
+	var pkgs []*Package
+	for _, arch := range strings.Split(r.Architectures, " ") {
+		path := fmt.Sprintf("dists/%s/main/binary-%s/Packages", dist, arch)
+		rd, err = c.Target.NewReader(ctx, path)
+		if err != nil {
+			return nil
+		}
+		defer rd.Close()
+
+		var p []*Package
+		if err = deb.NewDecoder(rd).Decode(&p); err != nil {
+			return nil
+		}
+		pkgs = append(pkgs, p...)
+	}
+
+	return pkgs
+}
+
+func getLatestVersion(pkgs []*Package) string {
+	var v string
+	for _, p := range pkgs {
+		s := "v" + p.Version
+		if semver.Compare(s, v) == 1 {
+			v = s
+		}
+	}
+	return v
+}
+
+func getPackages(ctx context.Context, c *Config, releases []*source.Release) ([]*Package, error) {
+	var pkgs []*Package
+	for _, release := range releases {
+		for _, asset := range release.Assets {
+			if path.Ext(asset.Name) != ".deb" {
+				continue
+			}
+			p, err := getPackage(ctx, c, release.Version, asset.Name)
+			if err != nil {
+				return nil, err
+			}
+			pkgs = append(pkgs, p)
+		}
+	}
+	return pkgs, nil
 }
 
 func getPackage(ctx context.Context, c *Config, version, name string) (*Package, error) {
@@ -93,7 +150,8 @@ func getPackage(ctx context.Context, c *Config, version, name string) (*Package,
 		return nil, err
 	}
 	p.Size = len(b)
-	p.Filename = path.Join("pool/main", p.Package[0:1], p.Package, name)
+	p.Filename = "pool/main/" + p.Package[0:1] + "/" + p.Package + "/" +
+		p.Package + "_" + p.Version + "_" + p.Architecture + ".deb"
 	p.MD5sum = md5.Sum(b)
 	p.SHA1 = sha1.Sum(b)
 	p.SHA256 = sha256.Sum256(b)
@@ -110,45 +168,4 @@ func getPackage(ctx context.Context, c *Config, version, name string) (*Package,
 	}
 
 	return p, nil
-}
-
-func read(ctx context.Context, c *Config) map[string]*Package {
-	res := map[string]*Package{}
-
-	dist := "edge"
-	rd, err := c.Target.NewReader(ctx, "dists/edge/Release")
-	if err != nil {
-		dist = "stable"
-		rd, err = c.Target.NewReader(ctx, "dists/stable/Release")
-		if err != nil {
-			return res
-		}
-	}
-	defer rd.Close()
-
-	r := &Releases{}
-	if err = deb.NewDecoder(rd).Decode(r); err != nil {
-		return res
-	}
-
-	var pkgs []*Package
-	for _, arch := range strings.Split(r.Architectures, " ") {
-		path := fmt.Sprintf("dists/%s/main/binary-%s/Packages", dist, arch)
-		rd, err = c.Target.NewReader(ctx, path)
-		if err != nil {
-			return res
-		}
-
-		var p []*Package
-		if err = deb.NewDecoder(rd).Decode(&p); err != nil {
-			return res
-		}
-		pkgs = append(pkgs, p...)
-	}
-
-	for _, p := range pkgs {
-		res[path.Base(p.Filename)] = p
-	}
-
-	return res
 }

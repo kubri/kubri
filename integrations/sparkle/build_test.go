@@ -44,7 +44,7 @@ func TestBuild(t *testing.T) {
 
 	tgt := testtarget.New()
 
-	w, err := tgt.NewWriter(ctx, "sparkle.xml")
+	w, err := tgt.NewWriter(ctx, "appcast.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,10 +82,10 @@ func TestBuild(t *testing.T) {
 	c := &sparkle.Config{
 		Title:       "Test",
 		Description: "Test",
-		URL:         "https://example.com/sparkle.xml",
+		URL:         "https://example.com/appcast.xml",
 		Source:      src,
 		Target:      tgt,
-		FileName:    "sparkle.xml",
+		FileName:    "appcast.xml",
 		Settings: []sparkle.Rule{
 			{
 				OS: sparkle.Windows,
@@ -122,7 +122,7 @@ func TestBuild(t *testing.T) {
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
 	<channel>
 		<title>Test</title>
-		<link>https://example.com/sparkle.xml</link>
+		<link>https://example.com/appcast.xml</link>
 		<description>Test</description>
 		<item>
 			<title>v1.1.0</title>
@@ -199,11 +199,22 @@ func TestBuild(t *testing.T) {
 	</channel>
 </rss>`
 
-	if err = sparkle.Build(ctx, c); err != nil {
+	testBuild(t, c, want)
+
+	// Should be no-op as nothing changed so timestamp should still be valid.
+	time.Sleep(time.Second)
+	testBuild(t, c, want)
+}
+
+func testBuild(t *testing.T, c *sparkle.Config, want string) {
+	t.Helper()
+
+	ctx := context.Background()
+	if err := sparkle.Build(ctx, c); err != nil {
 		t.Fatal(err)
 	}
 
-	r, err := tgt.NewReader(ctx, "sparkle.xml")
+	r, err := c.Target.NewReader(ctx, "appcast.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,10 +253,10 @@ func TestBuildSign(t *testing.T) {
 	c := &sparkle.Config{
 		Title:       "Test",
 		Description: "Test",
-		URL:         "https://example.com/sparkle.xml",
+		URL:         "https://example.com/appcast.xml",
 		Source:      src,
 		Target:      tgt,
-		FileName:    "sparkle.xml",
+		FileName:    "appcast.xml",
 		Settings:    []sparkle.Rule{},
 		DSAKey:      dsaKey,
 		Ed25519Key:  edKey,
@@ -254,16 +265,16 @@ func TestBuildSign(t *testing.T) {
 	pubDate := ts.Format(time.RFC1123)
 
 	want := sparkle.RSS{
-		Channels: []sparkle.Channel{{
+		Channels: []*sparkle.Channel{{
 			Title:       "Test",
-			Link:        "https://example.com/sparkle.xml",
+			Link:        "https://example.com/appcast.xml",
 			Description: "Test",
-			Items: []sparkle.Item{
+			Items: []*sparkle.Item{
 				{
 					Title:   "v1.0.0",
 					PubDate: pubDate,
 					Version: "1.0.0",
-					Enclosure: sparkle.Enclosure{
+					Enclosure: &sparkle.Enclosure{
 						URL:         "https://example.com/v1.0.0/test.dmg",
 						OS:          "macos",
 						Version:     "1.0.0",
@@ -276,7 +287,7 @@ func TestBuildSign(t *testing.T) {
 					Title:   "v1.0.0",
 					PubDate: pubDate,
 					Version: "1.0.0",
-					Enclosure: sparkle.Enclosure{
+					Enclosure: &sparkle.Enclosure{
 						URL:     "https://example.com/v1.0.0/test.msi",
 						OS:      "windows",
 						Version: "1.0.0",
@@ -298,7 +309,7 @@ func TestBuildSign(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r, err := tgt.NewReader(ctx, "sparkle.xml")
+	r, err := tgt.NewReader(ctx, "appcast.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -337,5 +348,51 @@ func TestBuildSign(t *testing.T) {
 
 	if diff := cmp.Diff(want, got, compareDSA, compareED); diff != "" {
 		t.Error(diff)
+	}
+}
+
+func TestBuildUpload(t *testing.T) {
+	ctx := context.Background()
+	data := []byte("test")
+	ts := time.Now().UTC()
+	src := testsource.New([]*source.Release{{Version: "v1.0.0", Date: ts}})
+	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
+	src.UploadAsset(ctx, "v1.0.0", "test.msi", data)
+
+	for _, upload := range []bool{true, false} {
+		tgt := testtarget.New()
+
+		c := &sparkle.Config{
+			Title:          "Test",
+			Description:    "Test",
+			URL:            "https://example.com/appcast.xml",
+			Source:         src,
+			Target:         tgt,
+			FileName:       "appcast.xml",
+			Settings:       []sparkle.Rule{},
+			UploadPackages: upload,
+		}
+
+		if err := sparkle.Build(ctx, c); err != nil {
+			t.Fatal(err)
+		}
+
+		r, err := src.GetRelease(ctx, "v1.0.0")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, asset := range r.Assets {
+			rd, err := tgt.NewReader(ctx, r.Version+"/"+asset.Name)
+			if err == nil {
+				rd.Close()
+			}
+			if upload && err != nil {
+				t.Fatalf("should upload assets: %v", err)
+			}
+			if !upload && err == nil {
+				t.Fatal("should not upload assets")
+			}
+		}
 	}
 }

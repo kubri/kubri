@@ -98,7 +98,7 @@ sparkle: {}
 					Description: "test",
 					Source:      src,
 					Target:      tgt.Sub("sparkle"),
-					FileName:    "sparkle.xml",
+					FileName:    "appcast.xml",
 					Settings:    []sparkle.Rule{},
 				},
 			},

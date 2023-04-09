@@ -14,58 +14,226 @@ import (
 	"github.com/abemedia/appcast/source"
 	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/russross/blackfriday/v2"
+	"golang.org/x/mod/semver"
 )
 
 func Build(ctx context.Context, c *Config) error {
+	items := read(ctx, c)
+
+	version := c.Version
+	if v := getLatestVersion(items); v != "" {
+		version = ">" + v + "," + version
+	}
+
 	releases, err := c.Source.ListReleases(ctx, &source.ListOptions{
-		Version:    c.Version,
+		Version:    version,
 		Prerelease: c.Prerelease,
 	})
+	if err == source.ErrNoReleaseFound {
+		return nil
+	}
 	if err != nil {
 		return err
 	}
 
-	cached := map[string][]Item{}
-	if r, err := read(ctx, c); err == nil {
-		for _, item := range r.Channels[0].Items {
-			cached[item.Version] = append(cached[item.Version], item)
-		}
+	i, err := getItems(ctx, c, releases)
+	if err != nil {
+		return err
+	}
+	items = append(i, items...)
+
+	link, err := c.Target.URL(ctx, c.FileName)
+	if err != nil {
+		return err
 	}
 
-	var items []Item
+	rss := &RSS{Channels: []*Channel{{
+		Title:       c.Title,
+		Description: c.Description,
+		Link:        link,
+		Items:       items,
+	}}}
+
+	return write(ctx, c, rss)
+}
+
+func read(ctx context.Context, c *Config) []*Item {
+	r, err := c.Target.NewReader(ctx, c.FileName)
+	if err != nil {
+		return nil
+	}
+	defer r.Close()
+	var rss RSS
+	if err = xml.NewDecoder(r).Decode(&rss); err != nil || len(rss.Channels) == 0 {
+		return nil
+	}
+	return rss.Channels[0].Items
+}
+
+func getLatestVersion(items []*Item) string {
+	var v string
+	for _, item := range items {
+		s := "v" + item.Version
+		if semver.Compare(s, v) == 1 {
+			v = s
+		}
+	}
+	return v
+}
+
+func getItems(ctx context.Context, c *Config, releases []*source.Release) ([]*Item, error) {
+	var items []*Item
 	for _, release := range releases {
-		// Load saved RSS.
-		if item, ok := cached[release.Version[1:]]; ok {
-			items = append(items, item...)
+		item, err := getReleaseItems(ctx, c, release)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item...)
+	}
+	return items, nil
+}
+
+//nolint:funlen
+func getReleaseItems(ctx context.Context, c *Config, release *source.Release) ([]*Item, error) {
+	var description *CdataString
+	if release.Description != "" {
+		desc := string(blackfriday.Run([]byte(release.Description)))
+		desc = strings.TrimSpace(xmlfmt.FormatXML(desc, "\t\t\t\t", "\t"))
+		description = &CdataString{Value: "\n\t\t\t\t" + desc + "\n\t\t\t"}
+	}
+
+	items := make([]*Item, 0, len(release.Assets))
+	for _, asset := range release.Assets {
+		detect := c.DetectOS
+		if detect == nil {
+			detect = DetectOS
+		}
+		os := detect(asset.Name)
+		if os == Unknown {
 			continue
 		}
 
-		item, err := createReleaseItems(ctx, c, release)
+		opt, err := getSettings(c.Settings, release.Version, os)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		items = append(items, item...)
+		var b []byte
+		if (os == MacOS && c.Ed25519Key != nil) || c.DSAKey != nil || c.UploadPackages {
+			b, err = c.Source.DownloadAsset(ctx, release.Version, asset.Name)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		edSig, dsaSig, err := signAsset(c, os, b)
+		if err != nil {
+			return nil, err
+		}
+
+		url := asset.URL
+		if c.UploadPackages {
+			url, err = uploadAsset(ctx, c, release.Version+"/"+asset.Name, b)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		version := strings.TrimPrefix(release.Version, "v")
+
+		items = append(items, &Item{
+			Title:                             release.Name,
+			PubDate:                           release.Date.UTC().Format(time.RFC1123),
+			Description:                       description,
+			Version:                           version,
+			CriticalUpdate:                    getCriticalUpdate(opt.CriticalUpdateBelowVersion),
+			Tags:                              getTags(opt.CriticalUpdate),
+			IgnoreSkippedUpgradesBelowVersion: opt.IgnoreSkippedUpgradesBelowVersion,
+			MinimumAutoupdateVersion:          opt.MinimumAutoupdateVersion,
+			Enclosure: &Enclosure{
+				Version:              version,
+				URL:                  url,
+				InstallerArguments:   opt.InstallerArguments,
+				MinimumSystemVersion: opt.MinimumSystemVersion,
+				Type:                 getFileType(asset.Name),
+				OS:                   os.String(),
+				Length:               asset.Size,
+				DSASignature:         dsaSig,
+				EDSignature:          edSig,
+			},
+		})
 	}
 
-	return write(ctx, c, newRSS(c.Title, c.Description, c.URL, items))
+	return items, nil
+}
+
+//nolint:nonamedreturns
+func signAsset(c *Config, os OS, b []byte) (edSig, dsaSig string, err error) {
+	if os == MacOS && c.Ed25519Key != nil {
+		sig := ed25519.Sign(c.Ed25519Key, b)
+		edSig = base64.RawStdEncoding.EncodeToString(sig)
+	} else if c.DSAKey != nil {
+		sum := sha1.Sum(b)
+		sum = sha1.Sum(sum[:])
+		sig, err := dsa.Sign(c.DSAKey, sum[:])
+		if err != nil {
+			return "", "", err
+		}
+		dsaSig = base64.RawStdEncoding.EncodeToString(sig)
+	}
+	return
+}
+
+func uploadAsset(ctx context.Context, c *Config, name string, b []byte) (string, error) {
+	w, err := c.Target.NewWriter(ctx, name)
+	if err != nil {
+		return "", err
+	}
+	if _, err := w.Write(b); err != nil {
+		return "", err
+	}
+	if err = w.Close(); err != nil {
+		return "", err
+	}
+	return c.Target.URL(ctx, name)
+}
+
+func getCriticalUpdate(version string) *CriticalUpdate {
+	if version != "" {
+		return &CriticalUpdate{Version: version}
+	}
+	return nil
+}
+
+func getTags(critical bool) *Tags {
+	if critical {
+		return &Tags{CriticalUpdate: true}
+	}
+	return nil
+}
+
+func getFileType(s string) string {
+	ext := path.Ext(s)
+	switch ext {
+	default:
+		return "application/octet-stream"
+	case ".pkg", ".mpkg":
+		return "application/vnd.apple.installer+xml"
+	case ".dmg":
+		return "application/x-apple-diskimage"
+	case ".msi":
+		return "application/x-msi"
+	case ".exe":
+		return "application/vnd.microsoft.portable-executable"
+
+	// See https://learn.microsoft.com/en-us/windows/msix/app-installer/web-install-iis#step-7---configure-the-web-app-for-app-package-mime-types
+	case ".msix", ".msixbundle", ".appx", ".appxbundle", ".appinstaller":
+		return "application/" + ext[1:]
+	}
 }
 
 //nolint:gochecknoglobals
 var replacer = strings.NewReplacer("></sparkle:criticalUpdate>", " />", "></enclosure>", " />")
-
-func read(ctx context.Context, c *Config) (*RSS, error) {
-	r, err := c.Target.NewReader(ctx, c.FileName)
-	if err != nil {
-		return nil, err
-	}
-	defer r.Close()
-	var rss RSS
-	if err = xml.NewDecoder(r).Decode(&rss); err != nil {
-		return nil, err
-	}
-	return &rss, nil
-}
 
 func write(ctx context.Context, c *Config, rss *RSS) error {
 	w, err := c.Target.NewWriter(ctx, c.FileName)
@@ -89,124 +257,4 @@ func write(ctx context.Context, c *Config, rss *RSS) error {
 	}
 
 	return w.Close()
-}
-
-func newRSS(title, description, url string, items []Item) *RSS {
-	return &RSS{Channels: []Channel{{Title: title, Description: description, Link: url, Items: items}}}
-}
-
-func createReleaseItems(ctx context.Context, c *Config, release *source.Release) ([]Item, error) {
-	var description *CdataString
-	if release.Description != "" {
-		desc := string(blackfriday.Run([]byte(release.Description)))
-		desc = strings.TrimSpace(xmlfmt.FormatXML(desc, "\t\t\t\t", "\t"))
-		description = &CdataString{Value: "\n\t\t\t\t" + desc + "\n\t\t\t"}
-	}
-
-	items := make([]Item, 0, len(release.Assets))
-	for _, asset := range release.Assets {
-		detect := c.DetectOS
-		if detect == nil {
-			detect = DetectOS
-		}
-		os := detect(asset.Name)
-		if os == Unknown {
-			continue
-		}
-
-		opt, err := getSettings(c.Settings, release.Version, os)
-		if err != nil {
-			return nil, err
-		}
-
-		edSig, dsaSig, err := signAsset(ctx, c, release.Version, os, asset)
-		if err != nil {
-			return nil, err
-		}
-
-		version := strings.TrimPrefix(release.Version, "v")
-
-		items = append(items, Item{
-			Title:                             release.Name,
-			PubDate:                           release.Date.UTC().Format(time.RFC1123),
-			Description:                       description,
-			Version:                           version,
-			CriticalUpdate:                    getCriticalUpdate(opt.CriticalUpdateBelowVersion),
-			Tags:                              getTags(opt.CriticalUpdate),
-			IgnoreSkippedUpgradesBelowVersion: opt.IgnoreSkippedUpgradesBelowVersion,
-			MinimumAutoupdateVersion:          opt.MinimumAutoupdateVersion,
-			Enclosure: Enclosure{
-				Version:              version,
-				URL:                  asset.URL,
-				InstallerArguments:   opt.InstallerArguments,
-				MinimumSystemVersion: opt.MinimumSystemVersion,
-				Type:                 getFileType(asset.Name),
-				OS:                   os.String(),
-				Length:               asset.Size,
-				DSASignature:         dsaSig,
-				EDSignature:          edSig,
-			},
-		})
-	}
-
-	return items, nil
-}
-
-//nolint:nonamedreturns
-func signAsset(ctx context.Context, c *Config, v string, os OS, a *source.Asset) (edSig, dsaSig string, err error) {
-	if os == MacOS && c.Ed25519Key != nil {
-		b, err := c.Source.DownloadAsset(ctx, v, a.Name)
-		if err != nil {
-			return "", "", err
-		}
-		sig := ed25519.Sign(c.Ed25519Key, b)
-		edSig = base64.RawStdEncoding.EncodeToString(sig)
-	} else if c.DSAKey != nil {
-		b, err := c.Source.DownloadAsset(ctx, v, a.Name)
-		if err != nil {
-			return "", "", err
-		}
-		sum := sha1.Sum(b)
-		sum = sha1.Sum(sum[:])
-		sig, err := dsa.Sign(c.DSAKey, sum[:])
-		if err != nil {
-			return "", "", err
-		}
-		dsaSig = base64.RawStdEncoding.EncodeToString(sig)
-	}
-	return
-}
-
-func getFileType(s string) string {
-	ext := path.Ext(s)
-	switch ext {
-	default:
-		return "application/octet-stream"
-	case ".pkg", ".mpkg":
-		return "application/vnd.apple.installer+xml"
-	case ".dmg":
-		return "application/x-apple-diskimage"
-	case ".msi":
-		return "application/x-msi"
-	case ".exe":
-		return "application/vnd.microsoft.portable-executable"
-
-	// See https://learn.microsoft.com/en-us/windows/msix/app-installer/web-install-iis#step-7---configure-the-web-app-for-app-package-mime-types
-	case ".msix", ".msixbundle", ".appx", ".appxbundle", ".appinstaller":
-		return "application/" + ext[1:]
-	}
-}
-
-func getTags(critical bool) *Tags {
-	if critical {
-		return &Tags{CriticalUpdate: true}
-	}
-	return nil
-}
-
-func getCriticalUpdate(version string) *CriticalUpdate {
-	if version != "" {
-		return &CriticalUpdate{Version: version}
-	}
-	return nil
 }
