@@ -3,7 +3,7 @@ package sparkle
 import "encoding/xml"
 
 type RSS struct {
-	Channels []Channel `xml:"channel"`
+	Channels []*Channel `xml:"channel"`
 }
 
 func (r *RSS) MarshalXML(enc *xml.Encoder, _ xml.StartElement) error {
@@ -33,18 +33,18 @@ func (r *RSS) UnmarshalXML(dec *xml.Decoder, _ xml.StartElement) error {
 		return err
 	}
 
-	r.Channels = make([]Channel, 0, len(data))
+	r.Channels = make([]*Channel, 0, len(data))
 	for _, item := range data {
-		channel := Channel{
+		channel := &Channel{
 			Title:       item.Title,
 			Link:        item.Link,
 			Description: item.Description,
 			Language:    item.Language,
-			Items:       make([]Item, 0, len(item.Items)),
+			Items:       make([]*Item, 0, len(item.Items)),
 		}
 
 		for _, item := range item.Items {
-			channel.Items = append(channel.Items, Item{
+			channel.Items = append(channel.Items, &Item{
 				Title:                             item.Title,
 				PubDate:                           item.PubDate,
 				Description:                       item.Description,
@@ -54,7 +54,7 @@ func (r *RSS) UnmarshalXML(dec *xml.Decoder, _ xml.StartElement) error {
 				Tags:                              (*Tags)(item.Tags),
 				MinimumAutoupdateVersion:          item.MinimumAutoupdateVersion,
 				IgnoreSkippedUpgradesBelowVersion: item.IgnoreSkippedUpgradesBelowVersion,
-				Enclosure:                         Enclosure(item.Enclosure),
+				Enclosure:                         (*Enclosure)(item.Enclosure),
 			})
 		}
 
@@ -65,11 +65,11 @@ func (r *RSS) UnmarshalXML(dec *xml.Decoder, _ xml.StartElement) error {
 }
 
 type Channel struct {
-	Title       string `xml:"title"`
-	Link        string `xml:"link,omitempty"`
-	Description string `xml:"description,omitempty"`
-	Language    string `xml:"language,omitempty"`
-	Items       []Item `xml:"item"`
+	Title       string  `xml:"title"`
+	Link        string  `xml:"link,omitempty"`
+	Description string  `xml:"description,omitempty"`
+	Language    string  `xml:"language,omitempty"`
+	Items       []*Item `xml:"item"`
 }
 
 type Item struct {
@@ -82,7 +82,7 @@ type Item struct {
 	Tags                              *Tags           `xml:"sparkle:tags,omitempty"`
 	MinimumAutoupdateVersion          string          `xml:"sparkle:minimumAutoupdateVersion,omitempty"`
 	IgnoreSkippedUpgradesBelowVersion string          `xml:"sparkle:ignoreSkippedUpgradesBelowVersion,omitempty"`
-	Enclosure                         Enclosure       `xml:"enclosure,omitempty"`
+	Enclosure                         *Enclosure      `xml:"enclosure,omitempty"`
 }
 
 // CdataString for XML CDATA
@@ -142,7 +142,7 @@ type unmarshalRSS struct {
 		} `xml:"tags,omitempty"`
 		MinimumAutoupdateVersion          string `xml:"minimumAutoupdateVersion,omitempty"`
 		IgnoreSkippedUpgradesBelowVersion string `xml:"ignoreSkippedUpgradesBelowVersion,omitempty"`
-		Enclosure                         struct {
+		Enclosure                         *struct {
 			URL                  string `xml:"url,attr"`
 			OS                   string `xml:"os,attr"`
 			Version              string `xml:"version,attr"`

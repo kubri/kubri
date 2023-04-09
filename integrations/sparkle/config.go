@@ -28,17 +28,17 @@ type Config struct {
 	Title       string
 	Description string
 	URL         string
+	FileName    string
 	DetectOS    func(string) OS
+	DSAKey      *dsa.PrivateKey
+	Ed25519Key  ed25519.PrivateKey
+	Settings    []Rule
 
-	Source     *source.Source
-	Target     target.Target
-	FileName   string
-	Version    string
-	Prerelease bool
-	DSAKey     *dsa.PrivateKey
-	Ed25519Key ed25519.PrivateKey
-
-	Settings []Rule
+	Source         *source.Source
+	Target         target.Target
+	Version        string
+	Prerelease     bool
+	UploadPackages bool
 }
 
 func getSettings(settings []Rule, v string, os OS) (*Settings, error) {

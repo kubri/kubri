@@ -18,15 +18,16 @@ import (
 )
 
 type config struct {
-	Title        string              `yaml:"title"`
-	Description  string              `yaml:"description"`
-	Version      string              `yaml:"version"`
-	Prerelease   bool                `yaml:"prerelease"`
-	Source       sourceConfig        `yaml:"source"`
-	Target       targetConfig        `yaml:"target"`
-	Apt          *aptConfig          `yaml:"apt"`
-	Sparkle      *sparkleConfig      `yaml:"sparkle"`
-	Appinstaller *appinstallerConfig `yaml:"appinstaller"`
+	Title          string              `yaml:"title"`
+	Description    string              `yaml:"description"`
+	Version        string              `yaml:"version"`
+	Prerelease     bool                `yaml:"prerelease"`
+	UploadPackages bool                `yaml:"upload-packages"`
+	Source         sourceConfig        `yaml:"source"`
+	Target         targetConfig        `yaml:"target"`
+	Apt            *aptConfig          `yaml:"apt"`
+	Sparkle        *sparkleConfig      `yaml:"sparkle"`
+	Appinstaller   *appinstallerConfig `yaml:"appinstaller"`
 
 	source *source.Source
 	target target.Target

@@ -10,19 +10,19 @@ import (
 
 func TestRSSMarshalUnmarshal(t *testing.T) {
 	in := &sparkle.RSS{
-		Channels: []sparkle.Channel{{
+		Channels: []*sparkle.Channel{{
 			Title:       "Title",
 			Description: "Description",
 			Link:        "https://example.com/sparkle.xml",
 			Language:    "en-gb",
-			Items: []sparkle.Item{
+			Items: []*sparkle.Item{
 				{
 					Title:       "v1.0.0",
 					Description: &sparkle.CdataString{"Test"},
 					PubDate:     "Mon, 02 Jan 2006 15:04:05 +0000",
 					Version:     "1.0.0",
 					Tags:        &sparkle.Tags{CriticalUpdate: true},
-					Enclosure: sparkle.Enclosure{
+					Enclosure: &sparkle.Enclosure{
 						URL:         "https://example.com/test_v1.0.0.dmg",
 						OS:          "macos",
 						Version:     "1.0.0",
@@ -38,7 +38,7 @@ func TestRSSMarshalUnmarshal(t *testing.T) {
 					PubDate:        "Mon, 02 Jan 2007 15:04:05 +0000",
 					Version:        "1.1.0",
 					CriticalUpdate: &sparkle.CriticalUpdate{Version: "1.0.0"},
-					Enclosure: sparkle.Enclosure{
+					Enclosure: &sparkle.Enclosure{
 						URL:         "https://example.com/test_v1.1.0.dmg",
 						OS:          "macos",
 						Version:     "1.1.0",

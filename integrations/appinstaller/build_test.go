@@ -3,6 +3,7 @@ package appinstaller_test
 import (
 	"context"
 	"io"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -85,6 +86,18 @@ func TestBuild(t *testing.T) {
 	</UpdateSettings>
 </AppInstaller>`,
 		},
+		{
+			name: "Test.appinstaller",
+			config: &appinstaller.Config{
+				Source:         src,
+				Target:         tgt,
+				UploadPackages: true,
+			},
+			want: `<?xml version="1.0" encoding="UTF-8"?>
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017" Version="1.0.0.1" Uri="file://` + dir + `/Test.appinstaller">
+	<MainBundle Name="Test" Publisher="CN=Test" Version="1.0.0.1" Uri="file://` + dir + `/test.msixbundle" />
+</AppInstaller>`,
+		},
 	}
 
 	for _, test := range tests {
@@ -106,6 +119,14 @@ func TestBuild(t *testing.T) {
 
 		if diff := cmp.Diff(test.want, string(got)); diff != "" {
 			t.Fatal(diff)
+		}
+
+		if test.config.UploadPackages {
+			for _, ext := range []string{".msixbundle", ".msix"} {
+				if _, err = os.Stat(dir + "/test" + ext); err != nil {
+					t.Fatal(err)
+				}
+			}
 		}
 	}
 }
