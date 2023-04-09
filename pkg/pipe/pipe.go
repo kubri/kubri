@@ -6,12 +6,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/abemedia/appcast/integrations/appinstaller"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/sparkle"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
+	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v3"
 )
 
@@ -37,25 +39,54 @@ type Pipe struct {
 }
 
 func (p *Pipe) Run(ctx context.Context) error {
-	var err error
+	var n int
+	start := time.Now()
+	g, ctx := errgroup.WithContext(ctx)
+
 	if p.Appinstaller != nil {
-		log.Print("Publishing App Installer packages...")
-		if err = appinstaller.Build(ctx, p.Appinstaller); err != nil {
-			return err
-		}
+		n++
+		g.Go(func() error {
+			log.Print("Publishing App Installer packages...")
+			if err := appinstaller.Build(ctx, p.Appinstaller); err != nil {
+				return err
+			}
+			log.Print("Completed publishing App Installer packages.")
+			return nil
+		})
 	}
 	if p.Apt != nil {
-		log.Print("Publishing APT packages...")
-		if err = apt.Build(ctx, p.Apt); err != nil {
-			return err
-		}
+		n++
+		g.Go(func() error {
+			log.Print("Publishing APT packages...")
+			if err := apt.Build(ctx, p.Apt); err != nil {
+				return err
+			}
+			log.Print("Completed publishing APT packages.")
+			return nil
+		})
 	}
 	if p.Sparkle != nil {
-		log.Print("Publishing Sparkle packages...")
-		if err = sparkle.Build(ctx, p.Sparkle); err != nil {
-			return err
-		}
+		n++
+		g.Go(func() error {
+			log.Print("Publishing Sparkle packages...")
+			if err := sparkle.Build(ctx, p.Sparkle); err != nil {
+				return err
+			}
+			log.Print("Completed publishing Sparkle packages.")
+			return nil
+		})
 	}
+
+	if n == 0 {
+		return errors.New("no integrations configured")
+	}
+
+	if err := g.Wait(); err != nil {
+		return err
+	}
+
+	log.Printf("Completed in %s", time.Since(start).Truncate(time.Millisecond))
+
 	return nil
 }
 
