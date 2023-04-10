@@ -69,10 +69,10 @@ func TestTarget(t *testing.T) {
 			in: targetConfig{
 				"type":  "github",
 				"owner": "abemedia",
-				"repo":  "appcast-test",
+				"repo":  "appcast",
 			},
 			want: func() (target.Target, error) {
-				return github.New(github.Config{Owner: "abemedia", Repo: "appcast-test"})
+				return github.New(github.Config{Owner: "abemedia", Repo: "appcast"})
 			},
 		},
 	}
