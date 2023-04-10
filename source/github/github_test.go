@@ -1,138 +1,69 @@
 package github_test
 
 import (
-	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/source"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/source/github"
-	"github.com/google/go-cmp/cmp"
 	gh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
 func TestGithub(t *testing.T) {
-	want := []*source.Release{
-		{
-			Name:        "v1.0.0",
-			Description: "This is a stable release.",
-			Date:        time.Date(2022, 11, 29, 22, 10, 53, 0, time.UTC),
-			Version:     "v1.0.0",
-			Assets: []*source.Asset{
-				{
-					Name: "test.dmg",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0/test.dmg",
-					Size: 5,
-				},
-				{
-					Name: "test_32-bit.msi",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0/test_32-bit.msi",
-					Size: 5,
-				},
-				{
-					Name: "test_64-bit.msi",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0/test_64-bit.msi",
-					Size: 5,
-				},
-			},
-		},
-		{
-			Name:        "v1.0.0-alpha1",
-			Description: "This is a pre-release.",
-			Date:        time.Date(2022, 11, 29, 22, 10, 19, 0, time.UTC),
-			Version:     "v1.0.0-alpha1",
-			Prerelease:  true,
-			Assets: []*source.Asset{
-				{
-					Name: "test.dmg",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0-alpha1/test.dmg",
-					Size: 5,
-				},
-				{
-					Name: "test_32-bit.msi",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0-alpha1/test_32-bit.msi",
-					Size: 5,
-				},
-				{
-					Name: "test_64-bit.msi",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0-alpha1/test_64-bit.msi",
-					Size: 5,
-				},
-			},
-		},
+	token, ok := os.LookupEnv("GITHUB_TOKEN")
+	if !ok {
+		t.Skip("Missing environment variable: GITHUB_TOKEN")
 	}
 
-	s, err := github.New(github.Config{Owner: "abemedia", Repo: "appcast-test"})
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	client := gh.NewClient(oauth2.NewClient(ctx, ts))
+	user, _, err := client.Users.Get(ctx, "")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ctx := context.Background()
+	owner := user.GetLogin()
+	repo := fmt.Sprintf("test_%d", time.Now().UnixNano())
 
-	t.Run("ListReleases", func(t *testing.T) {
-		got, err := s.ListReleases(ctx, &source.ListOptions{Prerelease: true})
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(want, got); diff != "" {
-			t.Error(diff)
-		}
-	})
-
-	t.Run("GetRelease", func(t *testing.T) {
-		got, err := s.GetRelease(ctx, want[0].Version)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(want[0], got); diff != "" {
-			t.Error(diff)
-		}
-	})
-
-	data := []byte("test")
-
-	t.Run("UploadAsset", func(t *testing.T) {
-		if _, ok := os.LookupEnv("GITHUB_TOKEN"); !ok {
-			t.Skip("missing GITHUB_TOKEN")
-		}
-		err := s.UploadAsset(ctx, want[0].Version, "test.txt", data)
-		if err != nil {
-			t.Fatal(err)
-		}
-	})
-
-	t.Run("DownloadAsset", func(t *testing.T) {
-		if _, ok := os.LookupEnv("GITHUB_TOKEN"); !ok {
-			t.Skip("missing GITHUB_TOKEN")
-		}
-		b, err := s.DownloadAsset(ctx, want[0].Version, "test.txt")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if !bytes.Equal(data, b) {
-			t.Error("should be equal")
-		}
-	})
-
+	_, _, err = client.Repositories.Create(ctx, "", &gh.Repository{Name: &repo})
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Cleanup(func() {
-		if _, ok := os.LookupEnv("GITHUB_TOKEN"); !ok {
-			return
+		_, err := client.Repositories.Delete(ctx, owner, repo)
+		if err != nil {
+			t.Fatal(err)
 		}
+	})
 
-		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")})
-		client := gh.NewClient(oauth2.NewClient(ctx, ts))
-		release, _, _ := client.Repositories.GetReleaseByTag(ctx, "abemedia", "appcast-test", want[0].Version)
+	opt := &gh.RepositoryContentFileOptions{
+		Message: gh.String("test"),
+		Content: []byte("test"),
+	}
+	_, _, err = client.Repositories.CreateFile(ctx, owner, repo, "test", opt)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		for _, asset := range release.Assets {
-			if asset.GetName() == "test.txt" {
-				_, _ = client.Repositories.DeleteReleaseAsset(ctx, "abemedia", "appcast-test", asset.GetID())
-			}
+	for _, r := range test.SourceWant() {
+		opt := &gh.RepositoryRelease{TagName: &r.Version, Body: &r.Description}
+		_, _, err = client.Repositories.CreateRelease(ctx, owner, repo, opt)
+		if err != nil {
+			t.Fatal(err)
 		}
+	}
+
+	s, err := github.New(github.Config{Owner: owner, Repo: repo})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Source(t, s, func(version, asset string) string {
+		return "https://github.com/" + owner + "/" + repo + "/releases/download/" + version + "/" + asset
 	})
 }

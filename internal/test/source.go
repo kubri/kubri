@@ -17,41 +17,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 
 	data := []byte("test\n")
 	ctx := context.Background()
-
-	want := []*source.Release{
-		{
-			Name:    "v1.0.0",
-			Date:    time.Now(),
-			Version: "v1.0.0",
-			Assets: []*source.Asset{
-				{Name: "test.dmg", Size: 5},
-				{Name: "test_32-bit.msi", Size: 5},
-				{Name: "test_64-bit.msi", Size: 5},
-			},
-		},
-		{
-			Name:       "v1.0.0-alpha1",
-			Date:       time.Now(),
-			Version:    "v1.0.0-alpha1",
-			Prerelease: true,
-			Assets: []*source.Asset{
-				{Name: "test.dmg", Size: 5},
-				{Name: "test_32-bit.msi", Size: 5},
-				{Name: "test_64-bit.msi", Size: 5},
-			},
-		},
-		{
-			Name:       "v0.9.1",
-			Date:       time.Now(),
-			Version:    "v0.9.1",
-			Prerelease: false,
-			Assets: []*source.Asset{
-				{Name: "test.dmg", Size: 5},
-				{Name: "test_32-bit.msi", Size: 5},
-				{Name: "test_64-bit.msi", Size: 5},
-			},
-		},
-	}
+	want := SourceWant()
 
 	for _, release := range want {
 		for _, asset := range release.Assets {
@@ -60,7 +26,10 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 		}
 	}
 
-	opt := cmpopts.EquateApproxTime(time.Second)
+	opt := []cmp.Option{
+		cmpopts.EquateApproxTime(10 * time.Second),
+		cmpopts.SortSlices(func(a, b *source.Asset) bool { return a.Name < b.Name }),
+	}
 
 	t.Run("ListReleases", func(t *testing.T) {
 		t.Helper()
@@ -69,7 +38,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 		if err != nil {
 			t.Fatal(err)
 		}
-		if diff := cmp.Diff(want, got, opt); diff != "" {
+		if diff := cmp.Diff(want, got, opt...); diff != "" {
 			t.Error(diff)
 		}
 	})
@@ -81,7 +50,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 		if err != nil {
 			t.Fatal(err)
 		}
-		if diff := cmp.Diff(want[0], got, opt); diff != "" {
+		if diff := cmp.Diff(want[0], got, opt...); diff != "" {
 			t.Error(diff)
 		}
 
@@ -121,4 +90,41 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 			t.Error("should return error")
 		}
 	})
+}
+
+func SourceWant() []*source.Release {
+	return []*source.Release{
+		{
+			Name:    "v1.0.0",
+			Date:    time.Now().UTC(),
+			Version: "v1.0.0",
+			Assets: []*source.Asset{
+				{Name: "test.dmg", Size: 5},
+				{Name: "test_32-bit.msi", Size: 5},
+				{Name: "test_64-bit.msi", Size: 5},
+			},
+		},
+		{
+			Name:       "v1.0.0-alpha",
+			Date:       time.Now().UTC(),
+			Version:    "v1.0.0-alpha",
+			Prerelease: true,
+			Assets: []*source.Asset{
+				{Name: "test.dmg", Size: 5},
+				{Name: "test_32-bit.msi", Size: 5},
+				{Name: "test_64-bit.msi", Size: 5},
+			},
+		},
+		{
+			Name:       "v0.9.1",
+			Date:       time.Now().UTC(),
+			Version:    "v0.9.1",
+			Prerelease: false,
+			Assets: []*source.Asset{
+				{Name: "test.dmg", Size: 5},
+				{Name: "test_32-bit.msi", Size: 5},
+				{Name: "test_64-bit.msi", Size: 5},
+			},
+		},
+	}
 }
