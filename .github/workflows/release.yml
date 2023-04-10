@@ -4,6 +4,10 @@ on:
   push:
     branches: [master]
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   release:
     name: Release
@@ -12,4 +16,3 @@ jobs:
       - uses: GoogleCloudPlatform/release-please-action@v3
         with:
           release-type: go
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
