@@ -105,7 +105,7 @@ type fileWriter struct {
 func (w *fileWriter) Close() error {
 	getOpt := &github.RepositoryContentGetOptions{Ref: w.t.branch}
 	file, _, res, err := w.t.client.GetContents(w.ctx, w.t.owner, w.t.repo, w.path, getOpt)
-	if err != nil && (res == nil || res.StatusCode != 404) {
+	if err != nil && (res == nil || res.StatusCode != http.StatusNotFound) {
 		return err
 	}
 

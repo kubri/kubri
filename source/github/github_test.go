@@ -41,18 +41,19 @@ func TestGithub(t *testing.T) {
 		}
 	})
 
-	opt := &gh.RepositoryContentFileOptions{
+	_, _, err = client.Repositories.CreateFile(ctx, owner, repo, "test", &gh.RepositoryContentFileOptions{
 		Message: gh.String("test"),
 		Content: []byte("test"),
-	}
-	_, _, err = client.Repositories.CreateFile(ctx, owner, repo, "test", opt)
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, r := range test.SourceWant() {
-		opt := &gh.RepositoryRelease{TagName: &r.Version, Body: &r.Description}
-		_, _, err = client.Repositories.CreateRelease(ctx, owner, repo, opt)
+		_, _, err = client.Repositories.CreateRelease(ctx, owner, repo, &gh.RepositoryRelease{
+			TagName: &r.Version,
+			Body:    &r.Description,
+		})
 		if err != nil {
 			t.Fatal(err)
 		}
