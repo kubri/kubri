@@ -2,9 +2,11 @@ package github_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path"
 	"testing"
+	"time"
 
 	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/target/github"
@@ -13,26 +15,28 @@ import (
 )
 
 func TestGithub(t *testing.T) {
-	owner := "abemedia"
-	repo := "appcast-test"
-
 	token, ok := os.LookupEnv("GITHUB_TOKEN")
 	if !ok {
 		t.Skip("Missing environment variable: GITHUB_TOKEN")
 	}
 
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	client := gh.NewClient(oauth2.NewClient(ctx, ts))
+	user, _, err := client.Users.Get(ctx, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	owner := user.GetLogin()
+	repo := fmt.Sprintf("test_%d", time.Now().UnixNano())
+
+	_, _, err = client.Repositories.Create(ctx, "", &gh.Repository{Name: &repo})
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Cleanup(func() {
-		ctx := context.Background()
-		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-		client := gh.NewClient(oauth2.NewClient(ctx, ts))
-
-		file, _, _, err := client.Repositories.GetContents(ctx, owner, repo, "path/to/file", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		opt := &gh.RepositoryContentFileOptions{Message: gh.String("Delete path/to/file"), SHA: file.SHA}
-		_, _, err = client.Repositories.DeleteFile(ctx, owner, repo, "path/to/file", opt)
+		_, err := client.Repositories.Delete(ctx, owner, repo)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -44,7 +48,7 @@ func TestGithub(t *testing.T) {
 	}
 
 	test.Target(t, tgt, func(asset string) string {
-		return "https://raw.githubusercontent.com/" + path.Join(owner, repo, "master", asset)
+		return "https://raw.githubusercontent.com/" + path.Join(owner, repo, "main", asset)
 	})
 
 	_, err = github.New(github.Config{Owner: owner, Repo: repo, Branch: "foo"})

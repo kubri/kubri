@@ -1,136 +1,82 @@
 package gitlab_test
 
 import (
-	"bytes"
-	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/source"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/source/gitlab"
-	"github.com/google/go-cmp/cmp"
 	gl "github.com/xanzy/go-gitlab"
 )
 
 func TestGitlab(t *testing.T) {
-	want := []*source.Release{
-		{
-			Name:        "v1.0.0",
-			Description: "This is a stable release.",
-			Date:        time.Date(2022, 12, 15, 18, 10, 26, 654000000, time.UTC),
-			Version:     "v1.0.0",
-			Assets: []*source.Asset{
-				{
-					Name: "test_64-bit.msi",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0/test_64-bit.msi",
-					Size: 5,
-				},
-				{
-					Name: "test_32-bit.msi",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0/test_32-bit.msi",
-					Size: 5,
-				},
-				{
-					Name: "test.dmg",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0/test.dmg",
-					Size: 5,
-				},
-			},
-		},
-		{
-			Name:        "v1.0.0-alpha1",
-			Description: "This is a pre-release.",
-			Date:        time.Date(2022, 12, 15, 18, 9, 32, 340000000, time.UTC),
-			Version:     "v1.0.0-alpha1",
-			Prerelease:  true,
-			Assets: []*source.Asset{
-				{
-					Name: "test_64-bit.msi",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0-alpha1/test_64-bit.msi",
-					Size: 5,
-				},
-				{
-					Name: "test_32-bit.msi",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0-alpha1/test_32-bit.msi",
-					Size: 5,
-				},
-				{
-					Name: "test.dmg",
-					URL:  "https://github.com/abemedia/appcast-test/releases/download/v1.0.0-alpha1/test.dmg",
-					Size: 5,
-				},
-			},
-		},
+	token, ok := os.LookupEnv("GITLAB_TOKEN")
+	if !ok {
+		t.Skip("Missing environment variable: GITHUB_TOKEN")
 	}
 
-	s, err := gitlab.New(gitlab.Config{Owner: "abemedia", Repo: "appcast-test"})
+	client, err := gl.NewClient(token)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ctx := context.Background()
+	user, _, err := client.Users.CurrentUser()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	t.Run("ListReleases", func(t *testing.T) {
-		got, err := s.ListReleases(ctx, &source.ListOptions{Prerelease: true})
-		if err != nil {
-			t.Fatal(err)
-		}
+	owner := user.Username
+	repo := fmt.Sprintf("test_%d", time.Now().UnixNano())
+	pid := owner + "/" + repo
 
-		if diff := cmp.Diff(want, got); diff != "" {
-			t.Error(diff)
-		}
+	_, _, err = client.Projects.CreateProject(&gl.CreateProjectOptions{
+		Name:       &repo,
+		Visibility: gl.Visibility(gl.PublicVisibility),
 	})
-
-	t.Run("GetRelease", func(t *testing.T) {
-		got, err := s.GetRelease(ctx, want[0].Version)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(want[0], got); diff != "" {
-			t.Error(diff)
-		}
-	})
-
-	data := []byte("test")
-
-	t.Run("UploadAsset", func(t *testing.T) {
-		if _, ok := os.LookupEnv("GITLAB_TOKEN"); !ok {
-			t.Skip("missing GITLAB_TOKEN")
-		}
-		err := s.UploadAsset(ctx, want[0].Version, "test.txt", data)
-		if err != nil {
-			t.Fatal(err)
-		}
-	})
-
-	t.Run("DownloadAsset", func(t *testing.T) {
-		if _, ok := os.LookupEnv("GITLAB_TOKEN"); !ok {
-			t.Skip("missing GITLAB_TOKEN")
-		}
-		b, err := s.DownloadAsset(ctx, want[0].Version, "test.txt")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if !bytes.Equal(data, b) {
-			t.Error("should be equal")
-		}
-	})
-
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Cleanup(func() {
-		if _, ok := os.LookupEnv("GITLAB_TOKEN"); !ok {
-			return
+		_, err = client.Projects.DeleteProject(pid)
+		if err != nil {
+			t.Fatal(err)
 		}
+	})
 
-		client, _ := gl.NewClient(os.Getenv("GITLAB_TOKEN"))
-		links, _, _ := client.ReleaseLinks.ListReleaseLinks("abemedia/appcast-test", want[0].Version, nil)
+	_, _, err = client.RepositoryFiles.CreateFile(pid, "test", &gl.CreateFileOptions{
+		Branch:        gl.String("main"),
+		CommitMessage: gl.String("test"),
+		Content:       gl.String("test"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 
+	for _, r := range test.SourceWant() {
+		_, _, err = client.Releases.CreateRelease(pid, &gl.CreateReleaseOptions{
+			Description: &r.Description,
+			Ref:         gl.String("main"),
+			TagName:     &r.Version,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	s, err := gitlab.New(gitlab.Config{Owner: owner, Repo: repo})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	test.Source(t, s, func(version, asset string) string {
+		links, _, _ := client.ReleaseLinks.ListReleaseLinks(pid, version, nil)
 		for _, link := range links {
-			if link.Name == "test.txt" {
-				_, _, _ = client.ReleaseLinks.DeleteReleaseLink("abemedia/appcast-test", want[0].Version, link.ID)
+			if link.Name == asset {
+				return link.URL
 			}
 		}
+		return ""
 	})
 }
