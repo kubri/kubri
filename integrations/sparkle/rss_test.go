@@ -28,13 +28,12 @@ func TestRSSMarshalUnmarshal(t *testing.T) {
 						Version:     "1.0.0",
 						EDSignature: "test",
 						Length:      100,
+						Type:        "application/x-apple-diskimage",
 					},
 				},
 				{
-					Title: "v1.1.0",
-					Description: &sparkle.CdataString{`
-						<h2>Test</h2>
-					`},
+					Title:          "v1.1.0",
+					Description:    &sparkle.CdataString{"\n\t\t\t\t<h2>Test</h2>\n\t\t\t"},
 					PubDate:        "Mon, 02 Jan 2007 15:04:05 +0000",
 					Version:        "1.1.0",
 					CriticalUpdate: &sparkle.CriticalUpdate{Version: "1.0.0"},
@@ -44,15 +43,49 @@ func TestRSSMarshalUnmarshal(t *testing.T) {
 						Version:     "1.1.0",
 						EDSignature: "test",
 						Length:      100,
+						Type:        "application/x-apple-diskimage",
 					},
 				},
 			},
 		}},
 	}
 
-	b, err := xml.Marshal(in)
+	want := `<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<channel>
+		<title>Title</title>
+		<link>https://example.com/sparkle.xml</link>
+		<description>Description</description>
+		<language>en-gb</language>
+		<item>
+			<title>v1.0.0</title>
+			<pubDate>Mon, 02 Jan 2006 15:04:05 +0000</pubDate>
+			<description><![CDATA[Test]]></description>
+			<sparkle:version>1.0.0</sparkle:version>
+			<sparkle:tags>
+				<sparkle:criticalUpdate></sparkle:criticalUpdate>
+			</sparkle:tags>
+			<enclosure url="https://example.com/test_v1.0.0.dmg" sparkle:os="macos" sparkle:version="1.0.0" sparkle:edSignature="test" length="100" type="application/x-apple-diskimage"></enclosure>
+		</item>
+		<item>
+			<title>v1.1.0</title>
+			<pubDate>Mon, 02 Jan 2007 15:04:05 +0000</pubDate>
+			<description><![CDATA[
+				<h2>Test</h2>
+			]]></description>
+			<sparkle:version>1.1.0</sparkle:version>
+			<sparkle:criticalUpdate sparkle:version="1.0.0"></sparkle:criticalUpdate>
+			<enclosure url="https://example.com/test_v1.1.0.dmg" sparkle:os="macos" sparkle:version="1.1.0" sparkle:edSignature="test" length="100" type="application/x-apple-diskimage"></enclosure>
+		</item>
+	</channel>
+</rss>`
+
+	b, err := xml.MarshalIndent(in, "", "\t")
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, string(b)); diff != "" {
+		t.Fatal(diff)
 	}
 
 	got := &sparkle.RSS{}
@@ -61,6 +94,6 @@ func TestRSSMarshalUnmarshal(t *testing.T) {
 	}
 
 	if diff := cmp.Diff(in, got); diff != "" {
-		t.Fatal(err)
+		t.Fatal(diff)
 	}
 }
