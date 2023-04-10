@@ -1,12 +1,12 @@
 package test
 
 import (
-	"bytes"
 	"context"
 	"io"
 	"testing"
 
 	"github.com/abemedia/appcast/target"
+	"github.com/google/go-cmp/cmp"
 )
 
 //nolint:funlen
@@ -67,8 +67,8 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string) {
 			t.Fatal(err)
 		}
 
-		if !bytes.Equal(data, got) {
-			t.Fatal("should be equal")
+		if diff := cmp.Diff(data, got); diff != "" {
+			t.Fatal(diff)
 		}
 	})
 
@@ -90,8 +90,8 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string) {
 			t.Fatal(err)
 		}
 
-		if url != makeURL("path/to/file") {
-			t.Fatal("should be equal")
+		if diff := cmp.Diff(makeURL("path/to/file"), url); diff != "" {
+			t.Fatal(diff)
 		}
 	})
 }
