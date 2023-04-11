@@ -59,6 +59,16 @@ publishers:
       - FURY_TOKEN={{ .Env.FURY_TOKEN }}
     cmd: ./scripts/fury-upload.sh {{ .ArtifactName }}
 
+snapcrafts:
+  - name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    summary: Distribute auto-updating software with ease
+    description: |
+      AppCast signs and releases software for common package managers and
+      software update frameworks.
+    grade: stable
+    confinement: classic
+    publish: true
+
 brews:
   - tap:
       owner: abemedia
