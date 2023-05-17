@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
-	github.com/dlclark/regexp2 v1.9.0
+	github.com/dlclark/regexp2 v1.10.0
 	github.com/docker/go-connections v0.4.0
 	github.com/fullstorydev/emulators/storage v0.0.0-20221201134230-39d0d46cb7ba
 	github.com/go-xmlfmt/xmlfmt v1.1.2
