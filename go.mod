@@ -11,7 +11,7 @@ require (
 	github.com/go-xmlfmt/xmlfmt v1.1.2
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/hashicorp/go-retryablehttp v0.7.2
+	github.com/hashicorp/go-retryablehttp v0.7.4
 	github.com/imdario/mergo v0.3.16
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.16.5
