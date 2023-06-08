@@ -21,6 +21,7 @@ linters:
   disable:
     - cyclop
     - deadcode # deprecated
+    - depguard
     - errorlint # TODO: turn on and fix
     - exhaustive
     - exhaustivestruct # deprecated
@@ -45,18 +46,21 @@ linters:
     - wsl
 
 linters-settings:
-  depguard:
-    list-type: denylist
-    include-go-root: true
-    packages:
-      - encoding/json
-      - github.com/pkg/errors
   gofmt:
     rewrite-rules:
       - pattern: interface{}
         replacement: any
   gofumpt:
     extra-rules: true
+  gomodguard:
+    blocked:
+      modules:
+        - encoding/json:
+            recommendations:
+              - github.com/goccy/go-json
+        - github.com/pkg/errors:
+            recommendations:
+              - errors
   gosec:
     excludes:
       - G107
