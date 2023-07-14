@@ -3,7 +3,7 @@ module github.com/abemedia/appcast
 go 1.20
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.1.0
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 	github.com/dlclark/regexp2 v1.10.0
 	github.com/docker/go-connections v0.4.0
