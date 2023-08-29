@@ -8,7 +8,7 @@ import (
 )
 
 func TestTarget(t *testing.T) {
-	tgt, err := blob.NewTarget("mem://", "", "mem:/")
+	tgt, err := blob.NewTarget("mem://", "", "mem://")
 	if err != nil {
 		t.Fatal(err)
 	}

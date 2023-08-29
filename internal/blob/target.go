@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"mime"
+	"net/url"
 	"path"
 	"strings"
 
@@ -23,32 +24,34 @@ func NewTarget(url, prefix, baseURL string) (target.Target, error) {
 		return nil, err
 	}
 
-	if prefix != "" {
-		prefix = path.Clean(prefix)
+	t := &blobTarget{
+		bucket:  b,
+		prefix:  strings.Trim(prefix, "/"),
+		baseURL: strings.TrimRight(baseURL, "/"),
 	}
 
-	return &blobTarget{bucket: b, prefix: prefix, baseURL: baseURL}, nil
+	return t, nil
 }
 
-func (s *blobTarget) NewWriter(ctx context.Context, filename string) (io.WriteCloser, error) {
+func (t *blobTarget) NewWriter(ctx context.Context, filename string) (io.WriteCloser, error) {
 	opt := &blob.WriterOptions{ContentType: mime.TypeByExtension(path.Ext(filename))}
-	return s.bucket.NewWriter(ctx, path.Join(s.prefix, filename), opt)
+	return t.bucket.NewWriter(ctx, path.Join(t.prefix, filename), opt)
 }
 
-func (s *blobTarget) NewReader(ctx context.Context, filename string) (io.ReadCloser, error) {
-	return s.bucket.NewReader(ctx, path.Join(s.prefix, filename), nil)
+func (t *blobTarget) NewReader(ctx context.Context, filename string) (io.ReadCloser, error) {
+	return t.bucket.NewReader(ctx, path.Join(t.prefix, filename), nil)
 }
 
-func (s *blobTarget) Sub(dir string) target.Target {
-	return &blobTarget{bucket: s.bucket, prefix: path.Join(s.prefix, dir)}
+func (t *blobTarget) Sub(dir string) target.Target {
+	return &blobTarget{bucket: t.bucket, prefix: path.Join(t.prefix, strings.Trim(dir, "/")), baseURL: t.baseURL}
 }
 
-func (s *blobTarget) URL(ctx context.Context, filename string) (string, error) {
-	if s.baseURL != "" {
-		return s.baseURL + "/" + path.Join(s.prefix, filename), nil
+func (t *blobTarget) URL(ctx context.Context, filename string) (string, error) {
+	if t.baseURL != "" {
+		return url.JoinPath(t.baseURL, t.prefix, filename)
 	}
 
-	url, err := s.bucket.SignedURL(ctx, path.Join(s.prefix, filename), &blob.SignedURLOptions{})
+	url, err := t.bucket.SignedURL(ctx, path.Join(t.prefix, filename), &blob.SignedURLOptions{})
 	if err != nil {
 		return "", err
 	}
