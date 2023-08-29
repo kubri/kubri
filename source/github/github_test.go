@@ -51,8 +51,8 @@ func TestGithub(t *testing.T) {
 
 	for _, r := range test.SourceWant() {
 		_, _, err = client.Repositories.CreateRelease(ctx, owner, repo, &gh.RepositoryRelease{
-			TagName: &r.Version,
-			Body:    &r.Description,
+			TagName: gh.String(r.Version),
+			Body:    gh.String(r.Description),
 		})
 		if err != nil {
 			t.Fatal(err)
