@@ -56,9 +56,9 @@ func TestGitlab(t *testing.T) {
 
 	for _, r := range test.SourceWant() {
 		_, _, err = client.Releases.CreateRelease(pid, &gl.CreateReleaseOptions{
-			Description: &r.Description,
+			Description: gl.String(r.Description),
 			Ref:         gl.String("main"),
-			TagName:     &r.Version,
+			TagName:     gl.String(r.Version),
 		})
 		if err != nil {
 			t.Fatal(err)
