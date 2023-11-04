@@ -121,7 +121,7 @@ func TestSource(t *testing.T) {
 			}, cmp.Ignore()),
 
 			// Ignore azblob policies as they are not comparable.
-			cmpopts.IgnoreFields(container.Client{}, "inner.pl"),
+			cmpopts.IgnoreFields(container.Client{}, "inner.internal.pl"),
 		}
 
 		if diff := cmp.Diff(want, s, opts...); diff != "" {
