@@ -73,7 +73,6 @@ linters-settings:
     disable:
       - fieldalignment
   nolintlint:
-    allow-leading-space: false
     require-specific: true
   tagliatelle:
     case:
@@ -91,6 +90,7 @@ issues:
         - errcheck
         - funlen
         - gocognit
+        - goconst
         - lll
     - linters:
         - govet
