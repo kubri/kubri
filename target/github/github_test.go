@@ -49,7 +49,7 @@ func TestGithub(t *testing.T) {
 
 	test.Target(t, tgt, func(asset string) string {
 		return "https://raw.githubusercontent.com/" + path.Join(owner, repo, "main", asset)
-	})
+	}, test.WithDelay(time.Second))
 
 	_, err = github.New(github.Config{Owner: owner, Repo: repo, Branch: "foo"})
 	if err == nil {
