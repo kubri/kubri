@@ -4,14 +4,34 @@ import (
 	"context"
 	"io"
 	"testing"
+	"time"
 
 	"github.com/abemedia/appcast/target"
 	"github.com/google/go-cmp/cmp"
 )
 
+type targetOptions struct {
+	delay time.Duration
+}
+
+type TargetOption func(*targetOptions)
+
+// WithDelay adds a delay between writing, updating & reading, to allow for
+// services where the changes aren't available instantly.
+func WithDelay(d time.Duration) TargetOption {
+	return func(opts *targetOptions) {
+		opts.delay = d
+	}
+}
+
 //nolint:funlen
-func Target(t *testing.T, tgt target.Target, makeURL func(string) string) {
+func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ...TargetOption) {
 	t.Helper()
+
+	opts := &targetOptions{}
+	for _, o := range opt {
+		o(opts)
+	}
 
 	ctx := context.Background()
 	data := []byte("test")
@@ -33,6 +53,8 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string) {
 		}
 	})
 
+	time.Sleep(opts.delay)
+
 	t.Run("NewWriter_Update", func(t *testing.T) {
 		t.Helper()
 
@@ -49,6 +71,8 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string) {
 			t.Fatal(err)
 		}
 	})
+
+	time.Sleep(opts.delay)
 
 	t.Run("NewReader", func(t *testing.T) {
 		t.Helper()

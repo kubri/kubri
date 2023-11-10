@@ -117,6 +117,14 @@ func (w *fileWriter) Close() error {
 	if res.StatusCode == http.StatusNotFound {
 		opt.Message = github.String("Create " + w.path)
 		_, _, err = w.t.client.CreateFile(w.ctx, w.t.owner, w.t.repo, w.path, opt)
+
+		// Retry if writing failed due to race condition.
+		// This can occur when creating a file and updating it right away in which case it might still return 404.
+		// if e, ok := err.(*github.ErrorResponse); ok &&
+		// 	e.Response.StatusCode == http.StatusUnprocessableEntity &&
+		// 	e.Message == "Invalid request.\n\n\"sha\" wasn't supplied." {
+		// 	return w.Close()
+		// }
 	} else {
 		opt.Message = github.String("Update " + w.path)
 		opt.SHA = file.SHA
