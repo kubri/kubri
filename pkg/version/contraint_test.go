@@ -66,6 +66,9 @@ func TestConstraint(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		if _, err := version.NewConstraint(test.constraint); err != nil {
+			t.Errorf("%q failed to parse: %s", test.constraint, err)
+		}
 		if test.want != version.Check(test.constraint, test.version) {
 			t.Errorf("%q should return %t for %q", test.constraint, test.want, test.version)
 		}
@@ -76,10 +79,12 @@ func TestConstraintError(t *testing.T) {
 	tests := []string{
 		"a",
 		"!1",
-		// TODO: Implement validation and enable tests below.
-		// "va",
-		// "1a",
-		// "=a",
+		"va",
+		"1a",
+		"=a",
+		"v1.0.",
+		"v1.0.a",
+		"*1",
 	}
 
 	for _, v := range tests {

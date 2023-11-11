@@ -91,8 +91,21 @@ func NewConstraint(v string) (Constraint, error) {
 		if !ok {
 			return nil, errors.New("invalid constraint: " + c)
 		}
+
 		if op != anything {
-			res = append(res, constraint{op: op, v: clean(c)})
+			c = clean(c)
+			var valid bool
+			if op == glob {
+				valid = semver.IsValid(strings.TrimSuffix(c, "."))
+			} else {
+				valid = semver.IsValid(c)
+			}
+			if !valid {
+				return nil, errors.New("invalid version in constraint: " + c)
+			}
+			res = append(res, constraint{op: op, v: c})
+		} else if c != "" {
+			return nil, errors.New("invalid constraint: *" + c)
 		}
 	}
 
