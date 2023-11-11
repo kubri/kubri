@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/abemedia/appcast/compare/v0.2.0...v0.2.1) (2023-11-11)
+
+
+### Bug Fixes
+
+* **github:** race in update file ([#189](https://github.com/abemedia/appcast/issues/189)) ([8f235c5](https://github.com/abemedia/appcast/commit/8f235c5f65b77cd685b9748eb66600091e7288b9))
+
 ## [0.2.0](https://github.com/abemedia/appcast/compare/v0.1.0...v0.2.0) (2023-06-08)
 
 
