@@ -32,11 +32,6 @@ type sparkleConfig struct {
 }
 
 func getSparkle(c *config) (*sparkle.Config, error) {
-	dir := c.Sparkle.Folder
-	if dir == "" {
-		dir = "sparkle"
-	}
-
 	var dsaKey *dsa.PrivateKey
 	if b, err := secret.Get("dsa_key"); err == nil {
 		block, _ := pem.Decode(b)
@@ -86,7 +81,7 @@ func getSparkle(c *config) (*sparkle.Config, error) {
 		DetectOS:    detectOS,
 
 		Source:         c.source,
-		Target:         c.target.Sub(dir),
+		Target:         c.target.Sub(fallback(c.Sparkle.Folder, "sparkle")),
 		Version:        c.Version,
 		Prerelease:     c.Prerelease,
 		UploadPackages: c.UploadPackages,

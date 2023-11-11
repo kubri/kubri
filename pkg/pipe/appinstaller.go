@@ -13,15 +13,6 @@ type appinstallerConfig struct {
 }
 
 func getAppinstaller(c *config) *appinstaller.Config {
-	if c.Appinstaller.Disabled {
-		return nil
-	}
-
-	dir := c.Appinstaller.Folder
-	if dir == "" {
-		dir = "appinstaller"
-	}
-
 	return &appinstaller.Config{
 		HoursBetweenUpdateChecks:  c.Appinstaller.HoursBetweenUpdateChecks,
 		UpdateBlocksActivation:    c.Appinstaller.UpdateBlocksActivation,
@@ -30,7 +21,7 @@ func getAppinstaller(c *config) *appinstaller.Config {
 		ForceUpdateFromAnyVersion: c.Appinstaller.ForceUpdateFromAnyVersion,
 
 		Source:         c.source,
-		Target:         c.target.Sub(dir),
+		Target:         c.target.Sub(fallback(c.Appinstaller.Folder, "appinstaller")),
 		Version:        c.Version,
 		Prerelease:     c.Prerelease,
 		UploadPackages: c.UploadPackages,

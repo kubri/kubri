@@ -29,22 +29,22 @@ func New(c Config) (target.Target, error) {
 	return &fileTarget{path}, nil
 }
 
-func (s *fileTarget) NewWriter(_ context.Context, filename string) (io.WriteCloser, error) {
-	path := filepath.Join(s.path, filename)
+func (t *fileTarget) NewWriter(_ context.Context, filename string) (io.WriteCloser, error) {
+	path := filepath.Join(t.path, filename)
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return nil, err
 	}
 	return os.Create(path)
 }
 
-func (s *fileTarget) NewReader(_ context.Context, filename string) (io.ReadCloser, error) {
-	return os.Open(filepath.Join(s.path, filename))
+func (t *fileTarget) NewReader(_ context.Context, filename string) (io.ReadCloser, error) {
+	return os.Open(filepath.Join(t.path, filename))
 }
 
-func (s *fileTarget) Sub(dir string) target.Target {
-	return &fileTarget{path: filepath.Join(s.path, dir)}
+func (t *fileTarget) Sub(dir string) target.Target {
+	return &fileTarget{path: filepath.Join(t.path, dir)}
 }
 
-func (s *fileTarget) URL(_ context.Context, filename string) (string, error) {
-	return "file://" + filepath.Join(s.path, filename), nil
+func (t *fileTarget) URL(_ context.Context, filename string) (string, error) {
+	return "file://" + filepath.Join(t.path, filename), nil
 }
