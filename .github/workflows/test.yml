@@ -17,15 +17,21 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
 
-      - run: go mod download
+      - name: Download dependencies
+        run: go mod download
 
-      - run: go test -v ./... -coverprofile=coverage.out
+      - name: Run tests
+        run: |
+          go install gotest.tools/gotestsum@latest &>/dev/null
+          gotestsum -- -coverprofile coverage.out ./...
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
@@ -37,15 +43,19 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
 
-      - run: go mod download
+      - name: Download dependencies
+        run: go mod download
 
-      - uses: golangci/golangci-lint-action@v3
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v3
         with:
           version: latest
           skip-pkg-cache: true
