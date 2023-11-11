@@ -8,14 +8,9 @@ type aptConfig struct {
 }
 
 func getApt(c *config) *apt.Config {
-	dir := c.Apt.Folder
-	if dir == "" {
-		dir = "apt"
-	}
-
 	return &apt.Config{
 		Source:     c.source,
-		Target:     c.target.Sub(dir),
+		Target:     c.target.Sub(fallback(c.Apt.Folder, "apt")),
 		Version:    c.Version,
 		Prerelease: c.Prerelease,
 	}
