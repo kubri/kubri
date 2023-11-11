@@ -9,8 +9,9 @@ import (
 type Config struct {
 	Bucket string
 	Folder string
+	URL    string
 }
 
 func New(c Config) (target.Target, error) {
-	return blob.NewTarget("azblob://"+c.Bucket, c.Folder, "")
+	return blob.NewTarget("azblob://"+c.Bucket, c.Folder, c.URL)
 }

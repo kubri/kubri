@@ -14,6 +14,7 @@ type Config struct {
 	Endpoint   string
 	Region     string
 	DisableSSL bool
+	URL        string
 }
 
 func New(c Config) (target.Target, error) {
@@ -28,5 +29,5 @@ func New(c Config) (target.Target, error) {
 		q.Add("endpoint", c.Endpoint)
 		q.Add("s3ForcePathStyle", "true")
 	}
-	return blob.NewTarget("s3://"+c.Bucket+"?"+q.Encode(), c.Folder, "")
+	return blob.NewTarget("s3://"+c.Bucket+"?"+q.Encode(), c.Folder, c.URL)
 }
