@@ -7,10 +7,10 @@ AppCast signs and publishes software for common package managers and software up
 
 ## Supported platforms
 
-- [APT](<https://en.wikipedia.org/wiki/APT_(software)>) (Debian, Ubuntu)
+- [APT](<https://en.wikipedia.org/wiki/APT_(software)>) (Debian, Ubuntu etc.)
+- [YUM](<https://en.wikipedia.org/wiki/Yum_(software)>) (RHEL, Fedora, CentOS, OpenSUSE etc.)
 - [App Installer](https://en.wikipedia.org/wiki/App_Installer) (Windows)
-- [Sparkle](https://sparkle-project.org/) (MacOS)
-- [WinSparkle](https://winsparkle.org/) (Windows)
+- [Sparkle](https://sparkle-project.org/) / [WinSparkle](https://winsparkle.org/) (MacOS, Windows)
 
 ## Installation
 
@@ -41,4 +41,5 @@ sudo yum install appcast
 
 ### Binary
 
-Download the latest binary from <https://github.com/abemedia/appcast/releases> and copy it to a folder in your `$PATH`.
+Download the latest binary from <https://github.com/abemedia/appcast/releases> and copy it to a
+folder in your `$PATH`.

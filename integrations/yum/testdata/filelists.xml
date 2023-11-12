@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<filelists xmlns="http://linux.duke.edu/metadata/filelists" packages="2">
+	<package name="test" pkgid="d5fdd6937aaf711ef1fc16fce36ec5672768fb2554b7a76c00ba1d3c3581ee20" arch="i386">
+		<version ver="1.0.0" rel="1" epoch="0"/>
+		<file>/usr/bin/test</file>
+	</package>
+	<package name="test" pkgid="cbcf08b8d70de16882d4a3632db9102e268853b851da391d2d9666c685844cce" arch="x86_64">
+		<version ver="1.0.0" rel="1" epoch="0"/>
+		<file>/usr/bin/test</file>
+	</package>
+</filelists>

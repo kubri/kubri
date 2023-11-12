@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://linux.duke.edu/metadata/common" xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="2">
+	<package type="rpm">
+		<name>test</name>
+		<arch>i386</arch>
+		<version ver="1.0.0" rel="1" epoch="0"/>
+		<checksum type="sha256" pkgid="YES">d5fdd6937aaf711ef1fc16fce36ec5672768fb2554b7a76c00ba1d3c3581ee20</checksum>
+		<summary>This is a test.</summary>
+		<description>This is a test.&#xA;It does nothing.&#xA;&#xA;Absolutely nothing.&#xA;</description>
+		<packager>Test User &lt;test@example.com&gt;</packager>
+		<url>http://example.com</url>
+		<time file="__TIME__" build="1699758848"/>
+		<size package="1888" installed="29" archive="29"/>
+		<location href="Packages/t/test-1.0.0-1.i386.rpm"/>
+		<format>
+			<rpm:license>MIT</rpm:license>
+			<rpm:vendor>Test Company</rpm:vendor>
+			<rpm:buildhost>adam-XPS-15-9560</rpm:buildhost>
+			<rpm:sourcerpm>test-1.0.0-1.src.rpm</rpm:sourcerpm>
+			<rpm:header-range start="272" end="1768"/>
+			<rpm:provides>
+				<rpm:entry name="bar"/>
+				<rpm:entry name="test" epoch="0" ver="1.0.0" rel="1"/>
+			</rpm:provides>
+			<rpm:obsoletes>
+				<rpm:entry name="old-test"/>
+			</rpm:obsoletes>
+			<rpm:requires>
+				<rpm:entry name="bash"/>
+			</rpm:requires>
+			<rpm:conflicts>
+				<rpm:entry name="new-test"/>
+			</rpm:conflicts>
+			<file>/usr/bin/test</file>
+		</format>
+	</package>
+	<package type="rpm">
+		<name>test</name>
+		<arch>x86_64</arch>
+		<version ver="1.0.0" rel="1" epoch="0"/>
+		<checksum type="sha256" pkgid="YES">cbcf08b8d70de16882d4a3632db9102e268853b851da391d2d9666c685844cce</checksum>
+		<summary>This is a test.</summary>
+		<description>This is a test.&#xA;It does nothing.&#xA;&#xA;Absolutely nothing.&#xA;</description>
+		<packager>Test User &lt;test@example.com&gt;</packager>
+		<url>http://example.com</url>
+		<time file="__TIME__" build="1699758869"/>
+		<size package="1888" installed="29" archive="29"/>
+		<location href="Packages/t/test-1.0.0-1.x86_64.rpm"/>
+		<format>
+			<rpm:license>MIT</rpm:license>
+			<rpm:vendor>Test Company</rpm:vendor>
+			<rpm:buildhost>adam-XPS-15-9560</rpm:buildhost>
+			<rpm:sourcerpm>test-1.0.0-1.src.rpm</rpm:sourcerpm>
+			<rpm:header-range start="272" end="1768"/>
+			<rpm:provides>
+				<rpm:entry name="bar"/>
+				<rpm:entry name="test" epoch="0" ver="1.0.0" rel="1"/>
+			</rpm:provides>
+			<rpm:obsoletes>
+				<rpm:entry name="old-test"/>
+			</rpm:obsoletes>
+			<rpm:requires>
+				<rpm:entry name="bash"/>
+			</rpm:requires>
+			<rpm:conflicts>
+				<rpm:entry name="new-test"/>
+			</rpm:conflicts>
+			<file>/usr/bin/test</file>
+		</format>
+	</package>
+</metadata>

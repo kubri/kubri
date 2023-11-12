@@ -30,6 +30,7 @@ linters:
     - godox
     - goerr113 # TODO: turn on and fix
     - golint # deprecated
+    - gomoddirectives # TODO: remove when go-rpm is updated.
     - gomnd
     - interfacer # deprecated
     - ireturn # false positive on returning generic

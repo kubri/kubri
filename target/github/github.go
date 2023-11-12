@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path"
@@ -70,8 +71,11 @@ func (t *githubTarget) NewWriter(ctx context.Context, filename string) (io.Write
 
 func (t *githubTarget) NewReader(ctx context.Context, filename string) (io.ReadCloser, error) {
 	opt := &github.RepositoryContentGetOptions{Ref: t.branch}
-	file, _, _, err := t.client.GetContents(ctx, t.owner, t.repo, path.Join(t.path, filename), opt)
+	file, _, r, err := t.client.GetContents(ctx, t.owner, t.repo, path.Join(t.path, filename), opt)
 	if err != nil {
+		if r.StatusCode == http.StatusNotFound {
+			return nil, &fs.PathError{Op: "read", Path: filename, Err: fs.ErrNotExist}
+		}
 		return nil, err
 	}
 
@@ -81,6 +85,24 @@ func (t *githubTarget) NewReader(ctx context.Context, filename string) (io.ReadC
 	}
 
 	return io.NopCloser(strings.NewReader(content)), nil
+}
+
+func (t *githubTarget) Remove(ctx context.Context, filename string) error {
+	path := path.Join(t.path, filename)
+	getOpt := &github.RepositoryContentGetOptions{Ref: t.branch}
+	file, _, r, err := t.client.GetContents(ctx, t.owner, t.repo, path, getOpt)
+	if err != nil {
+		if r != nil && r.StatusCode == http.StatusNotFound {
+			return &fs.PathError{Op: "remove", Path: filename, Err: fs.ErrNotExist}
+		}
+		return err
+	}
+	_, _, err = t.client.DeleteFile(ctx, t.owner, t.repo, path, &github.RepositoryContentFileOptions{
+		Message: github.String("Delete " + path),
+		Branch:  &t.branch,
+		SHA:     file.SHA,
+	})
+	return err
 }
 
 func (t *githubTarget) Sub(dir string) target.Target {

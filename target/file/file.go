@@ -47,6 +47,10 @@ func (t *fileTarget) NewReader(_ context.Context, filename string) (io.ReadClose
 	return os.Open(filepath.Join(t.path, filename))
 }
 
+func (t *fileTarget) Remove(_ context.Context, filename string) error {
+	return os.Remove(filepath.Join(t.path, filename))
+}
+
 func (t *fileTarget) Sub(dir string) target.Target {
 	u, _ := url.JoinPath(t.url, dir)
 	return &fileTarget{path: filepath.Join(t.path, dir), url: u}

@@ -2,7 +2,9 @@ package test
 
 import (
 	"context"
+	"errors"
 	"io"
+	"io/fs"
 	"testing"
 	"time"
 
@@ -11,7 +13,8 @@ import (
 )
 
 type targetOptions struct {
-	delay time.Duration
+	delay                time.Duration
+	ignoreRemoveNotFound bool
 }
 
 type TargetOption func(*targetOptions)
@@ -24,7 +27,15 @@ func WithDelay(d time.Duration) TargetOption {
 	}
 }
 
-//nolint:funlen
+// WithIgnoreRemoveNotFound disables testing if removing a non-existent file
+// returns an error.
+func WithIgnoreRemoveNotFound() TargetOption {
+	return func(opts *targetOptions) {
+		opts.ignoreRemoveNotFound = true
+	}
+}
+
+//nolint:funlen,gocognit
 func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ...TargetOption) {
 	t.Helper()
 
@@ -94,6 +105,11 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 		if diff := cmp.Diff(data, got); diff != "" {
 			t.Fatal(diff)
 		}
+
+		_, err = tgt.NewReader(ctx, "does/not/exist")
+		if !errors.Is(err, fs.ErrNotExist) {
+			t.Fatalf("Should return %q - got %q", fs.ErrNotExist, err)
+		}
 	})
 
 	t.Run("Sub", func(t *testing.T) {
@@ -101,8 +117,11 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 
 		sub := tgt.Sub("path/to")
 
-		if _, err := sub.NewReader(ctx, "file"); err != nil {
+		r, err := sub.NewReader(ctx, "file")
+		if err != nil {
 			t.Fatal(err)
+		} else {
+			r.Close()
 		}
 	})
 
@@ -116,6 +135,32 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 
 		if diff := cmp.Diff(makeURL("path/to/file"), url); diff != "" {
 			t.Fatal(diff)
+		}
+	})
+
+	t.Run("Remove", func(t *testing.T) {
+		t.Helper()
+
+		err := tgt.Remove(ctx, "path/to/file")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		time.Sleep(opts.delay)
+
+		r, err := tgt.NewReader(ctx, "path/to/file")
+		if err == nil {
+			r.Close()
+		}
+		if !errors.Is(err, fs.ErrNotExist) {
+			t.Fatalf("Read should return %q - got %q", fs.ErrNotExist, err)
+		}
+
+		if !opts.ignoreRemoveNotFound {
+			err = tgt.Remove(ctx, "does/not/exist")
+			if !errors.Is(err, fs.ErrNotExist) {
+				t.Fatalf("Remove should return %q - got %q", fs.ErrNotExist, err)
+			}
 		}
 	})
 }
