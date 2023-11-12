@@ -258,3 +258,8 @@ func write(ctx context.Context, c *Config, rss *RSS) error {
 
 	return w.Close()
 }
+
+//nolint:gochecknoinits // Don't use carriage return on windows.
+func init() {
+	xmlfmt.NL = "\n"
+}

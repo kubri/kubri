@@ -3,7 +3,9 @@ package blob
 import (
 	"context"
 	"io"
+	"math"
 	"mime"
+	"net/url"
 	"path"
 	"strings"
 
@@ -87,11 +89,17 @@ func (s *blobSource) GetRelease(ctx context.Context, version string) (*source.Re
 			r.Date = object.ModTime
 		}
 
-		url, err := s.bucket.SignedURL(ctx, object.Key, &blob.SignedURLOptions{})
-		if err != nil {
-			url = s.baseURL + "/" + object.Key
+		var u string
+		if s.baseURL != "" {
+			u, err = url.JoinPath(s.baseURL, object.Key)
+			if err != nil {
+				return nil, err
+			}
 		} else {
-			url, _, _ = strings.Cut(url, "?")
+			u, err = s.bucket.SignedURL(ctx, object.Key, &blob.SignedURLOptions{Expiry: math.MaxInt64})
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		attr, err := s.bucket.Attributes(ctx, object.Key)
@@ -101,7 +109,7 @@ func (s *blobSource) GetRelease(ctx context.Context, version string) (*source.Re
 
 		r.Assets = append(r.Assets, &source.Asset{
 			Name: path.Base(object.Key),
-			URL:  url,
+			URL:  u,
 			Size: int(attr.Size),
 		})
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 func TestSource(t *testing.T) {
-	s, err := blob.NewSource("mem://", "", "mem:/")
+	s, err := blob.NewSource("mem://", "", "mem://")
 	if err != nil {
 		t.Fatal(err)
 	}

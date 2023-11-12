@@ -1,6 +1,7 @@
 package file_test
 
 import (
+	"net/url"
 	"path/filepath"
 	"testing"
 
@@ -9,14 +10,31 @@ import (
 )
 
 func TestFile(t *testing.T) {
-	path := t.TempDir()
-
-	s, err := file.New(file.Config{Path: path})
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name string
+		url  string
+	}{
+		{"FileURL", ""},
+		{"CustomURL", "http://dl.example.com"},
 	}
 
-	test.Source(t, s, func(version, asset string) string {
-		return "file://" + filepath.Join(path, version, asset)
-	})
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			path := t.TempDir()
+
+			s, err := file.New(file.Config{Path: path, URL: testCase.url})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			baseURL := testCase.url
+			if baseURL == "" {
+				baseURL, _ = url.JoinPath("file:///", filepath.ToSlash(path))
+			}
+
+			test.Source(t, s, func(version, asset string) string {
+				return baseURL + "/" + version + "/" + asset
+			})
+		})
+	}
 }
