@@ -15,7 +15,10 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,17 +29,28 @@ jobs:
           go-version-file: go.mod
 
       - name: Download dependencies
-        run: go mod download
+        run: |
+          go mod download
+          go install gotest.tools/gotestsum@latest
+
+      - name: Setup docker (missing on MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install docker
+          colima start
+
+          # For testcontainers to find the Colima socket
+          # https://github.com/abiosoft/colima/blob/main/docs/FAQ.md#cannot-connect-to-the-docker-daemon-at-unixvarrundockersock-is-the-docker-daemon-running
+          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
       - name: Run tests
-        run: |
-          go install gotest.tools/gotestsum@latest &>/dev/null
-          gotestsum -- -coverprofile coverage.out ./...
+        run: gotestsum -- -coverprofile coverage.out ./...
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
 
       - name: Upload coverage reports to Codecov
+        if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v3
 
   lint:
