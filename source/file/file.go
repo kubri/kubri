@@ -1,6 +1,7 @@
 package file
 
 import (
+	"net/url"
 	"path/filepath"
 
 	"github.com/abemedia/appcast/internal/blob"
@@ -10,6 +11,7 @@ import (
 
 type Config struct {
 	Path string
+	URL  string
 }
 
 func New(c Config) (*source.Source, error) {
@@ -17,6 +19,12 @@ func New(c Config) (*source.Source, error) {
 	if err != nil {
 		return nil, err
 	}
-	url := "file://" + path
-	return blob.NewSource(url, "", url)
+	url, err := url.JoinPath("file:///", filepath.ToSlash(path))
+	if err != nil {
+		return nil, err
+	}
+	if c.URL == "" {
+		c.URL = url
+	}
+	return blob.NewSource(url, "", c.URL)
 }

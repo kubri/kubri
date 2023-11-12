@@ -1,7 +1,7 @@
 package testsource_test
 
 import (
-	"path/filepath"
+	"path"
 	"testing"
 
 	"github.com/abemedia/appcast/internal/test"
@@ -11,6 +11,6 @@ import (
 func TestFile(t *testing.T) {
 	s := testsource.New(test.SourceWant())
 	test.Source(t, s, func(version, asset string) string {
-		return "https://example.com/" + filepath.Join(version, asset)
+		return "https://example.com/" + path.Join(version, asset)
 	})
 }

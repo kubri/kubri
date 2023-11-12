@@ -13,20 +13,20 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/pipe"
-	fileSource "github.com/abemedia/appcast/source/file"
-	fileTarget "github.com/abemedia/appcast/target/file"
+	source "github.com/abemedia/appcast/source/file"
+	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestPipe(t *testing.T) {
 	dir := t.TempDir()
 
-	src, err := fileSource.New(fileSource.Config{Path: dir})
+	src, err := source.New(source.Config{Path: dir})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	tgt, err := fileTarget.New(fileTarget.Config{Path: dir})
+	tgt, err := target.New(target.Config{Path: dir})
 	if err != nil {
 		t.Fatal(err)
 	}

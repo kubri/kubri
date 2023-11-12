@@ -3,7 +3,6 @@ package emulator
 import (
 	"context"
 	"log"
-	"net"
 	"strconv"
 	"testing"
 
@@ -62,17 +61,12 @@ func RunContainer(c Container) (*Service, error) {
 		}
 	}()
 
-	mappedPort, err := container.MappedPort(ctx, nat.Port(port))
+	host, err := container.PortEndpoint(ctx, nat.Port(port), "")
 	if err != nil {
 		return nil, err
 	}
 
-	hostIP, err := container.Host(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Service{Host: net.JoinHostPort(hostIP, mappedPort.Port()), container: container}, nil
+	return &Service{Host: host, container: container}, nil
 }
 
 func TestContainer(t *testing.T, c Container) string {

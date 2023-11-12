@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -29,6 +30,16 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 	opt := []cmp.Option{
 		cmpopts.EquateApproxTime(10 * time.Second),
 		cmpopts.SortSlices(func(a, b *source.Asset) bool { return a.Name < b.Name }),
+
+		// Ignore asset URL query.
+		cmp.FilterPath(
+			func(p cmp.Path) bool { return strings.HasPrefix(p.String(), "Assets.URL") },
+			cmp.Comparer(func(a, b string) bool {
+				a, _, _ = strings.Cut(a, "?")
+				b, _, _ = strings.Cut(b, "?")
+				return a == b
+			}),
+		),
 	}
 
 	t.Run("ListReleases", func(t *testing.T) {

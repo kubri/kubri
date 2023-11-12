@@ -3,6 +3,7 @@ package file
 import (
 	"context"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -11,10 +12,12 @@ import (
 
 type Config struct {
 	Path string
+	URL  string
 }
 
 type fileTarget struct {
 	path string
+	url  string
 }
 
 func New(c Config) (target.Target, error) {
@@ -26,7 +29,10 @@ func New(c Config) (target.Target, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &fileTarget{path}, nil
+	if c.URL == "" {
+		c.URL, _ = url.JoinPath("file:///", filepath.ToSlash(path))
+	}
+	return &fileTarget{path, c.URL}, nil
 }
 
 func (t *fileTarget) NewWriter(_ context.Context, filename string) (io.WriteCloser, error) {
@@ -42,9 +48,10 @@ func (t *fileTarget) NewReader(_ context.Context, filename string) (io.ReadClose
 }
 
 func (t *fileTarget) Sub(dir string) target.Target {
-	return &fileTarget{path: filepath.Join(t.path, dir)}
+	u, _ := url.JoinPath(t.url, dir)
+	return &fileTarget{path: filepath.Join(t.path, dir), url: u}
 }
 
 func (t *fileTarget) URL(_ context.Context, filename string) (string, error) {
-	return "file://" + filepath.Join(t.path, filename), nil
+	return url.JoinPath(t.url, filename)
 }

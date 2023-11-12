@@ -3,21 +3,17 @@ package appinstaller_test
 import (
 	"context"
 	"io"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/appinstaller"
-	fileSource "github.com/abemedia/appcast/source/file"
-	fileTarget "github.com/abemedia/appcast/target/file"
+	source "github.com/abemedia/appcast/source/file"
+	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestBuild(t *testing.T) {
-	path, _ := filepath.Abs("../..")
-	dir := t.TempDir()
-	src, _ := fileSource.New(fileSource.Config{Path: "../../testdata"})
-	tgt, _ := fileTarget.New(fileTarget.Config{Path: dir})
+	src, _ := source.New(source.Config{Path: "../../testdata", URL: "https://dl.example.com/"})
+	tgt, _ := target.New(target.Config{Path: t.TempDir(), URL: "https://example.com"})
 
 	tests := []struct {
 		name   string
@@ -31,8 +27,8 @@ func TestBuild(t *testing.T) {
 				Target: tgt,
 			},
 			want: `<?xml version="1.0" encoding="UTF-8"?>
-<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017" Version="1.0.0.1" Uri="file://` + dir + `/Test-x64.appinstaller">
-	<MainPackage Name="Test" Publisher="CN=Test" Version="1.0.0.1" ProcessorArchitecture="x64" Uri="file://` + path + `/testdata/v1.0.0/test.msix" />
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017" Version="1.0.0.1" Uri="https://example.com/Test-x64.appinstaller">
+	<MainPackage Name="Test" Publisher="CN=Test" Version="1.0.0.1" ProcessorArchitecture="x64" Uri="https://dl.example.com/v1.0.0/test.msix" />
 </AppInstaller>`,
 		},
 		{
@@ -43,8 +39,8 @@ func TestBuild(t *testing.T) {
 				ShowPrompt: true,
 			},
 			want: `<?xml version="1.0" encoding="UTF-8"?>
-<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018" Version="1.0.0.1" Uri="file://` + dir + `/Test.appinstaller">
-	<MainBundle Name="Test" Publisher="CN=Test" Version="1.0.0.1" Uri="file://` + path + `/testdata/v1.0.0/test.msixbundle" />
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018" Version="1.0.0.1" Uri="https://example.com/Test.appinstaller">
+	<MainBundle Name="Test" Publisher="CN=Test" Version="1.0.0.1" Uri="https://dl.example.com/v1.0.0/test.msixbundle" />
 	<UpdateSettings>
 		<OnLaunch ShowPrompt="true" />
 	</UpdateSettings>
@@ -58,8 +54,8 @@ func TestBuild(t *testing.T) {
 				AutomaticBackgroundTask: true,
 			},
 			want: `<?xml version="1.0" encoding="UTF-8"?>
-<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2" Version="1.0.0.1" Uri="file://` + dir + `/Test-x64.appinstaller">
-	<MainPackage Name="Test" Publisher="CN=Test" Version="1.0.0.1" ProcessorArchitecture="x64" Uri="file://` + path + `/testdata/v1.0.0/test.msix" />
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2" Version="1.0.0.1" Uri="https://example.com/Test-x64.appinstaller">
+	<MainPackage Name="Test" Publisher="CN=Test" Version="1.0.0.1" ProcessorArchitecture="x64" Uri="https://dl.example.com/v1.0.0/test.msix" />
 	<UpdateSettings>
 		<AutomaticBackgroundTask />
 	</UpdateSettings>
@@ -77,8 +73,8 @@ func TestBuild(t *testing.T) {
 				ForceUpdateFromAnyVersion: true,
 			},
 			want: `<?xml version="1.0" encoding="UTF-8"?>
-<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018" Version="1.0.0.1" Uri="file://` + dir + `/Test-x64.appinstaller">
-	<MainPackage Name="Test" Publisher="CN=Test" Version="1.0.0.1" ProcessorArchitecture="x64" Uri="file://` + path + `/testdata/v1.0.0/test.msix" />
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018" Version="1.0.0.1" Uri="https://example.com/Test-x64.appinstaller">
+	<MainPackage Name="Test" Publisher="CN=Test" Version="1.0.0.1" ProcessorArchitecture="x64" Uri="https://dl.example.com/v1.0.0/test.msix" />
 	<UpdateSettings>
 		<OnLaunch HoursBetweenUpdateChecks="12" UpdateBlocksActivation="true" ShowPrompt="true" />
 		<AutomaticBackgroundTask />
@@ -94,8 +90,8 @@ func TestBuild(t *testing.T) {
 				UploadPackages: true,
 			},
 			want: `<?xml version="1.0" encoding="UTF-8"?>
-<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017" Version="1.0.0.1" Uri="file://` + dir + `/Test.appinstaller">
-	<MainBundle Name="Test" Publisher="CN=Test" Version="1.0.0.1" Uri="file://` + dir + `/test.msixbundle" />
+<AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2017" Version="1.0.0.1" Uri="https://example.com/Test.appinstaller">
+	<MainBundle Name="Test" Publisher="CN=Test" Version="1.0.0.1" Uri="https://example.com/test.msixbundle" />
 </AppInstaller>`,
 		},
 	}
@@ -123,7 +119,7 @@ func TestBuild(t *testing.T) {
 
 		if test.config.UploadPackages {
 			for _, ext := range []string{".msixbundle", ".msix"} {
-				if _, err = os.Stat(dir + "/test" + ext); err != nil {
+				if _, err = tgt.NewReader(context.Background(), "test"+ext); err != nil {
 					t.Fatal(err)
 				}
 			}

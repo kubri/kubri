@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/abemedia/appcast/target"
@@ -86,7 +85,7 @@ func (t *githubTarget) NewReader(ctx context.Context, filename string) (io.ReadC
 
 func (t *githubTarget) Sub(dir string) target.Target {
 	sub := *t
-	sub.path = filepath.Join(t.path, dir)
+	sub.path = path.Join(t.path, dir)
 	return &sub
 }
 
