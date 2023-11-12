@@ -63,6 +63,10 @@ func TestConstraint(t *testing.T) {
 		{">=1, <2", "1.1.0", true},
 		{">=1, <2", "2.0.0", false},
 		{">=1, <2", "0.1.0", false},
+
+		// TODO: Decide if leading/trailing commas should be a failure or ignored.
+		{",!=0.1.0,", "0.1.0", false},
+		{", ", "0.1.0", true},
 	}
 
 	for _, test := range tests {

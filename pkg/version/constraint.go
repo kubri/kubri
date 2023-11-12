@@ -2,6 +2,7 @@ package version
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"golang.org/x/mod/semver"
@@ -24,10 +25,16 @@ const (
 
 const separator = ","
 
+var errInvalid = errors.New("invalid version constraint")
+
 func parseOperator(v string) (operator, string, bool) {
 	var i int
 	for i < len(v) && (v[i] == ' ') {
 		i++
+	}
+
+	if len(v) < i+1 {
+		return anything, "", true // TODO: Decide if this should return an error.
 	}
 
 	switch v[i] {
@@ -77,7 +84,7 @@ func NewConstraint(v string) (Constraint, error) {
 
 	res := make([]constraint, 0, strings.Count(v, separator)+1)
 
-	for {
+	for v != "" {
 		var (
 			op operator
 			c  string
@@ -85,11 +92,11 @@ func NewConstraint(v string) (Constraint, error) {
 		)
 		c, v, _ = strings.Cut(v, separator)
 		if c == "" {
-			break
+			continue // TODO: Decide if this should return an error.
 		}
 		op, c, ok = parseOperator(c)
 		if !ok {
-			return nil, errors.New("invalid constraint: " + c)
+			return nil, fmt.Errorf("%w: %s", errInvalid, c)
 		}
 
 		if op != anything {
@@ -101,11 +108,11 @@ func NewConstraint(v string) (Constraint, error) {
 				valid = semver.IsValid(c)
 			}
 			if !valid {
-				return nil, errors.New("invalid version in constraint: " + c)
+				return nil, fmt.Errorf("%w: %s", errInvalid, c)
 			}
 			res = append(res, constraint{op: op, v: c})
 		} else if c != "" {
-			return nil, errors.New("invalid constraint: *" + c)
+			return nil, fmt.Errorf("%w: *%s", errInvalid, c)
 		}
 	}
 
