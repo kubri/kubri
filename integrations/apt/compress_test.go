@@ -47,6 +47,11 @@ func TestCompress(t *testing.T) {
 			continue
 		}
 
+		if err = r.Close(); err != nil {
+			t.Errorf("close %s: %s", ext, err)
+			continue
+		}
+
 		if !bytes.Equal(want, got) {
 			t.Errorf("%s: should be decompressed", ext)
 		}

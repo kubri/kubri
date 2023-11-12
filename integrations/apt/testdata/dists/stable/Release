@@ -1,0 +1,32 @@
+Suite: stable
+Codename: stable
+Date: Sun, 19 Nov 2023 23:37:12 UTC
+Architectures: amd64 i386
+Components: main
+MD5Sum:
+ 71ddaefb3fd185554ebdca91d10fa1e9 1739 main/binary-amd64/Packages
+ 492216268731ca69b97b3713c414d4f0 613 main/binary-amd64/Packages.gz
+ b308fcbb4d6c10f5b035763272076977 680 main/binary-amd64/Packages.xz
+ ed50c229b0405e82b42df9dffd1a478e 66 main/binary-amd64/Release
+ 6fb190158d777afb53fb2e6a6121e5b0 1733 main/binary-i386/Packages
+ 308d16f3f5c845a2454c6c83022590e9 618 main/binary-i386/Packages.gz
+ b791965b893f1c932ac05bf6282d0707 688 main/binary-i386/Packages.xz
+ 1c76c0e691587e8c0fa470f96791a23f 65 main/binary-i386/Release
+SHA1:
+ 3c55a3766fd32f3001ae509886b59dcd5e4ffe4d 1739 main/binary-amd64/Packages
+ 0a40493397a8c91de9e5f2b992d7bbf9da5ab868 613 main/binary-amd64/Packages.gz
+ b4a04c20fe5a52953bbf5cf3feca8e9a7b1f2c22 680 main/binary-amd64/Packages.xz
+ 0356f9e4028428574fb61279d6b7e3f64e02c474 66 main/binary-amd64/Release
+ 7fd1eb44b6d67f8a0dd1342bc7061c33e0e0705e 1733 main/binary-i386/Packages
+ 266d364797dd2b64b662029afb30f616e9b6d292 618 main/binary-i386/Packages.gz
+ bfe2362afa08bcd428ac6511f6d0b1f1cf33d68f 688 main/binary-i386/Packages.xz
+ 4c939f94794ad0f1ab92dedf4a3f8b9323a8730d 65 main/binary-i386/Release
+SHA256:
+ 8d1512dc088a40ed85410ee771808c311113594cc8c9a89c7f271325540290ee 1739 main/binary-amd64/Packages
+ 99a86b02a5549b92410c8cf65b75a371846066486b086e91d2cb9cb599c98e5a 613 main/binary-amd64/Packages.gz
+ e6696c011744c88df952adfa8f378d7b294cc990ac70e56cbdbdb077013667c9 680 main/binary-amd64/Packages.xz
+ eead410c09874826a4e597f34ae597d9e1eda87b072ebad5983d835c15139fe8 66 main/binary-amd64/Release
+ 527528e4e81abd80b4b37456b263ed670ca4e1cb7efff7a2254ee5f6b88977a0 1733 main/binary-i386/Packages
+ 7adbfabcea9a2720b7e6eedce5f5ac31cf2e3687490d97374adeac5ab7b7ae5d 618 main/binary-i386/Packages.gz
+ a66860c96de06c2c353b6967b1ab04ca6670df2592fe59ef37ea5136af5edfad 688 main/binary-i386/Packages.xz
+ 133ff0295c5a0d85673cd4d65a23ac847f62c0ffd68b706d631e61f4465f3b72 65 main/binary-i386/Release
