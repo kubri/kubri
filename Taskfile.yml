@@ -57,7 +57,7 @@ tasks:
     desc: Runs test suite
     aliases: [t]
     cmds:
-      - go test -cover ./...
+      - go run gotest.tools/gotestsum@latest -- -cover ./...
 
   install:
     desc: Install AppCast
