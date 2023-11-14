@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/internal/testtarget"
-	"github.com/abemedia/appcast/source/file"
+	source "github.com/abemedia/appcast/source/file"
+	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 	"github.com/klauspost/compress/gzip"
 )
@@ -83,12 +83,15 @@ Description: This is a test.
 		"dists/stable/main/binary-i386/Release":     "Archive: stable\nSuite: stable\nArchitecture: i386\nComponent: main\n",
 	}
 
-	src, err := file.New(file.Config{Path: "../../testdata"})
+	src, err := source.New(source.Config{Path: "../../testdata"})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	tgt := testtarget.New()
+	tgt, err := target.New(target.Config{Path: t.TempDir()})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	c := &apt.Config{
 		Source: src,
