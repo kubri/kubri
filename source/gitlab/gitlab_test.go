@@ -33,7 +33,7 @@ func TestGitlab(t *testing.T) {
 
 	_, _, err = client.Projects.CreateProject(&gl.CreateProjectOptions{
 		Name:       &repo,
-		Visibility: gl.Visibility(gl.PublicVisibility),
+		Visibility: gl.Ptr(gl.PublicVisibility),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -46,9 +46,9 @@ func TestGitlab(t *testing.T) {
 	})
 
 	_, _, err = client.RepositoryFiles.CreateFile(pid, "test", &gl.CreateFileOptions{
-		Branch:        gl.String("main"),
-		CommitMessage: gl.String("test"),
-		Content:       gl.String("test"),
+		Branch:        gl.Ptr("main"),
+		CommitMessage: gl.Ptr("test"),
+		Content:       gl.Ptr("test"),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -56,9 +56,9 @@ func TestGitlab(t *testing.T) {
 
 	for _, r := range test.SourceWant() {
 		_, _, err = client.Releases.CreateRelease(pid, &gl.CreateReleaseOptions{
-			Description: gl.String(r.Description),
-			Ref:         gl.String("main"),
-			TagName:     gl.String(r.Version),
+			Description: gl.Ptr(r.Description),
+			Ref:         gl.Ptr("main"),
+			TagName:     gl.Ptr(r.Version),
 		})
 		if err != nil {
 			t.Fatal(err)
