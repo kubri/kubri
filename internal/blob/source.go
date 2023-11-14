@@ -2,14 +2,17 @@ package blob
 
 import (
 	"context"
+	"errors"
 	"io"
 	"math"
 	"mime"
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/abemedia/appcast/source"
+	"github.com/parkr/changelog"
 	"gocloud.dev/blob"
 )
 
@@ -89,6 +92,22 @@ func (s *blobSource) GetRelease(ctx context.Context, version string) (*source.Re
 			r.Date = object.ModTime
 		}
 
+		if strings.EqualFold(path.Base(object.Key), "CHANGELOG.md") {
+			rd, err := s.bucket.NewReader(ctx, object.Key, nil)
+			if err != nil {
+				return nil, err
+			}
+			date, desc, err := parseChangelog(rd, version)
+			if err != nil {
+				return nil, err
+			}
+			if r.Date.IsZero() {
+				r.Date = date
+			}
+			r.Description = desc
+			continue
+		}
+
 		var u string
 		if s.baseURL != "" {
 			u, err = url.JoinPath(s.baseURL, object.Key)
@@ -128,4 +147,54 @@ func (s *blobSource) UploadAsset(ctx context.Context, version, name string, data
 
 func (s *blobSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {
 	return s.bucket.ReadAll(ctx, path.Join(s.prefix, version, name))
+}
+
+func parseChangelog(rd io.Reader, version string) (time.Time, string, error) {
+	var date time.Time
+
+	c, err := changelog.NewChangelogFromReader(rd)
+	if err != nil {
+		return time.Time{}, "", err
+	}
+	v := c.GetVersion(strings.TrimPrefix(version, "v"))
+	if v == nil {
+		return time.Time{}, "", errors.New("changelog doesn't contain " + version)
+	}
+
+	if v.Date != "" {
+		d, err := time.Parse(time.DateOnly, v.Date)
+		if err != nil {
+			return time.Time{}, "", err
+		}
+		date = d
+	}
+
+	var w strings.Builder
+	w.Grow(512)
+
+	if len(v.History) > 0 {
+		w.WriteString(v.History[0].Summary)
+		for _, history := range v.History[1:] {
+			w.WriteString("* ")
+			w.WriteString(history.Summary)
+		}
+	}
+
+	if len(v.Subsections) > 0 {
+		for i, subsection := range v.Subsections {
+			if i != 0 {
+				w.WriteString("\n\n")
+			}
+			w.WriteString("### ")
+			w.WriteString(subsection.Name)
+			w.WriteString("\n\n")
+			w.WriteString(subsection.History[0].Summary)
+			for _, history := range subsection.History[1:] {
+				w.WriteString("* ")
+				w.WriteString(history.Summary)
+			}
+		}
+	}
+
+	return date, w.String(), nil
 }

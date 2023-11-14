@@ -106,9 +106,10 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 func SourceWant() []*source.Release {
 	return []*source.Release{
 		{
-			Name:    "v1.0.0",
-			Date:    time.Now().UTC(),
-			Version: "v1.0.0",
+			Name:        "v1.0.0",
+			Description: "### New Features\n\n* Something\n* Something else",
+			Date:        time.Now().UTC(),
+			Version:     "v1.0.0",
 			Assets: []*source.Asset{
 				{Name: "test.dmg", Size: 5},
 				{Name: "test_32-bit.msi", Size: 5},
