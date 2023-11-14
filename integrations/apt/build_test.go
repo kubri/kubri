@@ -8,17 +8,22 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/apt"
+	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
+	"github.com/abemedia/appcast/target"
+	ftarget "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 	"github.com/klauspost/compress/gzip"
 )
 
 func TestBuild(t *testing.T) {
+	now := time.Now()
+
 	want := map[string]string{
+		"dists/stable/InRelease": "",
 		"dists/stable/Release": `Suite: stable
 Codename: stable
-Date: ` + time.Now().UTC().Format(time.RFC1123) + `
+Date: ` + now.UTC().Format(time.RFC1123) + `
 Architectures: amd64 i386
 Components: main
 MD5Sum:
@@ -83,30 +88,25 @@ Description: This is a test.
 		"dists/stable/main/binary-i386/Release":     "Archive: stable\nSuite: stable\nArchitecture: i386\nComponent: main\n",
 	}
 
-	src, err := source.New(source.Config{Path: "../../testdata"})
-	if err != nil {
-		t.Fatal(err)
-	}
+	c := &apt.Config{}
+	c.Source, _ = source.New(source.Config{Path: "../../testdata"})
+	c.Target, _ = ftarget.New(ftarget.Config{Path: t.TempDir()})
 
-	tgt, err := target.New(target.Config{Path: t.TempDir()})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	c := &apt.Config{
-		Source: src,
-		Target: tgt,
-	}
-
-	testBuild(t, c, want)
+	testBuild(t, c, want, now)
 
 	// Should be no-op as nothing changed so timestamp should still be valid.
-	time.Sleep(time.Second)
-	testBuild(t, c, want)
+	testBuild(t, c, want, now.Add(time.Hour))
+
+	t.Run("PGP", func(t *testing.T) {
+		c.Target, _ = ftarget.New(ftarget.Config{Path: t.TempDir()})
+		c.PGPKey, _ = pgp.NewPrivateKey("test", "test@example.com")
+		want["dists/stable/Release.gpg"] = ""
+		testBuild(t, c, want, now)
+	})
 }
 
-func testBuild(t *testing.T, c *apt.Config, want map[string]string) {
-	t.Helper()
+func testBuild(t *testing.T, c *apt.Config, want map[string]string, now time.Time) { //nolint:thelper
+	apt.SetTime(now)
 
 	err := apt.Build(context.Background(), c)
 	if err != nil {
@@ -114,31 +114,56 @@ func testBuild(t *testing.T, c *apt.Config, want map[string]string) {
 	}
 
 	for name, data := range want {
-		r, err := c.Target.NewReader(context.Background(), name)
-		if err != nil {
-			t.Fatal(name, err)
-		}
-		defer r.Close()
+		got := readFile(t, c.Target, name)
 
-		if path.Ext(name) == ".gz" {
+		switch path.Base(name) {
+		case "Packages.gz":
 			data = want[name[:len(name)-3]]
-			r, err = gzip.NewReader(r)
-			if err != nil {
-				t.Fatal(name, err)
-			}
-		}
-
-		if path.Base(name) == "InRelease" {
+		case "InRelease":
 			data = want[path.Dir(name)+"/Release"]
-		}
-
-		got, err := io.ReadAll(r)
-		if err != nil {
-			t.Fatal(name, err)
+			if c.PGPKey != nil {
+				var sig []byte
+				got, sig, err = pgp.Split(got)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !pgp.Verify(pgp.Public(c.PGPKey), got, sig) {
+					t.Error(name, "failed to verify signature")
+				}
+			}
+		case "Release.gpg":
+			if !pgp.Verify(pgp.Public(c.PGPKey), readFile(t, c.Target, path.Dir(name)+"/Release"), got) {
+				t.Error(name, "failed to verify signature")
+			}
+			continue
 		}
 
 		if diff := cmp.Diff(data, string(got)); diff != "" {
 			t.Error(name, diff)
 		}
 	}
+}
+
+func readFile(t *testing.T, tgt target.Target, name string) []byte {
+	t.Helper()
+
+	r, err := tgt.NewReader(context.Background(), name)
+	if err != nil {
+		t.Fatal(name, err)
+	}
+	defer r.Close()
+
+	if path.Ext(name) == ".gz" {
+		r, err = gzip.NewReader(r)
+		if err != nil {
+			t.Fatal(name, err)
+		}
+	}
+
+	b, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatal(name, err)
+	}
+
+	return b
 }

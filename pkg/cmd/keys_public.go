@@ -1,36 +1,35 @@
 package cmd
 
 import (
-	"encoding/pem"
 	"os"
 
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
+	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"github.com/abemedia/appcast/pkg/secret"
 	"github.com/spf13/cobra"
 )
 
 func keysPublicCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:       "public (dsa|ed25519)",
+		Use:       "public (dsa|ed25519|pgp)",
 		Short:     "Output public key",
 		Aliases:   []string{"p"},
 		Args:      cobra.ExactArgs(1),
-		ValidArgs: []string{"dsa", "ed25519"},
+		ValidArgs: []string{"dsa", "ed25519", "pgp"},
 		RunE: func(_ *cobra.Command, args []string) error {
-			var b []byte
+			var pub []byte
 			switch args[0] {
 			case "dsa":
 				priv, err := secret.Get("dsa_key")
 				if err != nil {
 					return err
 				}
-				block, _ := pem.Decode(priv)
-				key, err := dsa.UnmarshalPrivateKey(block.Bytes)
+				key, err := dsa.UnmarshalPrivateKey(priv)
 				if err != nil {
 					return err
 				}
-				b, err = dsa.MarshalPublicKey(dsa.Public(key))
+				pub, err = dsa.MarshalPublicKey(dsa.Public(key))
 				if err != nil {
 					return err
 				}
@@ -39,17 +38,31 @@ func keysPublicCmd() *cobra.Command {
 				if err != nil {
 					return err
 				}
-				block, _ := pem.Decode(priv)
-				key, err := ed25519.UnmarshalPrivateKey(block.Bytes)
+				key, err := ed25519.UnmarshalPrivateKey(priv)
 				if err != nil {
 					return err
 				}
-				b, err = ed25519.MarshalPublicKey(ed25519.Public(key))
+				pub, err = ed25519.MarshalPublicKey(ed25519.Public(key))
+				if err != nil {
+					return err
+				}
+			case "pgp":
+				priv, err := secret.Get("pgp_key")
+				if err != nil {
+					return err
+				}
+				key, err := pgp.UnmarshalPrivateKey(priv)
+				if err != nil {
+					return err
+				}
+				pub, err = pgp.MarshalPublicKey(pgp.Public(key))
 				if err != nil {
 					return err
 				}
 			}
-			return pem.Encode(os.Stdout, &pem.Block{Type: "PUBLIC KEY", Bytes: b})
+
+			_, err := os.Stdout.Write(pub)
+			return err
 		},
 	}
 

@@ -13,10 +13,11 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/apt/deb"
+	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"golang.org/x/mod/semver"
 )
 
-func release(p []*Package) (string, error) {
+func release(key *pgp.PrivateKey, p []*Package) (string, error) {
 	dir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return "", err
@@ -28,13 +29,13 @@ func release(p []*Package) (string, error) {
 			stable = append(stable, pkg)
 		}
 	}
-	if err = releaseSuite(stable, "stable", dir); err != nil {
+	if err = releaseSuite(key, stable, "stable", dir); err != nil {
 		return "", err
 	}
 
 	// If not all packages are stable publish a separate `edge` dist.
 	if len(p) > len(stable) {
-		if err = releaseSuite(p, "edge", dir); err != nil {
+		if err = releaseSuite(key, p, "edge", dir); err != nil {
 			return "", err
 		}
 	}
@@ -42,13 +43,12 @@ func release(p []*Package) (string, error) {
 	return dir, nil
 }
 
-func releaseSuite(p []*Package, suite, root string) error {
+func releaseSuite(key *pgp.PrivateKey, p []*Package, suite, root string) error {
 	dir := filepath.Join(root, "dists", suite)
 
 	r := Releases{
 		Suite:      suite,
 		Codename:   suite,
-		Date:       time.Now().UTC(),
 		Components: "main",
 	}
 
@@ -90,11 +90,7 @@ func releaseSuite(p []*Package, suite, root string) error {
 		return err
 	}
 
-	if err := writeFile(filepath.Join(dir, "Release"), r); err != nil {
-		return err
-	}
-
-	return writeFile(filepath.Join(dir, "InRelease"), r)
+	return writeRelease(dir, r, key)
 }
 
 func releaseArch(p []*Package, suite, arch, root string) error {
@@ -134,4 +130,32 @@ func writeFile(path string, v any) error {
 		return err
 	}
 	return f.Close()
+}
+
+var timeNow = time.Now //nolint:gochecknoglobals
+
+func writeRelease(dir string, r Releases, key *pgp.PrivateKey) error {
+	r.Date = timeNow().UTC()
+
+	b, err := deb.Marshal(r)
+	if err != nil {
+		return err
+	}
+
+	if err = os.WriteFile(filepath.Join(dir, "Release"), b, 0o600); err != nil {
+		return err
+	}
+
+	if key != nil {
+		sig, err := pgp.Sign(key, b)
+		if err != nil {
+			return err
+		}
+		if err = os.WriteFile(filepath.Join(dir, "Release.gpg"), sig, 0o600); err != nil {
+			return err
+		}
+		b = pgp.Join(b, sig)
+	}
+
+	return os.WriteFile(filepath.Join(dir, "InRelease"), b, 0o600)
 }

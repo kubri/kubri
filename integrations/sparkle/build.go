@@ -170,11 +170,13 @@ func getReleaseItems(ctx context.Context, c *Config, release *source.Release) ([
 //nolint:nonamedreturns
 func signAsset(c *Config, os OS, b []byte) (edSig, dsaSig string, err error) {
 	if os == MacOS && c.Ed25519Key != nil {
-		sig := ed25519.Sign(c.Ed25519Key, b)
+		sig, err := ed25519.Sign(c.Ed25519Key, b)
+		if err != nil {
+			return "", "", err
+		}
 		edSig = base64.RawStdEncoding.EncodeToString(sig)
 	} else if c.DSAKey != nil {
 		sum := sha1.Sum(b)
-		sum = sha1.Sum(sum[:])
 		sig, err := dsa.Sign(c.DSAKey, sum[:])
 		if err != nil {
 			return "", "", err

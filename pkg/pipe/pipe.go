@@ -113,7 +113,9 @@ func Load(path string) (*Pipe, error) {
 		p.Appinstaller = getAppinstaller(c)
 	}
 	if c.Apt != nil && !c.Apt.Disabled {
-		p.Apt = getApt(c)
+		if p.Apt, err = getApt(c); err != nil {
+			return nil, err
+		}
 	}
 	if c.Sparkle != nil && !c.Sparkle.Disabled {
 		if p.Sparkle, err = getSparkle(c); err != nil {

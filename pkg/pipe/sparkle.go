@@ -1,7 +1,6 @@
 package pipe
 
 import (
-	"encoding/pem"
 	"path"
 
 	"github.com/abemedia/appcast/integrations/sparkle"
@@ -34,8 +33,7 @@ type sparkleConfig struct {
 func getSparkle(c *config) (*sparkle.Config, error) {
 	var dsaKey *dsa.PrivateKey
 	if b, err := secret.Get("dsa_key"); err == nil {
-		block, _ := pem.Decode(b)
-		dsaKey, err = dsa.UnmarshalPrivateKey(block.Bytes)
+		dsaKey, err = dsa.UnmarshalPrivateKey(b)
 		if err != nil {
 			return nil, err
 		}
@@ -43,8 +41,7 @@ func getSparkle(c *config) (*sparkle.Config, error) {
 
 	var edKey ed25519.PrivateKey
 	if b, err := secret.Get("ed25519_key"); err == nil {
-		block, _ := pem.Decode(b)
-		edKey, err = ed25519.UnmarshalPrivateKey(block.Bytes)
+		edKey, err = ed25519.UnmarshalPrivateKey(b)
 		if err != nil {
 			return nil, err
 		}

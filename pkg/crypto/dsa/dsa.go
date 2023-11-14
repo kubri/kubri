@@ -3,10 +3,11 @@ package dsa
 import (
 	"crypto/dsa"
 	"crypto/rand"
+	"crypto/sha1"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
-	"fmt"
+	"encoding/pem"
 	"math/big"
 
 	"github.com/abemedia/appcast/pkg/crypto"
@@ -27,7 +28,11 @@ type signature struct {
 }
 
 func Sign(key *PrivateKey, data []byte) ([]byte, error) {
-	r, s, err := dsa.Sign(rand.Reader, key, data)
+	if key == nil {
+		return nil, crypto.ErrInvalidKey
+	}
+	sum := sha1.Sum(data)
+	r, s, err := dsa.Sign(rand.Reader, key, sum[:])
 	if err != nil {
 		return nil, err
 	}
@@ -35,11 +40,15 @@ func Sign(key *PrivateKey, data []byte) ([]byte, error) {
 }
 
 func Verify(key *PublicKey, data, sig []byte) bool {
+	if key == nil {
+		return false
+	}
 	var s signature
 	if _, err := asn1.Unmarshal(sig, &s); err != nil {
 		return false
 	}
-	return dsa.Verify(key, data, s.R, s.S)
+	sum := sha1.Sum(data)
+	return dsa.Verify(key, sum[:], s.R, s.S)
 }
 
 func NewPrivateKey() (*PrivateKey, error) {
@@ -56,29 +65,30 @@ func NewPrivateKey() (*PrivateKey, error) {
 }
 
 func MarshalPrivateKey(key *PrivateKey) ([]byte, error) {
-	return asn1.Marshal(privateKey{
-		P: key.P,
-		Q: key.Q,
-		G: key.G,
-		Y: key.Y,
-		X: key.X,
-	})
+	if key == nil {
+		return nil, crypto.ErrInvalidKey
+	}
+	b, err := asn1.Marshal(privateKey{0, key.P, key.Q, key.G, key.Y, key.X})
+	if err != nil {
+		return nil, err
+	}
+	return pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: b}), nil
 }
 
 func UnmarshalPrivateKey(b []byte) (*PrivateKey, error) {
+	block, _ := pem.Decode(b)
+	if block == nil {
+		return nil, crypto.ErrInvalidKey
+	}
 	var k privateKey
-	if _, err := asn1.Unmarshal(b, &k); err != nil {
-		return nil, fmt.Errorf("failed to parse DSA key: %w", err)
+	if _, err := asn1.Unmarshal(block.Bytes, &k); err != nil {
+		return nil, crypto.ErrInvalidKey
 	}
 
 	return &dsa.PrivateKey{
 		PublicKey: dsa.PublicKey{
-			Parameters: dsa.Parameters{
-				P: k.P,
-				Q: k.Q,
-				G: k.G,
-			},
-			Y: k.Y,
+			Parameters: dsa.Parameters{P: k.P, Q: k.Q, G: k.G},
+			Y:          k.Y,
 		},
 		X: k.X,
 	}, nil
@@ -89,6 +99,10 @@ func Public(key *PrivateKey) *PublicKey {
 }
 
 func MarshalPublicKey(key *PublicKey) ([]byte, error) {
+	if key == nil {
+		return nil, crypto.ErrInvalidKey
+	}
+
 	var pub struct {
 		Algo      pkix.AlgorithmIdentifier
 		BitString asn1.BitString
@@ -97,13 +111,23 @@ func MarshalPublicKey(key *PublicKey) ([]byte, error) {
 	pub.Algo.Parameters.FullBytes, _ = asn1.Marshal(key.Parameters)
 	pub.BitString.Bytes, _ = asn1.Marshal(key.Y)
 	pub.BitString.BitLength = len(pub.BitString.Bytes) * 8
-	return asn1.Marshal(pub)
+
+	b, err := asn1.Marshal(pub)
+	if err != nil {
+		return nil, err
+	}
+
+	return pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: b}), nil
 }
 
 func UnmarshalPublicKey(b []byte) (*PublicKey, error) {
-	key, err := x509.ParsePKIXPublicKey(b)
+	block, _ := pem.Decode(b)
+	if block == nil {
+		return nil, crypto.ErrInvalidKey
+	}
+	key, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
-		return nil, err
+		return nil, crypto.ErrInvalidKey
 	}
 	dsaKey, ok := key.(*PublicKey)
 	if !ok {
