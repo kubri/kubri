@@ -11,10 +11,10 @@ import (
 
 	"github.com/abemedia/appcast/integrations/sparkle"
 	"github.com/abemedia/appcast/internal/testsource"
-	"github.com/abemedia/appcast/internal/testtarget"
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/source"
+	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -42,7 +42,10 @@ func TestBuild(t *testing.T) {
 	src.UploadAsset(ctx, "v1.1.0", "test_32-bit.exe", data)
 	src.UploadAsset(ctx, "v1.1.0", "test_64-bit.msi", data)
 
-	tgt := testtarget.New()
+	tgt, err := target.New(target.Config{Path: t.TempDir(), URL: "https://example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	w, err := tgt.NewWriter(ctx, "appcast.xml")
 	if err != nil {
@@ -238,7 +241,10 @@ func TestBuildSign(t *testing.T) {
 	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
 	src.UploadAsset(ctx, "v1.0.0", "test.msi", data)
 
-	tgt := testtarget.New()
+	tgt, err := target.New(target.Config{Path: t.TempDir(), URL: "https://example.com"})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	dsaKey, err := dsa.NewPrivateKey()
 	if err != nil {
@@ -360,7 +366,10 @@ func TestBuildUpload(t *testing.T) {
 	src.UploadAsset(ctx, "v1.0.0", "test.msi", data)
 
 	for _, upload := range []bool{true, false} {
-		tgt := testtarget.New()
+		tgt, err := target.New(target.Config{Path: t.TempDir()})
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		c := &sparkle.Config{
 			Title:          "Test",
