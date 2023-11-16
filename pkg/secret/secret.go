@@ -10,6 +10,7 @@ import (
 var (
 	ErrKeyNotFound = errors.New("key not found")
 	ErrKeyExists   = errors.New("key already exists")
+	ErrEnvironment = errors.New("key set via environment variable")
 )
 
 func Get(key string) ([]byte, error) {
@@ -30,6 +31,10 @@ func Get(key string) ([]byte, error) {
 }
 
 func Put(key string, data []byte) error {
+	if data := getEnv(key); data != "" {
+		return ErrEnvironment
+	}
+
 	if path := getPathEnv(key); path != "" {
 		if _, err := os.Stat(path); !os.IsNotExist(err) {
 			return ErrKeyExists
@@ -45,6 +50,10 @@ func Put(key string, data []byte) error {
 }
 
 func Delete(key string) error {
+	if data := getEnv(key); data != "" {
+		return ErrEnvironment
+	}
+
 	if path := getPathEnv(key); path != "" {
 		return os.Remove(path)
 	}
