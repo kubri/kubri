@@ -1,10 +1,10 @@
 package apt
 
 import (
-	"compress/bzip2"
 	"compress/gzip"
 	"io"
 
+	"github.com/dsnet/compress/bzip2"
 	"github.com/klauspost/compress/zstd"
 	"github.com/ulikunitz/xz"
 	"github.com/ulikunitz/xz/lzma"
@@ -15,6 +15,10 @@ func compress(ext string) func(io.Writer) (io.WriteCloser, error) {
 	case ".gz":
 		return func(r io.Writer) (io.WriteCloser, error) {
 			return gzip.NewWriter(r), nil
+		}
+	case ".bz2":
+		return func(r io.Writer) (io.WriteCloser, error) {
+			return bzip2.NewWriter(r, nil)
 		}
 	case ".xz":
 		return func(r io.Writer) (io.WriteCloser, error) {
@@ -43,7 +47,7 @@ func decompress(ext string) func(io.Reader) (io.ReadCloser, error) {
 		}
 	case ".bz2":
 		return func(r io.Reader) (io.ReadCloser, error) {
-			return io.NopCloser(bzip2.NewReader(r)), nil
+			return bzip2.NewReader(r, nil)
 		}
 	case ".xz":
 		return func(r io.Reader) (io.ReadCloser, error) {

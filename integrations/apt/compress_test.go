@@ -1,19 +1,21 @@
-package apt //nolint:testpackage
+package apt_test
 
 import (
 	"bytes"
 	"io"
 	"testing"
+
+	"github.com/abemedia/appcast/integrations/apt"
 )
 
 func TestCompress(t *testing.T) {
 	want := []byte("test")
-	exts := []string{".gz", ".xz", ".lzma", ".zst", ""}
+	exts := []string{".gz", ".bz2", ".xz", ".lzma", ".zst", ""}
 
 	for _, ext := range exts {
 		buf := &bytes.Buffer{}
 
-		w, err := compress(ext)(buf)
+		w, err := apt.Compress(ext)(buf)
 		if err != nil {
 			t.Errorf("compress %s: %s", ext, err)
 			continue
@@ -33,7 +35,7 @@ func TestCompress(t *testing.T) {
 			continue
 		}
 
-		r, err := decompress(ext)(buf)
+		r, err := apt.Decompress(ext)(buf)
 		if err != nil {
 			t.Errorf("decompress %s: %s", ext, err)
 			continue

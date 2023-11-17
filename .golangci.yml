@@ -35,6 +35,7 @@ linters:
     - ireturn # false positive on returning generic
     - maligned # deprecated
     - musttag
+    - nonamedreturns
     - nosnakecase # deprecated
     - nlreturn
     - paralleltest

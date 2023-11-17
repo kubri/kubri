@@ -281,12 +281,15 @@ func TestBuildSign(t *testing.T) {
 					PubDate: pubDate,
 					Version: "1.0.0",
 					Enclosure: &sparkle.Enclosure{
-						URL:         "https://example.com/v1.0.0/test.dmg",
-						OS:          "macos",
-						Version:     "1.0.0",
-						EDSignature: base64.RawStdEncoding.EncodeToString(ed25519.Sign(edKey, data)),
-						Length:      4,
-						Type:        "application/x-apple-diskimage",
+						URL:     "https://example.com/v1.0.0/test.dmg",
+						OS:      "macos",
+						Version: "1.0.0",
+						EDSignature: func() string {
+							sig, _ := ed25519.Sign(edKey, data)
+							return base64.RawStdEncoding.EncodeToString(sig)
+						}(),
+						Length: 4,
+						Type:   "application/x-apple-diskimage",
 					},
 				},
 				{
@@ -299,7 +302,6 @@ func TestBuildSign(t *testing.T) {
 						Version: "1.0.0",
 						DSASignature: func() string {
 							sum := sha1.Sum(data)
-							sum = sha1.Sum(sum[:])
 							sig, _ := dsa.Sign(dsaKey, sum[:])
 							return base64.RawStdEncoding.EncodeToString(sig)
 						}(),
@@ -336,7 +338,6 @@ func TestBuildSign(t *testing.T) {
 		y, _ := base64.RawStdEncoding.DecodeString(b)
 		pub := dsa.Public(dsaKey)
 		sum := sha1.Sum(data)
-		sum = sha1.Sum(sum[:])
 		return dsa.Verify(pub, sum[:], x) && dsa.Verify(pub, sum[:], y)
 	}))
 

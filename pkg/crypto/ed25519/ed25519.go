@@ -4,6 +4,7 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/x509"
+	"encoding/pem"
 
 	"github.com/abemedia/appcast/pkg/crypto"
 )
@@ -13,11 +14,17 @@ type (
 	PublicKey  = ed25519.PublicKey
 )
 
-func Sign(key PrivateKey, data []byte) []byte {
-	return ed25519.Sign(key, data)
+func Sign(key PrivateKey, data []byte) ([]byte, error) {
+	if l := len(key); l != ed25519.PrivateKeySize {
+		return nil, crypto.ErrInvalidKey
+	}
+	return ed25519.Sign(key, data), nil
 }
 
 func Verify(key PublicKey, data, sig []byte) bool {
+	if l := len(key); l != ed25519.PublicKeySize {
+		return false
+	}
 	return ed25519.Verify(key, data, sig)
 }
 
@@ -27,13 +34,24 @@ func NewPrivateKey() (PrivateKey, error) {
 }
 
 func MarshalPrivateKey(key PrivateKey) ([]byte, error) {
-	return x509.MarshalPKCS8PrivateKey(key)
+	if l := len(key); l != ed25519.PrivateKeySize {
+		return nil, crypto.ErrInvalidKey
+	}
+	b, err := x509.MarshalPKCS8PrivateKey(key)
+	if err != nil {
+		return nil, err
+	}
+	return pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: b}), nil
 }
 
 func UnmarshalPrivateKey(b []byte) (PrivateKey, error) {
-	key, err := x509.ParsePKCS8PrivateKey(b)
+	block, _ := pem.Decode(b)
+	if block == nil {
+		return nil, crypto.ErrInvalidKey
+	}
+	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
-		return nil, err
+		return nil, crypto.ErrInvalidKey
 	}
 	edKey, ok := key.(PrivateKey)
 	if !ok {
@@ -47,13 +65,24 @@ func Public(key PrivateKey) PublicKey {
 }
 
 func MarshalPublicKey(key PublicKey) ([]byte, error) {
-	return x509.MarshalPKIXPublicKey(key)
+	if l := len(key); l != ed25519.PublicKeySize {
+		return nil, crypto.ErrInvalidKey
+	}
+	b, err := x509.MarshalPKIXPublicKey(key)
+	if err != nil {
+		return nil, err
+	}
+	return pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: b}), nil
 }
 
 func UnmarshalPublicKey(b []byte) (PublicKey, error) {
-	key, err := x509.ParsePKIXPublicKey(b)
+	block, _ := pem.Decode(b)
+	if block == nil {
+		return nil, crypto.ErrInvalidKey
+	}
+	key, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
-		return nil, err
+		return nil, crypto.ErrInvalidKey
 	}
 	edKey, ok := key.(PublicKey)
 	if !ok {

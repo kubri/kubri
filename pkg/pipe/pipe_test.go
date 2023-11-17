@@ -1,7 +1,6 @@
 package pipe_test
 
 import (
-	"encoding/pem"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -211,12 +210,10 @@ sparkle:
 		if test.want.Sparkle != nil {
 			if test.want.Sparkle.DSAKey != nil {
 				b, _ := dsa.MarshalPrivateKey(test.want.Sparkle.DSAKey)
-				b = pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: b})
 				os.WriteFile(filepath.Join(dir, "dsa_key"), b, 0o600)
 			}
 			if test.want.Sparkle.Ed25519Key != nil {
 				b, _ := ed25519.MarshalPrivateKey(test.want.Sparkle.Ed25519Key)
-				b = pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: b})
 				os.WriteFile(filepath.Join(dir, "ed25519_key"), b, 0o600)
 			}
 		}

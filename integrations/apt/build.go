@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/abemedia/appcast/integrations/apt/deb"
+	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
 	"golang.org/x/mod/semver"
@@ -22,6 +23,7 @@ type Config struct {
 	Version    string
 	Prerelease bool
 	Target     target.Target
+	PGPKey     *pgp.PrivateKey
 }
 
 func Build(ctx context.Context, c *Config) error {
@@ -49,7 +51,7 @@ func Build(ctx context.Context, c *Config) error {
 	}
 	pkgs = append(p, pkgs...)
 
-	dir, err := release(pkgs)
+	dir, err := release(c.PGPKey, pkgs)
 	if err != nil {
 		return err
 	}

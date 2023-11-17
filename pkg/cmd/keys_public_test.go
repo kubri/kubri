@@ -2,7 +2,6 @@ package cmd_test
 
 import (
 	"bytes"
-	"encoding/pem"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,26 +10,26 @@ import (
 	"github.com/abemedia/appcast/pkg/cmd"
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
+	"github.com/abemedia/appcast/pkg/crypto/pgp"
 )
 
 func TestKeysPublicCmd(t *testing.T) {
 	stdout := capture(t, os.Stdout)
+	t.Cleanup(func() { t.Log(stdout.String()) })
 	dir := t.TempDir()
 	t.Setenv("APPCAST_PATH", dir)
 
 	{
 		key, _ := dsa.NewPrivateKey()
-		b, _ := dsa.MarshalPrivateKey(key)
-		b = pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: b})
-		os.WriteFile(filepath.Join(dir, "dsa_key"), b, 0o600)
-		b, _ = dsa.MarshalPublicKey(dsa.Public(key))
-		b = pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: b})
+		priv, _ := dsa.MarshalPrivateKey(key)
+		os.WriteFile(filepath.Join(dir, "dsa_key"), priv, 0o600)
+		pub, _ := dsa.MarshalPublicKey(dsa.Public(key))
 
 		err := cmd.Execute("", []string{"keys", "public", "dsa"})
 		if err != nil {
 			t.Error(err)
 		}
-		if !bytes.Equal(stdout.Bytes(), b) {
+		if !bytes.Equal(stdout.Bytes(), pub) {
 			t.Error("dsa public keys should be equal")
 		}
 	}
@@ -39,18 +38,33 @@ func TestKeysPublicCmd(t *testing.T) {
 
 	{
 		key, _ := ed25519.NewPrivateKey()
-		b, _ := ed25519.MarshalPrivateKey(key)
-		b = pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: b})
-		os.WriteFile(filepath.Join(dir, "ed25519_key"), b, 0o600)
-		b, _ = ed25519.MarshalPublicKey(ed25519.Public(key))
-		b = pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: b})
+		priv, _ := ed25519.MarshalPrivateKey(key)
+		os.WriteFile(filepath.Join(dir, "ed25519_key"), priv, 0o600)
+		pub, _ := ed25519.MarshalPublicKey(ed25519.Public(key))
 
 		err := cmd.Execute("", []string{"keys", "public", "ed25519"})
 		if err != nil {
 			t.Error(err)
 		}
-		if !bytes.Equal(stdout.Bytes(), b) {
-			t.Error("dsa public keys should be equal")
+		if !bytes.Equal(stdout.Bytes(), pub) {
+			t.Error("ed25519 public keys should be equal")
+		}
+	}
+
+	stdout.Reset()
+
+	{
+		key, _ := pgp.NewPrivateKey("test", "test@example.com")
+		priv, _ := pgp.MarshalPrivateKey(key)
+		os.WriteFile(filepath.Join(dir, "pgp_key"), priv, 0o600)
+		pub, _ := pgp.MarshalPublicKey(pgp.Public(key))
+
+		err := cmd.Execute("", []string{"keys", "public", "pgp"})
+		if err != nil {
+			t.Error(err)
+		}
+		if !bytes.Equal(stdout.Bytes(), pub) {
+			t.Error("pgp public keys should be equal")
 		}
 	}
 }

@@ -4,39 +4,20 @@ import (
 	"testing"
 
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
+	"github.com/abemedia/appcast/pkg/crypto/internal/cryptotest"
 )
 
 func TestEd25519(t *testing.T) {
-	priv, err := ed25519.NewPrivateKey()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	privBytes, err := ed25519.MarshalPrivateKey(priv)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	pub := ed25519.Public(priv)
-	pubBytes, err := ed25519.MarshalPublicKey(pub)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	priv, err = ed25519.UnmarshalPrivateKey(privBytes)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	pub, err = ed25519.UnmarshalPublicKey(pubBytes)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	data := []byte("test")
-
-	sig := ed25519.Sign(priv, data)
-	if !ed25519.Verify(pub, data, sig) {
-		t.Fatal("invalid signature")
-	}
+	cryptotest.Test(t,
+		cryptotest.Implementation[ed25519.PrivateKey, ed25519.PublicKey]{
+			NewPrivateKey:       ed25519.NewPrivateKey,
+			MarshalPrivateKey:   ed25519.MarshalPrivateKey,
+			UnmarshalPrivateKey: ed25519.UnmarshalPrivateKey,
+			Public:              ed25519.Public,
+			MarshalPublicKey:    ed25519.MarshalPublicKey,
+			UnmarshalPublicKey:  ed25519.UnmarshalPublicKey,
+			Sign:                ed25519.Sign,
+			Verify:              ed25519.Verify,
+		},
+		cryptotest.WithOpenSSLTest("pkeyutl", "-verify", "-pubin", "-inkey", "public.pem", "-rawin", "-in", "data.txt", "-sigfile", "data.txt.sig"))
 }
