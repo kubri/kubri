@@ -93,7 +93,7 @@ func newStringerEncoder(reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
 		s := v.Interface().(fmt.Stringer).String() //nolint:forcetypeassert
 		if len(s) > 0 {
-			_, err := w.Write([]byte(s))
+			_, err := w.Write(atob(s))
 			return err
 		}
 		return nil
@@ -167,7 +167,7 @@ func newStructEncoder(typ reflect.Type) (encoder, error) {
 		if n == "" {
 			continue
 		}
-		name := []byte(n)
+		name := atob(n)
 
 		enc, err := newEncoder(field.Type)
 		if err != nil {
@@ -222,7 +222,7 @@ func newDateEncoder(reflect.Type) (encoder, error) {
 		if t.IsZero() {
 			return nil
 		}
-		_, err := w.Write([]byte(t.Format(time.RFC1123)))
+		_, err := w.Write(atob(t.Format(time.RFC1123)))
 		return err
 	}, nil
 }
@@ -233,7 +233,7 @@ func newIntEncoder(reflect.Type) (encoder, error) {
 		if i == 0 {
 			return nil
 		}
-		_, err := w.Write([]byte(strconv.FormatInt(i, 10)))
+		_, err := w.Write(atob(strconv.FormatInt(i, 10)))
 		return err
 	}, nil
 }
@@ -244,7 +244,7 @@ func newUintEncoder(reflect.Type) (encoder, error) {
 		if i == 0 {
 			return nil
 		}
-		_, err := w.Write([]byte(strconv.FormatUint(i, 10)))
+		_, err := w.Write(atob(strconv.FormatUint(i, 10)))
 		return err
 	}, nil
 }
@@ -256,7 +256,7 @@ func newFloatEncoder(typ reflect.Type) (encoder, error) {
 		if f == 0 {
 			return nil
 		}
-		_, err := w.Write([]byte(strconv.FormatFloat(f, 'f', -1, bits)))
+		_, err := w.Write(atob(strconv.FormatFloat(f, 'f', -1, bits)))
 		return err
 	}, nil
 }
@@ -282,7 +282,7 @@ func newByteArrayEncoder(typ reflect.Type) (encoder, error) {
 
 func newStringEncoder(reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
-		in := []byte(v.String())
+		in := atob(v.String())
 
 		if i := bytes.IndexByte(in, '\n'); i == -1 {
 			_, err := w.Write(in)

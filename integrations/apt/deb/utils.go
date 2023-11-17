@@ -48,6 +48,10 @@ func trim(s []byte) []byte {
 	return s[i:n]
 }
 
+func atob(s string) []byte {
+	return unsafe.Slice(unsafe.StringData(s), len(s))
+}
+
 func btoa(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
