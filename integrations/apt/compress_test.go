@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/apt"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestCompress(t *testing.T) {
 	want := []byte("test")
-	exts := []string{".gz", ".bz2", ".xz", ".lzma", ".zst", ""}
+	exts := []string{".gz", ".bz2", ".xz", ".lzma", ".lz4", ".zst", ""}
 
 	for _, ext := range exts {
 		buf := &bytes.Buffer{}
@@ -48,6 +49,30 @@ func TestCompress(t *testing.T) {
 
 		if !bytes.Equal(want, got) {
 			t.Errorf("%s: should be decompressed", ext)
+		}
+	}
+}
+
+func TestCompessionExtensions(t *testing.T) {
+	tests := []struct {
+		in   apt.CompressionAlgo
+		want []string
+	}{
+		{0, []string{"", ".xz", ".gz"}}, // defaults
+		{apt.NoCompression, []string{""}},
+		{apt.GZIP, []string{"", ".gz"}},
+		{apt.BZIP2, []string{"", ".bz2"}},
+		{apt.XZ, []string{"", ".xz"}},
+		{apt.LZMA, []string{"", ".lzma"}},
+		{apt.LZ4, []string{"", ".lz4"}},
+		{apt.ZSTD, []string{"", ".zst"}},
+		{apt.BZIP2 | apt.ZSTD | apt.XZ, []string{"", ".bz2", ".xz", ".zst"}},
+	}
+
+	for _, test := range tests {
+		got := apt.CompressionExtensions(test.in)
+		if diff := cmp.Diff(test.want, got); diff != "" {
+			t.Error(diff)
 		}
 	}
 }

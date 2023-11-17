@@ -1,11 +1,10 @@
 package pipe //nolint:testpackage
 
 import (
-	"log"
-	"reflect"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/source/azureblob"
 	"github.com/abemedia/appcast/source/file"
@@ -99,6 +98,15 @@ func TestSource(t *testing.T) {
 		},
 	}
 
+	opts := cmp.Options{
+		test.ExportAll(),
+		test.IgnoreFunctions(),
+		test.CompareLoggers(),
+
+		// Ignore azblob policies as they are not comparable.
+		cmpopts.IgnoreFields(container.Client{}, "inner.internal.pl"),
+	}
+
 	for i, test := range tests {
 		want, err := test.want()
 		if err != nil {
@@ -111,26 +119,7 @@ func TestSource(t *testing.T) {
 			continue
 		}
 
-		opts := cmp.Options{
-			// Export all unexported fields.
-			cmp.Exporter(func(t reflect.Type) bool { return true }),
-
-			// Ignore all function fields.
-			cmp.FilterPath(func(p cmp.Path) bool {
-				sf, ok := p.Index(-1).(cmp.StructField)
-				return ok && sf.Type().Kind() == reflect.Func
-			}, cmp.Ignore()),
-
-			// Ignore azblob policies as they are not comparable.
-			cmpopts.IgnoreFields(container.Client{}, "inner.internal.pl"),
-
-			// Compare logger.
-			cmp.Comparer(func(a, b *log.Logger) bool {
-				return a.Prefix() == b.Prefix() && a.Flags() == b.Flags() && a.Writer() == b.Writer()
-			}),
-		}
-
-		if diff := cmp.Diff(want, s, opts...); diff != "" {
+		if diff := cmp.Diff(want, s, opts); diff != "" {
 			t.Error(i, diff)
 		}
 	}

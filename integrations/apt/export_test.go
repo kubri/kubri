@@ -8,6 +8,7 @@ func SetTime(t time.Time) {
 
 //nolint:gochecknoglobals
 var (
-	Compress   = compress
-	Decompress = decompress
+	Compress              = compress
+	Decompress            = decompress
+	CompressionExtensions = compressionExtensions
 )
