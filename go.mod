@@ -1,6 +1,6 @@
 module github.com/abemedia/appcast
 
-go 1.20
+go 1.21
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.2.0

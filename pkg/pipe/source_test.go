@@ -1,6 +1,7 @@
 package pipe //nolint:testpackage
 
 import (
+	"log"
 	"reflect"
 	"testing"
 
@@ -122,6 +123,11 @@ func TestSource(t *testing.T) {
 
 			// Ignore azblob policies as they are not comparable.
 			cmpopts.IgnoreFields(container.Client{}, "inner.internal.pl"),
+
+			// Compare logger.
+			cmp.Comparer(func(a, b *log.Logger) bool {
+				return a.Prefix() == b.Prefix() && a.Flags() == b.Flags() && a.Writer() == b.Writer()
+			}),
 		}
 
 		if diff := cmp.Diff(want, s, opts...); diff != "" {
