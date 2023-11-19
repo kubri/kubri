@@ -220,10 +220,17 @@ func BenchmarkMarshal(b *testing.B) {
 		Int    int
 	}
 
-	v := record{
-		String: "test",
-		Hex:    [4]byte{1, 2, 3, 4},
-		Int:    1,
+	v := []record{
+		{
+			String: "foo\nbar\nbaz",
+			Hex:    [4]byte{1, 2, 3, 4},
+			Int:    1,
+		},
+		{
+			String: "foo\nbar\nbaz",
+			Hex:    [4]byte{1, 2, 3, 4},
+			Int:    1,
+		},
 	}
 
 	for i := 0; i < b.N; i++ {

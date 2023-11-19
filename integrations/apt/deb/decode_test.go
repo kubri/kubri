@@ -288,14 +288,15 @@ func BenchmarkUnmarshal(b *testing.B) {
 
 	in := []byte(`String: foo
  bar
+ baz
 Hex: 01020304
 Int: 1
 
 String: foo
  bar
+ baz
 Hex: 01020304
 Int: 1
-
 `)
 
 	var v []record
