@@ -3,12 +3,12 @@ package pipe_test
 import (
 	"os"
 	"path/filepath"
-	"reflect"
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/appinstaller"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/sparkle"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/pipe"
@@ -203,6 +203,8 @@ sparkle:
 		},
 	}
 
+	opts := test.ExportAll()
+
 	for i, test := range tests {
 		dir := t.TempDir()
 		t.Setenv("APPCAST_PATH", dir)
@@ -227,7 +229,7 @@ sparkle:
 			continue
 		}
 
-		if diff := cmp.Diff(test.want, c, cmp.Exporter(func(t reflect.Type) bool { return true })); diff != "" {
+		if diff := cmp.Diff(test.want, c, opts); diff != "" {
 			t.Error(i, diff)
 		}
 	}

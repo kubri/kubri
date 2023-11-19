@@ -17,7 +17,7 @@ import (
 	"golang.org/x/mod/semver"
 )
 
-func release(key *pgp.PrivateKey, p []*Package) (string, error) {
+func release(key *pgp.PrivateKey, algos CompressionAlgo, p []*Package) (string, error) {
 	dir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return "", err
@@ -29,13 +29,13 @@ func release(key *pgp.PrivateKey, p []*Package) (string, error) {
 			stable = append(stable, pkg)
 		}
 	}
-	if err = releaseSuite(key, stable, "stable", dir); err != nil {
+	if err = releaseSuite(key, algos, stable, "stable", dir); err != nil {
 		return "", err
 	}
 
 	// If not all packages are stable publish a separate `edge` dist.
 	if len(p) > len(stable) {
-		if err = releaseSuite(key, p, "edge", dir); err != nil {
+		if err = releaseSuite(key, algos, p, "edge", dir); err != nil {
 			return "", err
 		}
 	}
@@ -43,7 +43,7 @@ func release(key *pgp.PrivateKey, p []*Package) (string, error) {
 	return dir, nil
 }
 
-func releaseSuite(key *pgp.PrivateKey, p []*Package, suite, root string) error {
+func releaseSuite(key *pgp.PrivateKey, algos CompressionAlgo, p []*Package, suite, root string) error {
 	dir := filepath.Join(root, "dists", suite)
 
 	r := Releases{
@@ -60,7 +60,7 @@ func releaseSuite(key *pgp.PrivateKey, p []*Package, suite, root string) error {
 	{
 		var as []string
 		for a, pkgs := range byArch {
-			if err := releaseArch(pkgs, suite, a, dir); err != nil {
+			if err := releaseArch(algos, pkgs, suite, a, dir); err != nil {
 				return err
 			}
 			as = append(as, a)
@@ -93,7 +93,7 @@ func releaseSuite(key *pgp.PrivateKey, p []*Package, suite, root string) error {
 	return writeRelease(dir, r, key)
 }
 
-func releaseArch(p []*Package, suite, arch, root string) error {
+func releaseArch(algos CompressionAlgo, p []*Package, suite, arch, root string) error {
 	r := Release{
 		Archive:      suite,
 		Suite:        suite,
@@ -108,10 +108,7 @@ func releaseArch(p []*Package, suite, arch, root string) error {
 	if err := writeFile(filepath.Join(dir, "Release"), r); err != nil {
 		return err
 	}
-	if err := writeFile(filepath.Join(dir, "Packages"), p); err != nil {
-		return err
-	}
-	return writeFile(filepath.Join(dir, "Packages.gz"), p)
+	return writePackages(filepath.Join(dir, "Packages"), p, algos)
 }
 
 func writeFile(path string, v any) error {
@@ -130,6 +127,35 @@ func writeFile(path string, v any) error {
 		return err
 	}
 	return f.Close()
+}
+
+func writePackages(path string, v []*Package, algos CompressionAlgo) error {
+	b, err := deb.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	for _, ext := range compressionExtensions(algos) {
+		f, err := os.Create(path + ext)
+		if err != nil {
+			return err
+		}
+		w, err := compress(ext)(f)
+		if err != nil {
+			return err
+		}
+		if _, err = w.Write(b); err != nil {
+			return err
+		}
+		if err = w.Close(); err != nil {
+			return err
+		}
+		if err = f.Close(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 var timeNow = time.Now //nolint:gochecknoglobals

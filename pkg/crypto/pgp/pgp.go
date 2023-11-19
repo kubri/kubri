@@ -161,7 +161,7 @@ var ErrInvalidMessage = errors.New("pgp: invalid message")
 func wrapError(wrapErr, err error) error {
 	var e pgperrors.InvalidArgumentError
 	if errors.As(err, &e) {
-		return fmt.Errorf("%w: %s", wrapErr, e)
+		return fmt.Errorf("%w: %s", wrapErr, string(e))
 	}
 	return err
 }

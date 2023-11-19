@@ -24,6 +24,7 @@ type Config struct {
 	Prerelease bool
 	Target     target.Target
 	PGPKey     *pgp.PrivateKey
+	Compress   CompressionAlgo
 }
 
 func Build(ctx context.Context, c *Config) error {
@@ -51,7 +52,7 @@ func Build(ctx context.Context, c *Config) error {
 	}
 	pkgs = append(p, pkgs...)
 
-	dir, err := release(c.PGPKey, pkgs)
+	dir, err := release(c.PGPKey, c.Compress, pkgs)
 	if err != nil {
 		return err
 	}

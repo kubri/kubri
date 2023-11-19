@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/apt/deb"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -158,13 +159,14 @@ String: test
 		},
 	}
 
+	opts := test.ExportAll()
+
 	for _, test := range tests {
 		v := reflect.New(reflect.TypeOf(test.want))
 		if err := deb.Unmarshal([]byte(test.in), v.Interface()); err != nil {
 			t.Error(test.msg, err)
 		} else {
-			opt := cmp.Exporter(func(t reflect.Type) bool { return true })
-			if diff := cmp.Diff(test.want, v.Elem().Interface(), opt); diff != "" {
+			if diff := cmp.Diff(test.want, v.Elem().Interface(), opts); diff != "" {
 				t.Errorf("%s:\n%s", test.msg, diff)
 			}
 		}
@@ -269,11 +271,11 @@ func TestDecodeErrors(t *testing.T) {
 		},
 	}
 
+	opts := test.CompareErrorMessages()
+
 	for _, test := range tests {
 		err := deb.NewDecoder(test.reader).Decode(test.value)
-		if err == nil {
-			t.Error(test.msg, "should return error:", test.err)
-		} else if diff := cmp.Diff(test.err, err.Error()); diff != "" {
+		if diff := cmp.Diff(errors.New(test.err), err, opts); diff != "" {
 			t.Errorf("%s returned unexpected error:\n%s", test.msg, diff)
 		}
 	}

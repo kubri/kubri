@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/apt/deb"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -192,11 +193,11 @@ func TestEncodeErrors(t *testing.T) {
 		},
 	}
 
+	opts := test.CompareErrorMessages()
+
 	for _, test := range tests {
 		_, err := deb.Marshal(test.value)
-		if err == nil {
-			t.Error(test.msg, "should return error:", test.err)
-		} else if diff := cmp.Diff(test.err, err.Error()); diff != "" {
+		if diff := cmp.Diff(errors.New(test.err), err, opts); diff != "" {
 			t.Errorf("%s returned unexpected error:\n%s", test.msg, diff)
 		}
 	}
