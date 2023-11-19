@@ -1,6 +1,7 @@
 package pipe //nolint:testpackage
 
 import (
+	"log"
 	"reflect"
 	"testing"
 
@@ -104,6 +105,11 @@ func TestTarget(t *testing.T) {
 
 			// Ignore GitHub rate limit.
 			cmpopts.IgnoreTypes(gh.Rate{}),
+
+			// Compare logger.
+			cmp.Comparer(func(a, b *log.Logger) bool {
+				return a.Prefix() == b.Prefix() && a.Flags() == b.Flags() && a.Writer() == b.Writer()
+			}),
 		}
 
 		if diff := cmp.Diff(want, s, opts...); diff != "" {
