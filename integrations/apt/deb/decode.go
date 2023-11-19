@@ -29,6 +29,10 @@ func NewDecoder(r io.Reader) *Decoder {
 }
 
 func (d *Decoder) Decode(v any) error {
+	if v == nil {
+		return errors.New("unsupported type: nil")
+	}
+
 	val := reflect.ValueOf(v)
 	typ := val.Type()
 
@@ -37,10 +41,11 @@ func (d *Decoder) Decode(v any) error {
 	}
 
 	if dec, ok := decoders.Load(typ); ok {
-		if err := dec.(decoder)(d.r, val); err != nil && err != io.EOF { //nolint:forcetypeassert
-			return err
+		err := dec.(decoder)(d.r, val) //nolint:forcetypeassert
+		if err == io.EOF {
+			return errors.New("unexpected end of input")
 		}
-		return nil
+		return err
 	}
 
 	dec, err := newDecoder(typ)
@@ -55,11 +60,10 @@ func (d *Decoder) Decode(v any) error {
 var unmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
 
 func newDecoder(typ reflect.Type) (decoder, error) {
-	if typ == dateType {
+	switch {
+	case typ == dateType:
 		return newDateDecoder(typ)
-	}
-
-	if typ.Implements(unmarshalerType) {
+	case typ.Implements(unmarshalerType), reflect.PointerTo(typ).Implements(unmarshalerType):
 		return newUnmarshalerDecoder(typ)
 	}
 
@@ -83,12 +87,16 @@ func newDecoder(typ reflect.Type) (decoder, error) {
 			return newByteArrayDecoder(typ)
 		}
 	}
+
 	return nil, fmt.Errorf("unsupported type: %s", typ)
 }
 
 func newUnmarshalerDecoder(typ reflect.Type) (decoder, error) {
+	mustAddr := reflect.PointerTo(typ).Implements(unmarshalerType)
 	isPtr := typ.Kind() == reflect.Pointer
-	typ = typ.Elem()
+	if isPtr {
+		typ = typ.Elem()
+	}
 
 	return func(r *bufio.Reader, v reflect.Value) error {
 		b, err := readlines(r)
@@ -97,6 +105,9 @@ func newUnmarshalerDecoder(typ reflect.Type) (decoder, error) {
 		}
 		if isPtr && v.IsNil() {
 			v.Set(reflect.New(typ))
+		}
+		if mustAddr {
+			v = v.Addr()
 		}
 		return v.Interface().(encoding.TextUnmarshaler).UnmarshalText(b) //nolint:forcetypeassert
 	}, nil
@@ -173,7 +184,11 @@ func newStructDecoder(typ reflect.Type) (decoder, error) {
 
 	return func(r *bufio.Reader, v reflect.Value) error {
 		for {
-			if c, err := r.Peek(1); err == io.EOF || c[0] == '\n' || c[0] == '\r' {
+			c, err := r.Peek(1)
+			if err != nil && err != io.EOF {
+				return err
+			}
+			if err == io.EOF || c[0] == '\n' || c[0] == '\r' {
 				return nil
 			}
 			b, err := r.ReadSlice(':')
@@ -277,15 +292,15 @@ func newByteArrayDecoder(typ reflect.Type) (decoder, error) {
 		if err != nil || len(b) == 0 {
 			return err
 		}
-		if _, err = hex.Decode(b, b); err != nil {
+		if hex.DecodedLen(len(b)) > size {
+			return errors.New("hex data would overflow byte array")
+		}
+		out := make([]byte, size)
+		if _, err = hex.Decode(out, b); err != nil {
 			return err
 		}
-		for i := 0; i < size; i++ {
-			if len(b) > i {
-				v.Index(i).SetUint(uint64(b[i]))
-			} else {
-				v.Index(i).SetUint(0)
-			}
+		for i, x := range out {
+			v.Index(i).SetUint(uint64(x))
 		}
 		return nil
 	}, nil
@@ -300,31 +315,28 @@ func readline(r *bufio.Reader) ([]byte, error) {
 }
 
 func readlines(r *bufio.Reader) ([]byte, error) {
-	buf := bufPool.Get().(*bytes.Buffer) //nolint:forcetypeassert
-	buf.Reset()
-	defer bufPool.Put(buf)
-
-	l, err := r.ReadSlice('\n')
+	b, err := readline(r)
 	if err != nil {
 		return nil, err
 	}
 
-	buf.Write(trim(l))
-
 	for {
 		p, err := r.Peek(1)
+		if err != nil && err != io.EOF {
+			return nil, err
+		}
 		if err == io.EOF || p[0] != ' ' && p[0] != '\t' {
 			break
 		}
-		l, err = r.ReadSlice('\n')
+		l, err := readline(r)
 		if err != nil {
 			return nil, err
 		}
-		_ = buf.WriteByte('\n')
-		if l = trim(l); len(l) != 1 || l[0] != '.' {
-			buf.Write(l)
+		b = append(b, '\n')
+		if len(l) != 1 || l[0] != '.' {
+			b = append(b, l...)
 		}
 	}
 
-	return append([]byte(nil), buf.Bytes()...), nil
+	return b, nil
 }

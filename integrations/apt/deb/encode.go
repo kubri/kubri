@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"reflect"
@@ -33,6 +34,10 @@ func NewEncoder(w io.Writer) *Encoder {
 }
 
 func (e *Encoder) Encode(v any) error {
+	if v == nil {
+		return errors.New("unsupported type: nil")
+	}
+
 	val := reflect.ValueOf(v)
 	typ := val.Type()
 
@@ -55,15 +60,13 @@ var (
 )
 
 func newEncoder(typ reflect.Type) (encoder, error) {
-	if typ == dateType {
-		return newDateEncoder(typ)
-	}
-
 	switch {
-	case typ.Implements(stringerType):
-		return newStringerEncoder(typ)
+	case typ == dateType:
+		return newDateEncoder(typ)
 	case typ.Implements(marshalerType):
 		return newMarshalerEncoder(typ)
+	case typ.Implements(stringerType):
+		return newStringerEncoder(typ)
 	}
 
 	switch typ.Kind() {
@@ -89,14 +92,17 @@ func newEncoder(typ reflect.Type) (encoder, error) {
 	return nil, fmt.Errorf("unsupported type: %s", typ)
 }
 
-func newStringerEncoder(reflect.Type) (encoder, error) {
+func newStringerEncoder(typ reflect.Type) (encoder, error) {
+	ptr := typ.Kind() == reflect.Pointer
 	return func(w io.Writer, v reflect.Value) error {
-		s := v.Interface().(fmt.Stringer).String() //nolint:forcetypeassert
-		if len(s) > 0 {
-			_, err := w.Write(atob(s))
-			return err
+		if ptr && v.IsNil() {
+			return nil
 		}
-		return nil
+		s := v.Interface().(fmt.Stringer).String() //nolint:forcetypeassert
+		if len(s) == 0 {
+			return nil
+		}
+		return encodeText(w, atob(s))
 	}, nil
 }
 
@@ -113,8 +119,7 @@ func newMarshalerEncoder(typ reflect.Type) (encoder, error) {
 		if len(b) == 0 {
 			return nil
 		}
-		_, err = w.Write(b)
-		return err
+		return encodeText(w, b)
 	}, nil
 }
 
@@ -187,7 +192,7 @@ func newStructEncoder(typ reflect.Type) (encoder, error) {
 				return err
 			}
 
-			// Only write colon after space if content doesn't start with line break.
+			// Only write space after colon if content doesn't start with line break.
 			if c, _ := buf.ReadByte(); c != '\n' {
 				if _, err = w.Write(space); err != nil {
 					return err
@@ -282,33 +287,35 @@ func newByteArrayEncoder(typ reflect.Type) (encoder, error) {
 
 func newStringEncoder(reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
-		in := atob(v.String())
-
-		if i := bytes.IndexByte(in, '\n'); i == -1 {
-			_, err := w.Write(in)
-			return err
-		}
-
-		out := make([]byte, 0, len(in))
-		for i, c := range in {
-			if c == '\n' {
-				var last byte
-				for j := i - 1; j > 0; j-- {
-					if l := in[j]; l != '\n' && l != '\r' {
-						break
-					}
-					last = in[j]
-				}
-				if last == '\n' {
-					out = append(out, '.')
-				}
-				out = append(out, '\n', ' ')
-			} else {
-				out = append(out, c)
-			}
-		}
-
-		_, err := w.Write(out)
-		return err
+		return encodeText(w, atob(v.String()))
 	}, nil
+}
+
+func encodeText(w io.Writer, in []byte) error {
+	if i := bytes.IndexByte(in, '\n'); i == -1 {
+		_, err := w.Write(in)
+		return err
+	}
+
+	out := make([]byte, 0, len(in)+bytes.Count(in, nl)*2)
+	for i, c := range in {
+		if c == '\n' {
+			var last byte
+			for j := i - 1; j > 0; j-- {
+				if l := in[j]; l != '\n' && l != '\r' {
+					break
+				}
+				last = in[j]
+			}
+			if last == '\n' {
+				out = append(out, '.')
+			}
+			out = append(out, '\n', ' ')
+		} else {
+			out = append(out, c)
+		}
+	}
+
+	_, err := w.Write(out)
+	return err
 }

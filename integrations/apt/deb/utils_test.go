@@ -23,6 +23,18 @@ func (s *marshaler) UnmarshalText(text []byte) error {
 	return nil
 }
 
+type errMarshaler struct {
+	E error
+}
+
+func (s errMarshaler) MarshalText() ([]byte, error) {
+	return nil, s.E
+}
+
+func (s *errMarshaler) UnmarshalText([]byte) error {
+	return s.E
+}
+
 type record struct {
 	String    string
 	Hex       [4]byte
