@@ -19,6 +19,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.17.3
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/parkr/changelog v1.4.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.8.0
 	github.com/testcontainers/testcontainers-go v0.26.0
