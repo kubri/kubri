@@ -1,18 +1,16 @@
 package yum_test
 
 import (
-	"bytes"
-	"compress/gzip"
 	"context"
 	"io"
 	"io/fs"
 	"os"
-	"path"
-	"strconv"
+	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/abemedia/appcast/integrations/yum"
+	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	source "github.com/abemedia/appcast/source/file"
 	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
@@ -20,47 +18,64 @@ import (
 
 func TestBuild(t *testing.T) {
 	want := readTestData(t)
-	dir := t.TempDir() + "/rpm"
+	now := time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC)
 
-	src, err := source.New(source.Config{Path: "../../testdata"})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	tgt, err := target.New(target.Config{Path: dir})
-	if err != nil {
-		t.Fatal(err)
-	}
+	src, _ := source.New(source.Config{Path: "../../testdata"})
+	tgt, _ := target.New(target.Config{Path: t.TempDir() + "/rpm"})
+	key, _ := pgp.NewPrivateKey("test", "test@example.com")
 
 	c := &yum.Config{
 		Source: src,
 		Target: tgt,
+		PGPKey: key,
 	}
 
-	testBuild(t, c, os.DirFS(dir), want)
+	t.Run("New", func(t *testing.T) {
+		testBuild(t, c, want, now)
+	})
 
-	// Should be no-op as nothing changed so timestamps should still be valid.
-	time.Sleep(time.Second)
-	testBuild(t, c, os.DirFS(dir), want)
+	t.Run("NoChange", func(t *testing.T) {
+		testBuild(t, c, want, now.Add(time.Hour))
+	})
+
+	t.Run("PGP", func(t *testing.T) {
+		dir := t.TempDir()
+		pgpKey, _ := pgp.NewPrivateKey("test", "test@example.com")
+		tgt, _ := target.New(target.Config{Path: dir})
+
+		c := &yum.Config{
+			Source: src,
+			Target: tgt,
+			PGPKey: pgpKey,
+		}
+
+		testBuild(t, c, want, now)
+
+		data, _ := os.ReadFile(filepath.Join(dir, "repodata", "repomd.xml"))
+		key, _ := os.ReadFile(filepath.Join(dir, "repodata", "repomd.xml.key"))
+		sig, _ := os.ReadFile(filepath.Join(dir, "repodata", "repomd.xml.asc"))
+		pub, _ := pgp.UnmarshalPublicKey(key)
+
+		if !pgp.Verify(pub, data, sig) {
+			t.Error("should pass pgp verification")
+		}
+	})
 }
 
-func readTestData(t *testing.T) map[string]string {
+func readTestData(t *testing.T) map[string][]byte {
 	t.Helper()
 
-	ts := strconv.Itoa(int(time.Now().Unix()))
-	want := make(map[string]string)
+	want := make(map[string][]byte)
 
 	err := fs.WalkDir(os.DirFS("testdata"), ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return err
 		}
-		b, err := fs.ReadFile(os.DirFS("testdata"), d.Name())
+		b, err := fs.ReadFile(os.DirFS("testdata"), path)
 		if err != nil {
 			return err
 		}
-		b = bytes.TrimSpace(bytes.ReplaceAll(b, []byte("__TIME__"), []byte(ts)))
-		path = "*-" + path + ".gz"
-		want["repodata/"+path] = string(b)
+		want[path] = b
 		return nil
 	})
 	if err != nil {
@@ -70,8 +85,10 @@ func readTestData(t *testing.T) map[string]string {
 	return want
 }
 
-func testBuild(t *testing.T, c *yum.Config, fsys fs.FS, want map[string]string) {
+func testBuild(t *testing.T, c *yum.Config, want map[string][]byte, now time.Time) {
 	t.Helper()
+
+	yum.SetTime(now)
 
 	err := yum.Build(context.Background(), c)
 	if err != nil {
@@ -79,32 +96,18 @@ func testBuild(t *testing.T, c *yum.Config, fsys fs.FS, want map[string]string) 
 	}
 
 	for name, data := range want {
-		matches, err := fs.Glob(fsys, name)
-		if err != nil {
-			t.Fatal(name, err)
-		}
-		if len(matches) != 1 {
-			t.Fatalf("Expected %s: %v", name, matches)
-		}
-		r, err := c.Target.NewReader(context.Background(), matches[0])
+		r, err := c.Target.NewReader(context.Background(), name)
 		if err != nil {
 			t.Fatal(name, err)
 		}
 		defer r.Close()
-
-		if path.Ext(name) == ".gz" {
-			r, err = gzip.NewReader(r)
-			if err != nil {
-				t.Fatal(name, err)
-			}
-		}
 
 		got, err := io.ReadAll(r)
 		if err != nil {
 			t.Fatal(name, err)
 		}
 
-		if diff := cmp.Diff(data, string(got)); diff != "" {
+		if diff := cmp.Diff(data, got); diff != "" {
 			t.Error(name, diff)
 		}
 	}

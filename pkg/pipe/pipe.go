@@ -132,7 +132,9 @@ func Load(path string) (*Pipe, error) {
 		}
 	}
 	if c.Yum != nil && !c.Yum.Disabled {
-		p.Yum = getYum(c)
+		if p.Yum, err = getYum(c); err != nil {
+			return nil, err
+		}
 	}
 	if c.Sparkle != nil && !c.Sparkle.Disabled {
 		if p.Sparkle, err = getSparkle(c); err != nil {

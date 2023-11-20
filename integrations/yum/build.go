@@ -8,6 +8,7 @@ import (
 	"path"
 	"unsafe"
 
+	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
 )
@@ -17,6 +18,7 @@ type Config struct {
 	Version    string
 	Prerelease bool
 	Target     target.Target
+	PGPKey     *pgp.PrivateKey
 }
 
 //nolint:funlen,gocognit
@@ -63,7 +65,7 @@ func Build(ctx context.Context, c *Config) error {
 		return nil
 	}
 
-	if err = repo.Write(); err != nil {
+	if err = repo.Write(c.PGPKey); err != nil {
 		return err
 	}
 

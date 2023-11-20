@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"github.com/abemedia/appcast/target"
 	"github.com/cavaliergopher/rpm"
 )
@@ -103,7 +104,7 @@ func (r *repo) Add(b []byte) error {
 		Packager:    h.Packager(),
 		URL:         h.URL(),
 		Time: Time{
-			File:  int(time.Now().Unix()),
+			File:  timeNow(),
 			Build: int(h.BuildTime().Unix()),
 		},
 		Size: Size{
@@ -149,7 +150,8 @@ func (r *repo) Add(b []byte) error {
 	return writeFile(filepath.Join(r.dir, p.Location.HREF), b)
 }
 
-func (r *repo) Write() error {
+//nolint:funlen
+func (r *repo) Write(pgpKey *pgp.PrivateKey) error {
 	md := &RepoMD{}
 
 	data := map[string]any{
@@ -174,7 +176,7 @@ func (r *repo) Write() error {
 		d.Checksum = getChecksum(gz)
 		d.OpenChecksum = getChecksum(raw)
 		d.Location.HREF = "repodata/" + d.Checksum.Value + "-" + name + ".xml.gz"
-		d.Timestamp = int(time.Now().Unix())
+		d.Timestamp = timeNow()
 		d.Size = len(gz)
 		d.OpenSize = len(raw)
 
@@ -186,14 +188,36 @@ func (r *repo) Write() error {
 		md.Data = append(md.Data, d)
 	}
 
-	md.Revision = int(time.Now().Unix())
+	md.Revision = timeNow()
+	filename := filepath.Join(r.dir, "repodata/repomd.xml")
 
 	b, err := xmlMarshal(md)
 	if err != nil {
 		return err
 	}
+	if err = writeFile(filename, b); err != nil {
+		return err
+	}
 
-	return writeFile(filepath.Join(r.dir, "repodata/repomd.xml"), b)
+	if pgpKey != nil {
+		key, err := pgp.MarshalPublicKey(pgp.Public(pgpKey))
+		if err != nil {
+			return err
+		}
+		if err = writeFile(filename+".key", key); err != nil {
+			return err
+		}
+
+		sig, err := pgp.Sign(pgpKey, b)
+		if err != nil {
+			return err
+		}
+		if err = writeFile(filename+".asc", sig); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func readXML(ctx context.Context, t target.Target, path string, res any) error {
@@ -302,3 +326,6 @@ func writeFile(path string, data []byte) error {
 	}
 	return os.WriteFile(path, data, 0o600)
 }
+
+//nolint:gochecknoglobals
+var timeNow = func() int { return int(time.Now().Unix()) }
