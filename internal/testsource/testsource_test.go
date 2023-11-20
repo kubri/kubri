@@ -9,7 +9,7 @@ import (
 )
 
 func TestFile(t *testing.T) {
-	s := testsource.New(test.SourceWant())
+	s := testsource.New(t, testsource.WithReleases(test.SourceWant()))
 	test.Source(t, s, func(version, asset string) string {
 		return "https://example.com/" + path.Join(version, asset)
 	})

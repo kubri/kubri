@@ -20,27 +20,21 @@ import (
 
 func TestBuild(t *testing.T) {
 	ctx := context.Background()
-	data := []byte("test")
 	ts := time.Now().UTC()
-	src := testsource.New([]*source.Release{
-		{
-			Version: "v1.0.0",
-			Date:    ts,
-		},
-		{
-			Version: "v1.1.0",
-			Date:    ts,
-			Description: `## New Features
-- Something
-- Something else`,
-		},
-	})
-	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.0.0", "test_32-bit.exe", data)
-	src.UploadAsset(ctx, "v1.0.0", "test_64-bit.msi", data)
-	src.UploadAsset(ctx, "v1.1.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.1.0", "test_32-bit.exe", data)
-	src.UploadAsset(ctx, "v1.1.0", "test_64-bit.msi", data)
+	src := testsource.New(t,
+		testsource.WithReleases([]*source.Release{
+			{
+				Version: "v1.0.0",
+				Date:    ts,
+			},
+			{
+				Version:     "v1.1.0",
+				Date:        ts,
+				Description: "## New Features\n- Something\n- Something else",
+			},
+		}),
+		testsource.WithAssets("test.dmg", "test_32-bit.exe", "test_64-bit.msi"),
+	)
 
 	tgt, err := target.New(target.Config{Path: t.TempDir(), URL: "https://example.com"})
 	if err != nil {
@@ -237,9 +231,7 @@ func TestBuildSign(t *testing.T) {
 	ctx := context.Background()
 	data := []byte("test")
 	ts := time.Now().UTC()
-	src := testsource.New([]*source.Release{{Version: "v1.0.0", Date: ts}})
-	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.0.0", "test.msi", data)
+	src := testsource.New(t, testsource.WithVersions("v1.0.0"), testsource.WithAssets("test.dmg", "test.msi"))
 
 	tgt, err := target.New(target.Config{Path: t.TempDir(), URL: "https://example.com"})
 	if err != nil {
@@ -360,11 +352,7 @@ func TestBuildSign(t *testing.T) {
 
 func TestBuildUpload(t *testing.T) {
 	ctx := context.Background()
-	data := []byte("test")
-	ts := time.Now().UTC()
-	src := testsource.New([]*source.Release{{Version: "v1.0.0", Date: ts}})
-	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.0.0", "test.msi", data)
+	src := testsource.New(t, testsource.WithVersions("v1.0.0"), testsource.WithAssets("test.dmg", "test.msi"))
 
 	for _, upload := range []bool{true, false} {
 		tgt, err := target.New(target.Config{Path: t.TempDir()})

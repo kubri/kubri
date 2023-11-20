@@ -3,10 +3,12 @@ package source_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/abemedia/appcast/internal/testsource"
 	"github.com/abemedia/appcast/source"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func TestSource(t *testing.T) {
@@ -14,24 +16,22 @@ func TestSource(t *testing.T) {
 		{
 			Name:       "v1.1.0-pre",
 			Version:    "v1.1.0-pre",
+			Date:       time.Now(),
 			Prerelease: true,
 		},
 		{
 			Name:    "v1.0.0",
 			Version: "v1.0.0",
+			Date:    time.Now(),
 		},
 		{
 			Name:    "v0.9.0",
 			Version: "v0.9.0",
+			Date:    time.Now(),
 		},
 	}
 
-	s := testsource.New([]*source.Release{
-		{Version: "foo"},
-		{Version: "v0.9.0"},
-		{Version: "v1.1.0-pre"},
-		{Version: "v1.0.0"},
-	})
+	s := testsource.New(t, testsource.WithVersions("foo", "v0.9.0", "v1.1.0-pre", "v1.0.0"))
 
 	ctx := context.Background()
 
@@ -49,7 +49,7 @@ func TestSource(t *testing.T) {
 
 		for _, test := range tests {
 			got, _ := s.ListReleases(ctx, test.opt)
-			if diff := cmp.Diff(test.want, got); diff != "" {
+			if diff := cmp.Diff(test.want, got, cmpopts.EquateApproxTime(time.Second)); diff != "" {
 				t.Errorf("%s\n%s", test.msg, diff)
 			}
 		}
@@ -57,7 +57,7 @@ func TestSource(t *testing.T) {
 
 	t.Run("GetRelease", func(t *testing.T) {
 		got, _ := s.GetRelease(ctx, want[0].Version)
-		if diff := cmp.Diff(want[0], got); diff != "" {
+		if diff := cmp.Diff(want[0], got, cmpopts.EquateApproxTime(time.Second)); diff != "" {
 			t.Error(diff)
 		}
 	})
