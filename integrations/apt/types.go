@@ -46,9 +46,9 @@ func (c Checksums[T]) MarshalText() ([]byte, error) {
 		return nil, nil
 	}
 
-	b := make([]byte, 0, 512)
+	b := make([]byte, 0, len(c)*(hex.EncodedLen(len(c[0].Sum))+40))
 	for _, info := range c {
-		b = append(b, fmt.Sprintf("\n%x %d %s", info.Sum, info.Size, info.Name)...)
+		b = fmt.Appendf(b, "\n%x %d %s", info.Sum, info.Size, info.Name)
 	}
 
 	return b, nil
@@ -56,32 +56,35 @@ func (c Checksums[T]) MarshalText() ([]byte, error) {
 
 var space = []byte{' '} //nolint:gochecknoglobals
 
-func (c *Checksums[T]) UnmarshalText(b []byte) error {
+func (c *Checksums[T]) UnmarshalText(b []byte) (err error) {
 	r := bufio.NewScanner(bytes.NewReader(b))
 	if !r.Scan() {
 		return nil
 	}
 
+	var f ChecksumFile[T]
+
 	for r.Scan() {
-		a := bytes.SplitN(r.Bytes(), space, 3)
-		size, err := strconv.Atoi(string(a[1]))
+		sum, rest, _ := bytes.Cut(r.Bytes(), space)
+		size, name, _ := bytes.Cut(rest, space)
+
+		f.Name = string(name)
+		f.Size, err = strconv.Atoi(string(size))
 		if err != nil {
 			return err
 		}
 
-		var sum T
-		if hex.DecodedLen(len(a[0])) != len(sum) {
+		if hex.DecodedLen(len(sum)) != len(f.Sum) {
 			return errors.New("hex data would overflow byte array")
 		}
-		b := make([]byte, len(sum))
-		if _, err = hex.Decode(b, a[0]); err != nil {
+		if _, err = hex.Decode(sum, sum); err != nil {
 			return err
 		}
-		for i := 0; i < len(sum); i++ {
-			sum[i] = b[i]
+		for i := 0; i < len(f.Sum); i++ {
+			f.Sum[i] = sum[i]
 		}
 
-		*c = append(*c, ChecksumFile[T]{sum, size, string(a[2])})
+		*c = append(*c, f)
 	}
 
 	return r.Err()
