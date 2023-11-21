@@ -11,6 +11,7 @@ import (
 	"github.com/abemedia/appcast/integrations/appinstaller"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/sparkle"
+	"github.com/abemedia/appcast/integrations/yum"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
 	"golang.org/x/sync/errgroup"
@@ -26,6 +27,7 @@ type config struct {
 	Source         sourceConfig        `yaml:"source"`
 	Target         targetConfig        `yaml:"target"`
 	Apt            *aptConfig          `yaml:"apt"`
+	Yum            *yumConfig          `yaml:"yum"`
 	Sparkle        *sparkleConfig      `yaml:"sparkle"`
 	Appinstaller   *appinstallerConfig `yaml:"appinstaller"`
 
@@ -36,6 +38,7 @@ type config struct {
 type Pipe struct {
 	Appinstaller *appinstaller.Config
 	Apt          *apt.Config
+	Yum          *yum.Config
 	Sparkle      *sparkle.Config
 }
 
@@ -63,6 +66,17 @@ func (p *Pipe) Run(ctx context.Context) error {
 				return err
 			}
 			log.Print("Completed publishing APT packages.")
+			return nil
+		})
+	}
+	if p.Yum != nil {
+		n++
+		g.Go(func() error {
+			log.Print("Publishing YUM packages...")
+			if err := yum.Build(ctx, p.Yum); err != nil {
+				return err
+			}
+			log.Print("Completed publishing YUM packages.")
 			return nil
 		})
 	}
@@ -114,6 +128,11 @@ func Load(path string) (*Pipe, error) {
 	}
 	if c.Apt != nil && !c.Apt.Disabled {
 		if p.Apt, err = getApt(c); err != nil {
+			return nil, err
+		}
+	}
+	if c.Yum != nil && !c.Yum.Disabled {
+		if p.Yum, err = getYum(c); err != nil {
 			return nil, err
 		}
 	}

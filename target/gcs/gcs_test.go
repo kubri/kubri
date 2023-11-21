@@ -18,5 +18,5 @@ func TestGCS(t *testing.T) {
 
 	test.Target(t, tgt, func(asset string) string {
 		return "https://storage.googleapis.com/bucket/folder/" + asset
-	})
+	}, test.WithIgnoreRemoveNotFound())
 }

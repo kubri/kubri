@@ -2,11 +2,18 @@ module github.com/abemedia/appcast
 
 go 1.21
 
+// TODO: Remove and enable gomoddirectives linter when the following PRs are merged:
+// https://github.com/cavaliergopher/rpm/pull/29
+// https://github.com/cavaliergopher/rpm/pull/30
+// https://github.com/cavaliergopher/rpm/pull/31
+replace github.com/cavaliergopher/rpm => github.com/abemedia/rpm v0.0.0-20230903161415-49b78cf4b264
+
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.2.0
 	github.com/ProtonMail/go-crypto v0.0.0-20230923063757-afb1ddc0824c
 	github.com/ProtonMail/gopenpgp/v2 v2.7.4
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
+	github.com/cavaliergopher/rpm v1.2.0
 	github.com/dlclark/regexp2 v1.10.0
 	github.com/docker/go-connections v0.4.0
 	github.com/dsnet/compress v0.0.1
