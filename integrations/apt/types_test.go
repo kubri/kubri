@@ -11,7 +11,7 @@ import (
 )
 
 func TestReleases(t *testing.T) {
-	in := apt.Releases{
+	in := &apt.Releases{
 		Suite:         "stable",
 		Codename:      "stable",
 		Date:          time.Date(2023, 11, 19, 16, 30, 23, 0, time.UTC),
