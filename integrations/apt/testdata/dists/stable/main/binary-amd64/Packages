@@ -1,0 +1,65 @@
+Package: appcast-test
+Version: 2.0.0
+Architecture: amd64
+Maintainer: Test User <test@example.com>
+Depends: bash
+Recommends: git
+Conflicts: appcast-test-new
+Replaces: appcast-test-old
+Provides: appcast-test-alt
+Priority: optional
+Section: utils
+Filename: pool/main/a/appcast-test/appcast-test_2.0.0_amd64.deb
+Size: 804
+MD5sum: 0ace6eee4a8a2de1214aa7b4c9044c31
+SHA1: e78e7c264f2c0d120c823588d9a816ffa0242662
+SHA256: 34779377f5fe75773d9817c35ab293495e1a66ada44b943e7f0f121239f99c3f
+Homepage: http://example.com
+Description: This is a test.
+ It does nothing.
+ .
+ Absolutely nothing.
+
+Package: appcast-test
+Version: 1.1.0
+Architecture: amd64
+Maintainer: Test User <test@example.com>
+Depends: bash
+Recommends: git
+Conflicts: appcast-test-new
+Replaces: appcast-test-old
+Provides: appcast-test-alt
+Priority: optional
+Section: utils
+Filename: pool/main/a/appcast-test/appcast-test_1.1.0_amd64.deb
+Size: 804
+MD5sum: 37453a182bfbd84ba57859808504b824
+SHA1: 9bb4bed6635e94c94cf2844a929d88f39c0a3bad
+SHA256: bcfa9d367c108aabea947086549d69c85a31720ea261f893afb52a58bfa9c76b
+Homepage: http://example.com
+Description: This is a test.
+ It does nothing.
+ .
+ Absolutely nothing.
+
+Package: appcast-test
+Version: 1.0.0
+Architecture: amd64
+Maintainer: Test User <test@example.com>
+Depends: bash
+Recommends: git
+Conflicts: appcast-test-new
+Replaces: appcast-test-old
+Provides: appcast-test-alt
+Priority: optional
+Section: utils
+Filename: pool/main/a/appcast-test/appcast-test_1.0.0_amd64.deb
+Size: 804
+MD5sum: 63f837cdbbbd1dc17848cdb4b158cace
+SHA1: e7045359d37007bb3364681eea993c0ae0e40a53
+SHA256: 26230d86b8dd4a234805d2a68437551a096b5e17a59251049d2de76012c00773
+Homepage: http://example.com
+Description: This is a test.
+ It does nothing.
+ .
+ Absolutely nothing.
