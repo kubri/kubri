@@ -10,10 +10,10 @@ Provides: appcast-test-alt
 Priority: optional
 Section: utils
 Filename: pool/main/a/appcast-test/appcast-test_2.0.0_i386.deb
-Size: 802
-MD5sum: a10ac5fd97aa54ab6650ff753b5cdb4f
-SHA1: 87eac201a2e1f45ab458d173c60c109127af79de
-SHA256: 49c4ed38d6c83d438bb578fdcbf7f5a1ca10cb3eeec359545838631222cdf26d
+Size: 860
+MD5sum: 1236f205442c2f783af83f91c2737f9f
+SHA1: e067a72ada9b115e18a5c87f1945bfe465b4f16f
+SHA256: 4ac66738a2d3436cc716788361e64e01d161dbddc98696d92f26ad5f35e93c05
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.
@@ -32,10 +32,10 @@ Provides: appcast-test-alt
 Priority: optional
 Section: utils
 Filename: pool/main/a/appcast-test/appcast-test_1.1.0_i386.deb
-Size: 806
-MD5sum: 647cbf3ab9842e88bd621091b755dbbf
-SHA1: f4d5552129f0fcc2d0545515f3a975b451cb4443
-SHA256: af213411f38476e05d49a1207905fef993972e7587970c72789d8c3bc3682928
+Size: 862
+MD5sum: bdf5a5541a5a9ed7f56cb2722a2515dd
+SHA1: 99309ee5a6822ec6c5b1e5a8444c05ef6f18a48f
+SHA256: 2052d3d6a24d2ec3d182fe64ec4cef7d2cf9205fa388b53473393e4a4d0a23cf
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.
@@ -54,10 +54,10 @@ Provides: appcast-test-alt
 Priority: optional
 Section: utils
 Filename: pool/main/a/appcast-test/appcast-test_1.0.0_i386.deb
-Size: 804
-MD5sum: 5719ffb59d8fb413674088a4e14e32b0
-SHA1: b04d96fceaee7b2305ae0857ced8db93b576cf5a
-SHA256: 766f68c7695c0bc692548250e7b4f5fd2a7513cac7382c22af69a95265d58e8d
+Size: 862
+MD5sum: 3b3aced8e6a09264b54bd750cba60327
+SHA1: 4026f621c30aab28af64b43c7c4ba722058825f2
+SHA256: 905085bc7be62e87389d5869df5e8c6cf7e1cfb15ea46130ad35ff3f533d91e3
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"bou.ke/monkey"
@@ -53,7 +54,7 @@ var (
 						Destination: "/usr/bin/appcast-test",
 					},
 				},
-				Deb: nfpm.Deb{Compression: "zstd"},
+				Deb: nfpm.Deb{Compression: "xz"},
 			},
 		},
 	}
@@ -91,7 +92,7 @@ func buildPackages(packager string, config nfpm.Config) error {
 	defer os.RemoveAll(srcDir)
 
 	binPath := filepath.Join(srcDir, "appcast-test")
-	bin := []byte(fmt.Sprintf(`#/bin/bash\n\necho "test %s"\n`, config.Version))
+	bin := []byte(fmt.Sprintf("#/bin/bash\n\necho %q\n", config.Version))
 	if err = os.WriteFile(filepath.Join(srcDir, "appcast-test"), bin, 0o755); err != nil { //nolint:gosec
 		return err
 	}
@@ -100,6 +101,11 @@ func buildPackages(packager string, config nfpm.Config) error {
 	info, err := config.Get(packager)
 	if err != nil {
 		return err
+	}
+
+	// TODO: Remove once fix is merged: https://github.com/goreleaser/nfpm/pull/742
+	if packager == "deb" {
+		info.Description = strings.ReplaceAll(info.Description, "\n\n", "\n.\n")
 	}
 
 	info = nfpm.WithDefaults(info)
