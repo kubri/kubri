@@ -23,9 +23,10 @@ tasks:
       - task: test
 
   init:
-    desc: Setup git hooks
+    desc: Setup git hooks & dev dependencies
     cmds:
       - cp -f scripts/pre-commit.sh .git/hooks/pre-commit
+      - test gotestsum || go install gotest.tools/gotestsum@latest
 
   mod:
     desc: Download Go modules
@@ -57,7 +58,13 @@ tasks:
     desc: Runs test suite
     aliases: [t]
     cmds:
-      - go run gotest.tools/gotestsum@latest -- -cover ./...
+      - gotestsum -- -cover ./...
+
+  acceptance:
+    desc: Runs test suite
+    aliases: [a]
+    cmds:
+      - gotestsum -- -tags acceptance -run ^TestAcceptance$ ./integrations/...
 
   install:
     desc: Install AppCast

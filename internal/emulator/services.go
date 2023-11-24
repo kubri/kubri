@@ -2,22 +2,28 @@ package emulator
 
 import (
 	"context"
-	"log"
 	"testing"
 
+	"github.com/docker/go-connections/nat"
 	"github.com/fullstorydev/emulators/storage/gcsemu"
+	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
-	azblob "gocloud.dev/blob/azureblob"
+	"gocloud.dev/blob/azureblob"
 )
 
 func AzureBlob(t *testing.T, bucket string) string {
 	t.Helper()
 
-	host := TestContainer(t, Container{
-		Image:   "mcr.microsoft.com/azure-storage/azurite:latest",
-		Port:    10000,
-		Command: []string{"azurite-blob", "--blobHost", "0.0.0.0"},
+	c := runContainer(t, testcontainers.ContainerRequest{
+		Image:        "mcr.microsoft.com/azure-storage/azurite:latest",
+		ExposedPorts: []string{"10000"},
+		Cmd:          []string{"azurite-blob", "--blobHost", "0.0.0.0"},
+		WaitingFor:   wait.ForListeningPort(nat.Port("10000")),
 	})
+	host, err := c.PortEndpoint(context.Background(), "10000", "")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	t.Setenv("AZURE_STORAGE_ACCOUNT", "devstoreaccount1")
 	t.Setenv("AZURE_STORAGE_KEY",
@@ -25,15 +31,13 @@ func AzureBlob(t *testing.T, bucket string) string {
 	t.Setenv("AZURE_STORAGE_DOMAIN", host)
 	t.Setenv("AZURE_STORAGE_PROTOCOL", "http")
 
-	client, err := azblob.NewDefaultClient(
-		azblob.ServiceURL("http://"+host+"/devstoreaccount1"), azblob.ContainerName(bucket))
+	u := azureblob.ServiceURL("http://" + host + "/devstoreaccount1")
+	client, err := azureblob.NewDefaultClient(u, azureblob.ContainerName(bucket))
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
-
-	_, err = client.Create(context.Background(), nil)
-	if err != nil {
-		log.Fatal(err)
+	if _, err = client.Create(context.Background(), nil); err != nil {
+		t.Fatal(err)
 	}
 
 	return host
@@ -44,11 +48,11 @@ func GCS(t *testing.T, bucket string) string {
 
 	emu, err := gcsemu.NewServer(":0", gcsemu.Options{})
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	if err = emu.InitBucket(bucket); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	t.Setenv("STORAGE_EMULATOR_HOST", emu.Addr)
@@ -59,12 +63,16 @@ func GCS(t *testing.T, bucket string) string {
 func S3(t *testing.T, bucket string) string {
 	t.Helper()
 
-	host := TestContainer(t, Container{
-		Image: "adobe/s3mock:latest",
-		Port:  9090,
-		Env:   map[string]string{"initialBuckets": bucket},
-		Wait:  wait.ForHTTP("/").WithPort("9090").WithStatusCodeMatcher(nil),
+	c := runContainer(t, testcontainers.ContainerRequest{
+		Image:        "adobe/s3mock:latest",
+		ExposedPorts: []string{"9090"},
+		Env:          map[string]string{"initialBuckets": bucket},
+		WaitingFor:   wait.ForHTTP("/").WithPort("9090").WithStatusCodeMatcher(nil),
 	})
+	host, err := c.PortEndpoint(context.Background(), "9090", "")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	t.Setenv("AWS_ACCESS_KEY_ID", "test")
 	t.Setenv("AWS_SECRET_ACCESS_KEY", "test")

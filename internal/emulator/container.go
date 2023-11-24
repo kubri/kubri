@@ -1,91 +1,95 @@
 package emulator
 
 import (
+	"archive/tar"
+	"bytes"
 	"context"
-	"log"
-	"strconv"
+	"strings"
 	"testing"
+	"unicode"
 
-	"github.com/docker/go-connections/nat"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/wait"
+	"github.com/testcontainers/testcontainers-go/exec"
 )
 
-type Container struct {
-	Image      string
-	Port       int
-	Env        map[string]string
-	Command    []string
-	Entrypoint []string
-	Wait       wait.Strategy
-}
+type Container struct{ testcontainers.Container }
 
-type Service struct {
-	Host string
-
-	container testcontainers.Container
-}
-
-func (s *Service) Close() {
-	terminate(s.container)
-}
-
-func RunContainer(c Container) (*Service, error) {
-	ctx := context.Background()
-	port := strconv.Itoa(c.Port)
-
-	w := c.Wait
-	if w == nil {
-		w = wait.ForListeningPort(nat.Port(port))
-	}
-
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: testcontainers.ContainerRequest{
-			Image:        c.Image,
-			ExposedPorts: []string{port},
-			Env:          c.Env,
-			Cmd:          c.Command,
-			Entrypoint:   c.Entrypoint,
-			WaitingFor:   w,
-		},
-		Started: true,
-		Logger:  NopLogger{},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	defer func() {
-		if err != nil {
-			terminate(container)
-		}
-	}()
-
-	host, err := container.PortEndpoint(ctx, nat.Port(port), "")
-	if err != nil {
-		return nil, err
-	}
-
-	return &Service{Host: host, container: container}, nil
-}
-
-func TestContainer(t *testing.T, c Container) string {
+func (c *Container) Exec(t *testing.T, script string) string {
 	t.Helper()
-	s, err := RunContainer(c)
+
+	var buf bytes.Buffer
+	opt := exec.ProcessOptionFunc(func(opts *exec.ProcessOptions) {
+		_, _ = stdcopy.StdCopy(&buf, &buf, opts.Reader)
+	})
+
+	code, _, err := c.Container.Exec(context.Background(), []string{"bash", "-c", script}, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(s.Close)
-	return s.Host
-}
 
-func terminate(c testcontainers.Container) {
-	if err := c.Terminate(context.Background()); err != nil {
-		log.Printf("Error shutting down container: %s", err)
+	s := strings.NewReplacer("\r\n", "\n", "\r", "\n").Replace(buf.String())
+	t.Logf("%s\n%s", script, s)
+
+	if code != 0 {
+		t.FailNow()
 	}
+
+	return strings.TrimRightFunc(s, unicode.IsSpace)
 }
 
-type NopLogger struct{}
+func Image(t *testing.T, name string) Container {
+	t.Helper()
+	return runContainer(t, testcontainers.ContainerRequest{
+		Image:              name,
+		HostConfigModifier: func(hc *container.HostConfig) { hc.NetworkMode = "host" },
+		Entrypoint:         []string{"tail", "-f", "/dev/null"},
+	})
+}
 
-func (NopLogger) Printf(string, ...any) {}
-func (NopLogger) Print(...any)          {}
+func Build(t *testing.T, dockerfile string) Container {
+	t.Helper()
+
+	var buf bytes.Buffer
+	tw := tar.NewWriter(&buf)
+	hdr := &tar.Header{
+		Name: "Dockerfile",
+		Mode: 0o600,
+		Size: int64(len(dockerfile)),
+	}
+	if err := tw.WriteHeader(hdr); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := tw.Write([]byte(dockerfile)); err != nil {
+		t.Fatal(err)
+	}
+	if err := tw.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	return runContainer(t, testcontainers.ContainerRequest{
+		FromDockerfile:     testcontainers.FromDockerfile{ContextArchive: &buf},
+		HostConfigModifier: func(hc *container.HostConfig) { hc.NetworkMode = "host" },
+	})
+}
+
+func runContainer(t *testing.T, cr testcontainers.ContainerRequest) Container {
+	t.Helper()
+	ctx := context.Background()
+	c, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: cr,
+		Started:          true,
+		Logger:           nopLogger{},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = c.Terminate(ctx) })
+	return Container{c}
+}
+
+type nopLogger struct{}
+
+func (nopLogger) Printf(string, ...any) {}
+func (nopLogger) Print(...any)          {}

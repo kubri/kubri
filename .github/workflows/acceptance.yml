@@ -1,0 +1,51 @@
+name: Acceptance Test
+
+on:
+  pull_request:
+    paths:
+      - 'integrations/*/*.go'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  packages:
+    name: Changed packages
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Find packages with changes
+        id: packages
+        uses: tj-actions/changed-files@v40
+        with:
+          files: 'integrations/*/*.go'
+          dir_names: true
+          json: true
+
+      - name: Set output
+        id: set-matrix
+        run: |
+          echo "matrix={\"package\":${{ steps.packages.outputs.all_changed_and_modified_files }}}" >> $GITHUB_OUTPUT
+
+  acceptance:
+    name: ${{ matrix.package }}
+    needs: packages
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.packages.outputs.matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: go.mod
+
+      - name: Run acceptance tests
+        run: go test -tags acceptance -run ^TestAcceptance$ ./${{ matrix.package }}
