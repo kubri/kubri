@@ -60,12 +60,12 @@ func TestAcceptance(t *testing.T) {
 						t.Fatal(err)
 					}
 
-					c.Exec(t, "apt-get update -qq")
+					c.Exec(t, "apt-get update -q")
 
 					if i == 0 {
-						c.Exec(t, "apt-get install -qq -y --no-install-recommends appcast-test")
+						c.Exec(t, "apt-get install -yq --no-install-recommends appcast-test")
 					} else {
-						c.Exec(t, "apt-get upgrade -qq -y")
+						c.Exec(t, "apt-get upgrade -yq")
 					}
 
 					if v := c.Exec(t, "appcast-test"); v != test.version {

@@ -180,7 +180,10 @@ func writeRelease(dir string, r Releases, key *pgp.PrivateKey) error {
 		if err = os.WriteFile(filepath.Join(dir, "Release.gpg"), sig, 0o600); err != nil {
 			return err
 		}
-		b = pgp.Join(b, sig)
+		b, err = pgp.SignText(key, b)
+		if err != nil {
+			return err
+		}
 	}
 
 	return os.WriteFile(filepath.Join(dir, "InRelease"), b, 0o600)

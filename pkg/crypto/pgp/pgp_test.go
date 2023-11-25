@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ProtonMail/gopenpgp/v2/crypto"
+	"github.com/abemedia/appcast/internal/test"
+	"github.com/abemedia/appcast/pkg/crypto"
 	"github.com/abemedia/appcast/pkg/crypto/internal/cryptotest"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"github.com/google/go-cmp/cmp"
@@ -16,7 +17,7 @@ import (
 func TestPGP(t *testing.T) {
 	cryptotest.Test(t,
 		cryptotest.Implementation[*pgp.PrivateKey, *pgp.PublicKey]{
-			NewPrivateKey: func() (*crypto.Key, error) {
+			NewPrivateKey: func() (*pgp.PrivateKey, error) {
 				return pgp.NewPrivateKey("test", "test@example.com")
 			},
 			MarshalPrivateKey:   pgp.MarshalPrivateKey,
@@ -27,12 +28,7 @@ func TestPGP(t *testing.T) {
 			Sign:                pgp.Sign,
 			Verify:              pgp.Verify,
 		},
-		cryptotest.WithCmpOptions(cmp.Comparer(func(a, b *crypto.Key) bool {
-			if a == nil || b == nil {
-				return a == b
-			}
-			return a.GetFingerprint() == b.GetFingerprint()
-		})),
+		cryptotest.WithCmpOptions(test.ComparePGPKeys()),
 	)
 
 	priv, _ := pgp.NewPrivateKey("test", "test@example.com")
@@ -40,7 +36,7 @@ func TestPGP(t *testing.T) {
 	pubBytes, _ := pgp.MarshalPublicKey(pub)
 	data := []byte("foo\nbar\nbaz")
 	sig, _ := pgp.Sign(priv, data)
-	signed := pgp.Join(data, sig)
+	signed, _ := pgp.SignText(priv, data)
 
 	t.Run("NewPrivateKey", func(t *testing.T) {
 		tests := []struct {
@@ -71,19 +67,53 @@ func TestPGP(t *testing.T) {
 		}
 	})
 
-	t.Run("Split", func(t *testing.T) {
+	t.Run("SignText", func(t *testing.T) {
 		tests := []struct {
-			name     string
-			in       []byte
-			wantData []byte
-			wantSig  []byte
-			err      error
+			name string
+			key  *pgp.PrivateKey
+			data []byte
+			err  error
 		}{
 			{
-				name:     "valid message",
-				in:       signed,
-				wantData: data,
-				wantSig:  sig,
+				name: "valid key",
+				key:  priv,
+				data: data,
+			},
+			{
+				name: "nil key",
+				data: data,
+				err:  crypto.ErrInvalidKey,
+			},
+		}
+
+		for _, test := range tests {
+			got, err := pgp.SignText(test.key, data)
+			if !errors.Is(err, test.err) {
+				t.Errorf("%s should return error %q got %q", test.name, test.err, err)
+			} else if test.err == nil {
+				gotData, gotSig, err := pgp.Split(got)
+				if err != nil {
+					t.Errorf("%s failed to split message: %s", test.name, err)
+				} else if diff := cmp.Diff(string(test.data), string(gotData)); diff != "" {
+					t.Error(test.name, diff)
+				} else if test.err == nil && !pgp.Verify(pub, gotData, gotSig) {
+					t.Error(test.name, "should pass verification")
+				}
+			}
+		}
+	})
+
+	t.Run("Split", func(t *testing.T) {
+		tests := []struct {
+			name string
+			in   []byte
+			want []byte
+			err  error
+		}{
+			{
+				name: "valid message",
+				in:   signed,
+				want: data,
 			},
 			{
 				name: "nil bytes",
@@ -96,7 +126,7 @@ func TestPGP(t *testing.T) {
 			},
 			{
 				name: "missing signature",
-				in:   []byte("-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA512\n\ndata"),
+				in:   []byte("-----BEGIN PGP SIGNED MESSAGE-----\r\nHash: SHA512\r\n\r\ndata\r\n"),
 				err:  pgp.ErrInvalidMessage,
 			},
 			{
@@ -110,10 +140,10 @@ func TestPGP(t *testing.T) {
 			gotData, gotSig, err := pgp.Split(test.in)
 			if !errors.Is(err, test.err) {
 				t.Errorf("%s should return error %q got %q", test.name, test.err, err)
-			} else if diff := cmp.Diff(string(test.wantData), string(gotData)); diff != "" {
+			} else if diff := cmp.Diff(string(test.want), string(gotData)); diff != "" {
 				t.Error(test.name, diff)
-			} else if diff := cmp.Diff(string(test.wantSig), string(gotSig)); diff != "" {
-				t.Error(test.name, diff)
+			} else if test.err == nil && !pgp.Verify(pub, gotData, gotSig) {
+				t.Error(test.name, "should pass verification")
 			}
 		}
 	})
