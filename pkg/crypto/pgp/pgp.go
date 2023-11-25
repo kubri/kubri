@@ -80,6 +80,24 @@ func UnmarshalPublicKey(b []byte) (*PublicKey, error) {
 }
 
 func Sign(key *PrivateKey, data []byte) ([]byte, error) {
+	return sign(key, data, false)
+}
+
+func SignText(key *PrivateKey, data []byte) ([]byte, error) {
+	data = bytes.ReplaceAll(data, lf, crlf)
+	sig, err := sign(key, data, true)
+	if err != nil {
+		return nil, err
+	}
+	b := make([]byte, 0, len(startText)+len(data)+len("\r\n")+len(sig))
+	b = append(b, startText...)
+	b = append(b, data...)
+	b = append(b, "\r\n"...)
+	b = append(b, sig...)
+	return b, nil
+}
+
+func sign(key *PrivateKey, data []byte, text bool) ([]byte, error) {
 	if key == nil {
 		return nil, crypto.ErrInvalidKey
 	}
@@ -95,7 +113,7 @@ func Sign(key *PrivateKey, data []byte) ([]byte, error) {
 	}
 
 	msg := pgpcrypto.NewPlainMessage(data)
-	msg.TextType = true
+	msg.TextType = text
 
 	signature, err := keyring.SignDetached(msg)
 	if err != nil {
@@ -124,19 +142,9 @@ func Verify(key *PublicKey, data, sig []byte) bool {
 	}
 
 	msg := pgpcrypto.NewPlainMessage(data)
-	msg.TextType = true
 
 	err = keyring.VerifyDetached(msg, signature, pgpcrypto.GetUnixTime())
 	return err == nil
-}
-
-func Join(data, sig []byte) []byte {
-	b := make([]byte, 0, len(startText)+len(data)+len("\n")+len(sig))
-	b = append(b, startText...)
-	b = append(b, data...)
-	b = append(b, "\n"...)
-	b = append(b, sig...)
-	return b
 }
 
 func Split(msg []byte) (data, sig []byte, _ error) {
@@ -147,13 +155,15 @@ func Split(msg []byte) (data, sig []byte, _ error) {
 		return nil, nil, ErrInvalidMessage
 	}
 
-	return msg[start+len(startText) : end], msg[end+1:], nil
+	return bytes.ReplaceAll(msg[start+len(startText):end], crlf, lf), msg[end+2:], nil
 }
 
 //nolint:gochecknoglobals
 var (
-	startText = []byte("-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA512\n\n")
-	endText   = []byte("\n-----BEGIN PGP SIGNATURE-----")
+	startText = []byte("-----BEGIN PGP SIGNED MESSAGE-----\r\nHash: SHA512\r\n\r\n")
+	endText   = []byte("\r\n-----BEGIN PGP SIGNATURE-----")
+	lf        = []byte("\n")
+	crlf      = []byte("\r\n")
 )
 
 var ErrInvalidMessage = errors.New("pgp: invalid message")

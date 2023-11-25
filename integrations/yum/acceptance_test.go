@@ -32,7 +32,7 @@ func TestAcceptance(t *testing.T) {
 	}{
 		{"RHEL 9", "registry.access.redhat.com/ubi9/ubi:latest", "dnf"},
 		{"RHEL 8", "registry.access.redhat.com/ubi8/ubi:latest", "dnf"},
-		// {"Fedora 39", "fedora:39", "dnf"}, // TODO: Fix GPG error.
+		{"Fedora 39", "fedora:39", "dnf"},
 		{"Fedora 38", "fedora:38", "dnf"},
 		{"openSUSE Leap 15", "opensuse/leap:15", "zypper"},
 	}
