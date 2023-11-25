@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.3.0](https://github.com/abemedia/appcast/compare/v0.2.0...v0.3.0) (2023-11-24)
+
+
+### Features
+
+* allow overriding URL in blob targets ([#155](https://github.com/abemedia/appcast/issues/155)) ([3156196](https://github.com/abemedia/appcast/commit/315619652b9c3840a178e7da437a3ecb76cd8207))
+* **apt:** custom compression, support lz4 ([#212](https://github.com/abemedia/appcast/issues/212)) ([8f54a05](https://github.com/abemedia/appcast/commit/8f54a0522e9bf6e298e0d07ad328e25270de4469))
+* custom URLs in source & target, fix windows paths ([#202](https://github.com/abemedia/appcast/issues/202)) ([e9c1c78](https://github.com/abemedia/appcast/commit/e9c1c78bd38b731fd07a56a3a950a83b506e1c24))
+* pgp sign repo metadata, simplify crypto packages ([#207](https://github.com/abemedia/appcast/issues/207)) ([bc3ef36](https://github.com/abemedia/appcast/commit/bc3ef366e666bb34834e022f97374a364089d357))
+* validate version constraint ([#194](https://github.com/abemedia/appcast/issues/194)) ([1e77b34](https://github.com/abemedia/appcast/commit/1e77b34164a9744757249a08db793602b9d63ecc))
+* yum integration ([#196](https://github.com/abemedia/appcast/issues/196)) ([540b88c](https://github.com/abemedia/appcast/commit/540b88ca52c79d29cd1d4878abef96ca0f053747))
+
+
+### Bug Fixes
+
+* **apt:** deb encoding bugs ([#213](https://github.com/abemedia/appcast/issues/213)) ([6d564c4](https://github.com/abemedia/appcast/commit/6d564c40aa184eeb354107377d81e44164a79d14))
+* skip empty version constraint ([#198](https://github.com/abemedia/appcast/issues/198)) ([cc9a300](https://github.com/abemedia/appcast/commit/cc9a3006bc9ff057a3a73f32764510e6d25348a7))
+
+
+### Performance Improvements
+
+* **apt:** reduce allocs on encoding metadata ([#211](https://github.com/abemedia/appcast/issues/211)) ([0b43413](https://github.com/abemedia/appcast/commit/0b4341385e80578f85841a567b19262f214159a1))
+
 ## [0.2.0](https://github.com/abemedia/appcast/compare/v0.1.0...v0.2.0) (2023-06-08)
 
 
