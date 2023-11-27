@@ -10,15 +10,15 @@ import (
 )
 
 type sparkleConfig struct {
-	Disabled    bool                  `yaml:"disabled"`
-	Folder      string                `yaml:"folder"`
-	Title       string                `yaml:"title"`
-	Description string                `yaml:"description"`
-	Filename    string                `yaml:"filename"`
-	DetectOS    map[sparkle.OS]string `yaml:"detect_os"`
+	Disabled    bool                 `yaml:"disabled"`
+	Folder      string               `yaml:"folder"`
+	Title       string               `yaml:"title"`
+	Description string               `yaml:"description"`
+	Filename    string               `yaml:"filename"`
+	DetectOS    map[sparkleOS]string `yaml:"detect_os"`
 	Params      []struct {
-		OS       sparkle.OS `yaml:"os"`
-		Version  string     `yaml:"version"`
+		OS       sparkleOS `yaml:"os"`
+		Version  string    `yaml:"version"`
 		Settings *struct {
 			InstallerArguments                string `yaml:"installer_arguments"`
 			MinimumSystemVersion              string `yaml:"minimum_system_version"`
@@ -28,6 +28,24 @@ type sparkleConfig struct {
 			CriticalUpdateBelowVersion        string `yaml:"critical_update_below_version"`
 		} `yaml:",inline"`
 	} `yaml:"params"`
+}
+
+type sparkleOS sparkle.OS
+
+func (os *sparkleOS) UnmarshalText(text []byte) error {
+	switch string(text) {
+	default:
+		*os = sparkleOS(sparkle.Unknown)
+	case "macos":
+		*os = sparkleOS(sparkle.MacOS)
+	case "windows":
+		*os = sparkleOS(sparkle.Windows)
+	case "windows_x64":
+		*os = sparkleOS(sparkle.Windows64)
+	case "windows_x86":
+		*os = sparkleOS(sparkle.Windows32)
+	}
+	return nil
 }
 
 func getSparkle(c *config) (*sparkle.Config, error) {
@@ -52,7 +70,7 @@ func getSparkle(c *config) (*sparkle.Config, error) {
 		detectOS = func(s string) sparkle.OS {
 			for k, v := range c.Sparkle.DetectOS {
 				if ok, _ := path.Match(v, s); ok {
-					return k
+					return sparkle.OS(k)
 				}
 			}
 			return sparkle.Unknown
@@ -62,7 +80,7 @@ func getSparkle(c *config) (*sparkle.Config, error) {
 	params := make([]sparkle.Rule, len(c.Sparkle.Params))
 	for i, p := range c.Sparkle.Params {
 		params[i] = sparkle.Rule{
-			OS:       p.OS,
+			OS:       sparkle.OS(p.OS),
 			Version:  p.Version,
 			Settings: (*sparkle.Settings)(p.Settings),
 		}
