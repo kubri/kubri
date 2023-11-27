@@ -23,7 +23,7 @@ type config struct {
 	Description    string              `yaml:"description"`
 	Version        string              `yaml:"version"`
 	Prerelease     bool                `yaml:"prerelease"`
-	UploadPackages bool                `yaml:"upload-packages"`
+	UploadPackages bool                `yaml:"upload_packages"`
 	Source         sourceConfig        `yaml:"source"`
 	Target         targetConfig        `yaml:"target"`
 	Apt            *aptConfig          `yaml:"apt"`

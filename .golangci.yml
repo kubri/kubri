@@ -82,7 +82,7 @@ linters-settings:
     case:
       use-field-name: true
       rules:
-        yaml: kebab
+        yaml: snake
         deb: header
 
 issues:
