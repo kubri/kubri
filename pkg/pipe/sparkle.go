@@ -15,17 +15,17 @@ type sparkleConfig struct {
 	Title       string                `yaml:"title"`
 	Description string                `yaml:"description"`
 	Filename    string                `yaml:"filename"`
-	DetectOS    map[sparkle.OS]string `yaml:"detect-os"`
+	DetectOS    map[sparkle.OS]string `yaml:"detect_os"`
 	Params      []struct {
 		OS       sparkle.OS `yaml:"os"`
 		Version  string     `yaml:"version"`
 		Settings *struct {
-			InstallerArguments                string `yaml:"installer-arguments"`
-			MinimumSystemVersion              string `yaml:"minimum-system-version"`
-			MinimumAutoupdateVersion          string `yaml:"minimum-autoupdate-version"`
-			IgnoreSkippedUpgradesBelowVersion string `yaml:"ignore-skipped-upgrades-below-version"`
-			CriticalUpdate                    bool   `yaml:"critical-update"`
-			CriticalUpdateBelowVersion        string `yaml:"critical-update-below-version"`
+			InstallerArguments                string `yaml:"installer_arguments"`
+			MinimumSystemVersion              string `yaml:"minimum_system_version"`
+			MinimumAutoupdateVersion          string `yaml:"minimum_autoupdate_version"`
+			IgnoreSkippedUpgradesBelowVersion string `yaml:"ignore_skipped_upgrades_below_version"`
+			CriticalUpdate                    bool   `yaml:"critical_update"`
+			CriticalUpdateBelowVersion        string `yaml:"critical_update_below_version"`
 		} `yaml:",inline"`
 	} `yaml:"params"`
 }

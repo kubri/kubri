@@ -115,11 +115,11 @@ target:
   path: ` + dir + `
 appinstaller:
   folder: .
-  hours-between-update-checks: 12
-  update-blocks-activation: true
-  show-prompt: true
-  automatic-background-task: true
-  force-update-from-any-version: true	
+  hours_between_update_checks: 12
+  update_blocks_activation: true
+  show_prompt: true
+  automatic_background_task: true
+  force_update_from_any_version: true	
 apt:
   folder: .
 sparkle:
@@ -129,16 +129,16 @@ sparkle:
   description: bar
   params:
     - os: windows
-      installer-arguments: /passive
+      installer_arguments: /passive
     - os: macos
-      minimum-system-version: '10.13.0'
+      minimum_system_version: '10.13.0'
     - version: '1.0.0'
-      critical-update: true
+      critical_update: true
     - version: '> 1.0.0'
-      critical-update-below-version: '1.0.0'
-      minimum-autoupdate-version: '1.0.0'
+      critical_update_below_version: '1.0.0'
+      minimum_autoupdate_version: '1.0.0'
     - version: '1.1.0'
-      ignore-skipped-upgrades-below-version: '1.1.0'
+      ignore_skipped_upgrades_below_version: '1.1.0'
 `,
 			want: &pipe.Pipe{
 				Appinstaller: &appinstaller.Config{
