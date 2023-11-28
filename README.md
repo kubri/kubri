@@ -12,3 +12,7 @@ Kubri signs and publishes software for common package managers and software upda
 - [APK](https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper) (Alpine Linux)
 - [App Installer](https://en.wikipedia.org/wiki/App_Installer) (Windows)
 - [Sparkle](https://sparkle-project.org/) / [WinSparkle](https://winsparkle.org/) (MacOS, Windows)
+
+## Documentation
+
+See <https://kubri.dev>.
