@@ -1,6 +1,7 @@
 package cryptotest
 
 import (
+	"bytes"
 	"errors"
 	"os"
 	"os/exec"
@@ -288,10 +289,10 @@ func Test[PrivateKey, PublicKey any](t *testing.T, i Implementation[PrivateKey, 
 			cmd.Dir = dir
 
 			out, err := cmd.CombinedOutput()
+			t.Log(string(bytes.TrimSpace(out)))
 			if err != nil {
-				t.Fatal(string(out))
+				t.Fatal(err)
 			}
-			t.Log(string(out))
 		})
 	}
 }
