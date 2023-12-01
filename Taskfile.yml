@@ -45,7 +45,7 @@ tasks:
       - go build
 
   lint:
-    desc: Runs golangci-lint
+    desc: Run golangci-lint
     aliases: [l]
     sources:
       - './**/*.go'
@@ -55,13 +55,13 @@ tasks:
       - golangci-lint run
 
   test:
-    desc: Runs test suite
+    desc: Run test suite
     aliases: [t]
     cmds:
       - gotestsum -- -cover ./...
 
   acceptance:
-    desc: Runs test suite
+    desc: Run acceptance tests
     aliases: [a]
     cmds:
       - gotestsum -- -tags acceptance -run ^TestAcceptance$ ./integrations/...
