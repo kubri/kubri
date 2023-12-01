@@ -41,8 +41,8 @@ type UpdateSettings struct {
 
 type OnLaunch struct {
 	HoursBetweenUpdateChecks int  `xml:",attr,omitempty"`
-	UpdateBlocksActivation   bool `xml:",attr,omitempty"`
 	ShowPrompt               bool `xml:",attr,omitempty"`
+	UpdateBlocksActivation   bool `xml:",attr,omitempty"`
 }
 
 type Bool bool

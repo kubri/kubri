@@ -34,9 +34,11 @@ func TestBuild(t *testing.T) {
 		{
 			name: "Test.appinstaller",
 			config: &appinstaller.Config{
-				Source:     src,
-				Target:     tgt,
-				ShowPrompt: true,
+				Source: src,
+				Target: tgt,
+				OnLaunch: &appinstaller.OnLaunchConfig{
+					ShowPrompt: true,
+				},
 			},
 			want: `<?xml version="1.0" encoding="UTF-8"?>
 <AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018" Version="1.0.0.1" Uri="https://example.com/Test.appinstaller">
@@ -64,11 +66,13 @@ func TestBuild(t *testing.T) {
 		{
 			name: "Test-x64.appinstaller",
 			config: &appinstaller.Config{
-				Source:                    src,
-				Target:                    tgt,
-				HoursBetweenUpdateChecks:  12,
-				UpdateBlocksActivation:    true,
-				ShowPrompt:                true,
+				Source: src,
+				Target: tgt,
+				OnLaunch: &appinstaller.OnLaunchConfig{
+					HoursBetweenUpdateChecks: 12,
+					UpdateBlocksActivation:   true,
+					ShowPrompt:               true,
+				},
 				AutomaticBackgroundTask:   true,
 				ForceUpdateFromAnyVersion: true,
 			},
@@ -76,7 +80,7 @@ func TestBuild(t *testing.T) {
 <AppInstaller xmlns="http://schemas.microsoft.com/appx/appinstaller/2018" Version="1.0.0.1" Uri="https://example.com/Test-x64.appinstaller">
 	<MainPackage Name="Test" Publisher="CN=Test" Version="1.0.0.1" ProcessorArchitecture="x64" Uri="https://dl.example.com/v1.0.0/test.msix" />
 	<UpdateSettings>
-		<OnLaunch HoursBetweenUpdateChecks="12" UpdateBlocksActivation="true" ShowPrompt="true" />
+		<OnLaunch HoursBetweenUpdateChecks="12" ShowPrompt="true" UpdateBlocksActivation="true" />
 		<AutomaticBackgroundTask />
 		<ForceUpdateFromAnyVersion>true</ForceUpdateFromAnyVersion>
 	</UpdateSettings>
