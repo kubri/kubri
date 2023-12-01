@@ -14,7 +14,7 @@ import (
 func TestGitlab(t *testing.T) {
 	token, ok := os.LookupEnv("GITLAB_TOKEN")
 	if !ok {
-		t.Skip("Missing environment variable: GITHUB_TOKEN")
+		t.Skip("Missing environment variable: GITLAB_TOKEN")
 	}
 
 	client, err := gl.NewClient(token)

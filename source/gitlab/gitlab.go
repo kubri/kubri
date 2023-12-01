@@ -17,6 +17,7 @@ import (
 type Config struct {
 	Owner string
 	Repo  string
+	URL   string
 }
 
 type gitlabSource struct {
@@ -25,7 +26,12 @@ type gitlabSource struct {
 }
 
 func New(c Config) (*source.Source, error) {
-	client, err := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"))
+	var opt []gitlab.ClientOptionFunc
+	if c.URL != "" {
+		opt = append(opt, gitlab.WithBaseURL(c.URL))
+	}
+
+	client, err := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"), opt...)
 	if err != nil {
 		return nil, err
 	}
