@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"bou.ke/monkey"
+	"github.com/abemedia/appcast/integrations/apk"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/yum"
 	source "github.com/abemedia/appcast/source/file"
@@ -28,7 +30,7 @@ var (
 	date     = time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC)
 	versions = []string{"v1.0.0", "v1.1.0-beta", "v1.1.0", "v2.0.0"}
 	archs    = []string{"amd64", "386"}
-	formats  = []string{"deb", "rpm"}
+	formats  = []string{"deb", "rpm", "apk"}
 
 	config = nfpm.Config{
 		Info: nfpm.Info{
@@ -77,7 +79,7 @@ func main() {
 		}
 	}
 
-	err := errors.Join(aptGolden(), yumGolden())
+	err := errors.Join(apkGolden(), aptGolden(), yumGolden())
 	if err != nil {
 		fmt.Printf("failed to generate golden: %s\n", err) //nolint:forbidigo
 		os.Exit(1)
@@ -106,6 +108,14 @@ func buildPackages(packager string, config nfpm.Config) error {
 	// TODO: Remove once fix is merged: https://github.com/goreleaser/nfpm/pull/742
 	if packager == "deb" {
 		info.Description = strings.ReplaceAll(info.Description, "\n\n", "\n.\n")
+	}
+
+	if packager == "apk" {
+		d := strings.Split(info.Description, "\n")
+		for i, l := range d {
+			d[i] = strings.TrimSpace(l)
+		}
+		info.Description = strings.Join(d, " ")
 	}
 
 	info = nfpm.WithDefaults(info)
@@ -194,4 +204,37 @@ func yumGolden() error {
 	}
 
 	return os.RemoveAll(filepath.Join(path, "Packages"))
+}
+
+func apkGolden() error {
+	dir := filepath.Join("integrations", "apk", "testdata")
+
+	if err := os.RemoveAll(dir); err != nil {
+		return err
+	}
+
+	src, err := source.New(source.Config{Path: "testdata"})
+	if err != nil {
+		return err
+	}
+
+	tgt, err := target.New(target.Config{Path: dir})
+	if err != nil {
+		return err
+	}
+
+	err = apk.Build(context.Background(), &apk.Config{Source: src, Target: tgt})
+	if err != nil {
+		return err
+	}
+
+	return fs.WalkDir(os.DirFS(dir), ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		if strings.HasSuffix(path, ".apk") {
+			os.Remove(filepath.Join(dir, path))
+		}
+		return nil
+	})
 }

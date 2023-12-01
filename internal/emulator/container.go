@@ -24,7 +24,7 @@ func (c *Container) Exec(t *testing.T, script string) string {
 		_, _ = stdcopy.StdCopy(&buf, &buf, opts.Reader)
 	})
 
-	code, _, err := c.Container.Exec(context.Background(), []string{"bash", "-c", script}, opt)
+	code, _, err := c.Container.Exec(context.Background(), []string{"sh", "-c", script}, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
