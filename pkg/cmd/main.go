@@ -10,7 +10,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Execute(version string, args []string) error {
+type Option func(*cobra.Command)
+
+func WithArgs(args ...string) Option { return func(c *cobra.Command) { c.SetArgs(args) } }
+func WithStdout(w io.Writer) Option  { return func(c *cobra.Command) { c.SetOut(w) } }
+func WithStderr(w io.Writer) Option  { return func(c *cobra.Command) { c.SetErr(w) } }
+
+func Execute(version string, opt ...Option) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -22,8 +28,9 @@ func Execute(version string, args []string) error {
 	}()
 
 	cmd := rootCmd(version)
-	if args != nil {
-		cmd.SetArgs(args)
+
+	for _, o := range opt {
+		o(cmd)
 	}
 
 	return cmd.ExecuteContext(ctx)
@@ -34,11 +41,13 @@ func rootCmd(version string) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:  "appcast",
-		Long: "Generate appcast XML files for Sparkle from your repo.",
-		PersistentPreRun: func(*cobra.Command, []string) {
+		Long: "Sign and release software for common package managers and software update frameworks.",
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 			log.SetFlags(0)
 			if silent {
 				log.SetOutput(io.Discard)
+			} else {
+				log.SetOutput(cmd.OutOrStdout())
 			}
 		},
 	}

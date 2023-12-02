@@ -1,8 +1,8 @@
 package cmd_test
 
 import (
+	"bytes"
 	"fmt"
-	"os"
 	"runtime"
 	"testing"
 
@@ -14,9 +14,9 @@ func TestVersionCmd(t *testing.T) {
 	version := "v1.0.0"
 	want := fmt.Sprintf("appcast v1.0.0 %s/%s\n", runtime.GOOS, runtime.GOARCH)
 
-	stdout := capture(t, os.Stdout)
+	var stdout bytes.Buffer
 
-	err := cmd.Execute(version, []string{"version"})
+	err := cmd.Execute(version, cmd.WithArgs("version"), cmd.WithStdout(&stdout))
 	if err != nil {
 		t.Error(err)
 	}

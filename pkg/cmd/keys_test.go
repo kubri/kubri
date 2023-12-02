@@ -1,15 +1,14 @@
 package cmd_test
 
 import (
-	"os"
+	"io"
 	"testing"
 
 	"github.com/abemedia/appcast/pkg/cmd"
 )
 
 func TestKeysCmd(t *testing.T) {
-	capture(t, os.Stdout) // Reduce noise.
-	err := cmd.Execute("", []string{"keys"})
+	err := cmd.Execute("", cmd.WithArgs("keys"), cmd.WithStdout(io.Discard))
 	if err != nil {
 		t.Error(err)
 	}

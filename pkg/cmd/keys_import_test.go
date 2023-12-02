@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"bytes"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,6 +12,7 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
+	"github.com/abemedia/appcast/pkg/crypto/rsa"
 	"github.com/abemedia/appcast/pkg/secret"
 )
 
@@ -30,21 +32,27 @@ func TestKeysImportCmd(t *testing.T) {
 	pgpPath := filepath.Join(t.TempDir(), "test")
 	os.WriteFile(pgpPath, pgpBytes, os.ModePerm)
 
+	rsaKey, _ := rsa.NewPrivateKey()
+	rsaBytes, _ := rsa.MarshalPrivateKey(rsaKey)
+	rsaPath := filepath.Join(t.TempDir(), "test")
+	os.WriteFile(rsaPath, rsaBytes, os.ModePerm)
+
 	tests := [][]string{
 		{"keys", "import", "dsa", dsaPath},
 		{"keys", "import", "ed25519", ed25519Path},
 		{"keys", "import", "pgp", pgpPath},
+		{"keys", "import", "rsa", rsaPath},
 		{"keys", "import", "dsa", dsaPath, "--force"},
 		{"keys", "import", "ed25519", ed25519Path, "--force"},
 		{"keys", "import", "pgp", pgpPath, "--force"},
+		{"keys", "import", "rsa", rsaPath, "--force"},
 	}
 
-	capture(t, os.Stderr)
 	t.Setenv("APPCAST_PATH", t.TempDir())
 
 	for _, test := range tests {
 		want, _ := os.ReadFile(test[3])
-		err := cmd.Execute("", test)
+		err := cmd.Execute("", cmd.WithArgs(test...), cmd.WithStdout(io.Discard))
 		if err != nil {
 			t.Errorf("%s: %s", test, err)
 		} else if b, _ := secret.Get(test[2] + "_key"); !bytes.Equal(want, b) {
@@ -71,6 +79,11 @@ func TestKeysImportCmdErrors(t *testing.T) {
 	pgpKey, _ := pgp.NewPrivateKey("test", "test@example.com")
 	pgpBytes, _ := pgp.MarshalPrivateKey(pgpKey)
 	os.WriteFile(pgpPath, pgpBytes, os.ModePerm)
+
+	rsaPath := filepath.Join(t.TempDir(), "test")
+	rsaKey, _ := rsa.NewPrivateKey()
+	rsaBytes, _ := rsa.MarshalPrivateKey(rsaKey)
+	os.WriteFile(rsaPath, rsaBytes, os.ModePerm)
 
 	tests := []struct {
 		args []string
@@ -101,6 +114,10 @@ func TestKeysImportCmdErrors(t *testing.T) {
 			want: "key already exists",
 		},
 		{
+			args: []string{"keys", "import", "rsa", rsaPath},
+			want: "key already exists",
+		},
+		{
 			args: []string{"keys", "import", "dsa", path},
 			want: "invalid key",
 		},
@@ -113,22 +130,26 @@ func TestKeysImportCmdErrors(t *testing.T) {
 			want: "invalid key",
 		},
 		{
+			args: []string{"keys", "import", "rsa", path},
+			want: "invalid key",
+		},
+		{
 			args: []string{"keys", "import", "dsa", "foo", "--force"},
 			want: "no such file or directory",
 		},
 	}
 
-	stderr := capture(t, os.Stderr)
 	t.Setenv("APPCAST_PATH", t.TempDir())
 	secret.Put("dsa_key", nil)
 	secret.Put("ed25519_key", nil)
 	secret.Put("pgp_key", nil)
+	secret.Put("rsa_key", nil)
 
 	for _, test := range tests {
-		err := cmd.Execute("", test.args)
+		var stderr bytes.Buffer
+		err := cmd.Execute("", cmd.WithArgs(test.args...), cmd.WithStderr(&stderr), cmd.WithStdout(io.Discard))
 		if err == nil || !strings.Contains(stderr.String(), test.want) {
 			t.Errorf("%s should fail with %q:\n%s", test.args, test.want, err)
 		}
-		stderr.Reset()
 	}
 }
