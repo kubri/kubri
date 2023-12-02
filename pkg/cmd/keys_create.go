@@ -6,11 +6,11 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
+	"github.com/abemedia/appcast/pkg/crypto/rsa"
 	"github.com/abemedia/appcast/pkg/secret"
 	"github.com/spf13/cobra"
 )
 
-//nolint:funlen,gocognit
 func keysCreateCmd() *cobra.Command {
 	var name, email string
 
@@ -21,64 +21,49 @@ func keysCreateCmd() *cobra.Command {
 		Aliases: []string{"c"},
 		Args:    cobra.NoArgs,
 		RunE: func(*cobra.Command, []string) error {
-			if _, err := secret.Get("dsa_key"); errors.Is(err, secret.ErrKeyNotFound) {
-				key, err := dsa.NewPrivateKey()
-				if err != nil {
-					return err
-				}
-
-				b, err := dsa.MarshalPrivateKey(key)
-				if err != nil {
-					return err
-				}
-
-				if err = secret.Put("dsa_key", b); err != nil {
-					return err
-				}
+			if err := createPrivateKey("dsa_key", dsa.NewPrivateKey, dsa.MarshalPrivateKey); err != nil {
+				return err
 			}
-
-			if _, err := secret.Get("ed25519_key"); errors.Is(err, secret.ErrKeyNotFound) {
-				key, err := ed25519.NewPrivateKey()
-				if err != nil {
-					return err
-				}
-
-				b, err := ed25519.MarshalPrivateKey(key)
-				if err != nil {
-					return err
-				}
-
-				if err = secret.Put("ed25519_key", b); err != nil {
-					return err
-				}
+			if err := createPrivateKey("ed25519_key", ed25519.NewPrivateKey, ed25519.MarshalPrivateKey); err != nil {
+				return err
 			}
-
-			if _, err := secret.Get("pgp_key"); errors.Is(err, secret.ErrKeyNotFound) {
-				if name == "" && email == "" {
-					return errors.New("generating PGP key requires either name or email")
-				}
-
-				key, err := pgp.NewPrivateKey(name, email)
-				if err != nil {
-					return err
-				}
-
-				b, err := pgp.MarshalPrivateKey(key)
-				if err != nil {
-					return err
-				}
-
-				if err = secret.Put("pgp_key", b); err != nil {
-					return err
-				}
+			if err := createPrivateKey("pgp_key", newPGPKey(name, email), pgp.MarshalPrivateKey); err != nil {
+				return err
 			}
-
-			return nil
+			return createPrivateKey("rsa_key", rsa.NewPrivateKey, rsa.MarshalPrivateKey)
 		},
 	}
 
 	cmd.Flags().StringVar(&name, "name", "", "your name for the PGP key")
-	cmd.Flags().StringVar(&email, "email", "", "you email for the pgp key")
+	cmd.Flags().StringVar(&email, "email", "", "your email for the PGP key")
 
 	return cmd
+}
+
+func newPGPKey(name, email string) func() (*pgp.PrivateKey, error) {
+	return func() (*pgp.PrivateKey, error) {
+		if name == "" && email == "" {
+			return nil, errors.New("generating PGP key requires either name or email")
+		}
+		return pgp.NewPrivateKey(name, email)
+	}
+}
+
+func createPrivateKey[PrivateKey any](
+	name string,
+	newKey func() (PrivateKey, error),
+	marshal func(PrivateKey) ([]byte, error),
+) error {
+	if _, err := secret.Get(name); !errors.Is(err, secret.ErrKeyNotFound) {
+		return err
+	}
+	key, err := newKey()
+	if err != nil {
+		return err
+	}
+	b, err := marshal(key)
+	if err != nil {
+		return err
+	}
+	return secret.Put(name, b)
 }

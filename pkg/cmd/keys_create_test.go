@@ -8,20 +8,21 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
+	"github.com/abemedia/appcast/pkg/crypto/rsa"
 	"github.com/abemedia/appcast/pkg/secret"
 )
 
 func TestKeysCreateCmd(t *testing.T) {
 	t.Setenv("APPCAST_PATH", t.TempDir())
 
-	for _, s := range []string{"dsa", "ed25519", "pgp"} {
+	for _, s := range []string{"dsa", "ed25519", "pgp", "rsa"} {
 		_, err := secret.Get(s + "_key")
 		if err == nil {
 			t.Fatalf("should not have %s key: %s", s, err)
 		}
 	}
 
-	err := cmd.Execute("", []string{"keys", "create", "--name", "test", "--email", "test@example.com"})
+	err := cmd.Execute("", cmd.WithArgs("keys", "create", "--name", "test", "--email", "test@example.com"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,8 +54,17 @@ func TestKeysCreateCmd(t *testing.T) {
 		t.Fatalf("should be valid pgp key: %s", err)
 	}
 
+	rsaKey, err := secret.Get("rsa_key")
+	if err != nil {
+		t.Fatalf("should have created rsa key: %s", err)
+	}
+	_, err = rsa.UnmarshalPrivateKey(rsaKey)
+	if err != nil {
+		t.Fatalf("should be valid rsa key: %s", err)
+	}
+
 	// Run again to ensure existing keys aren't overwritten.
-	err = cmd.Execute("", []string{"keys", "create"})
+	err = cmd.Execute("", cmd.WithArgs("keys", "create"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,5 +79,9 @@ func TestKeysCreateCmd(t *testing.T) {
 
 	if k, _ := secret.Get("pgp_key"); !bytes.Equal(pgpKey, k) {
 		t.Fatal("should not have regenerated pgp key")
+	}
+
+	if k, _ := secret.Get("rsa_key"); !bytes.Equal(rsaKey, k) {
+		t.Fatal("should not have regenerated rsa key")
 	}
 }

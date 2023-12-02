@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"bytes"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -11,21 +12,21 @@ import (
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
+	"github.com/abemedia/appcast/pkg/crypto/rsa"
 )
 
 func TestKeysPublicCmd(t *testing.T) {
-	stdout := capture(t, os.Stdout)
-	t.Cleanup(func() { t.Log(stdout.String()) })
 	dir := t.TempDir()
 	t.Setenv("APPCAST_PATH", dir)
 
 	{
+		var stdout bytes.Buffer
 		key, _ := dsa.NewPrivateKey()
 		priv, _ := dsa.MarshalPrivateKey(key)
 		os.WriteFile(filepath.Join(dir, "dsa_key"), priv, 0o600)
 		pub, _ := dsa.MarshalPublicKey(dsa.Public(key))
 
-		err := cmd.Execute("", []string{"keys", "public", "dsa"})
+		err := cmd.Execute("", cmd.WithArgs("keys", "public", "dsa"), cmd.WithStdout(&stdout))
 		if err != nil {
 			t.Error(err)
 		}
@@ -34,15 +35,14 @@ func TestKeysPublicCmd(t *testing.T) {
 		}
 	}
 
-	stdout.Reset()
-
 	{
+		var stdout bytes.Buffer
 		key, _ := ed25519.NewPrivateKey()
 		priv, _ := ed25519.MarshalPrivateKey(key)
 		os.WriteFile(filepath.Join(dir, "ed25519_key"), priv, 0o600)
 		pub, _ := ed25519.MarshalPublicKey(ed25519.Public(key))
 
-		err := cmd.Execute("", []string{"keys", "public", "ed25519"})
+		err := cmd.Execute("", cmd.WithArgs("keys", "public", "ed25519"), cmd.WithStdout(&stdout))
 		if err != nil {
 			t.Error(err)
 		}
@@ -51,20 +51,35 @@ func TestKeysPublicCmd(t *testing.T) {
 		}
 	}
 
-	stdout.Reset()
-
 	{
+		var stdout bytes.Buffer
 		key, _ := pgp.NewPrivateKey("test", "test@example.com")
 		priv, _ := pgp.MarshalPrivateKey(key)
 		os.WriteFile(filepath.Join(dir, "pgp_key"), priv, 0o600)
 		pub, _ := pgp.MarshalPublicKey(pgp.Public(key))
 
-		err := cmd.Execute("", []string{"keys", "public", "pgp"})
+		err := cmd.Execute("", cmd.WithArgs("keys", "public", "pgp"), cmd.WithStdout(&stdout))
 		if err != nil {
 			t.Error(err)
 		}
 		if !bytes.Equal(stdout.Bytes(), pub) {
 			t.Error("pgp public keys should be equal")
+		}
+	}
+
+	{
+		var stdout bytes.Buffer
+		key, _ := rsa.NewPrivateKey()
+		priv, _ := rsa.MarshalPrivateKey(key)
+		os.WriteFile(filepath.Join(dir, "rsa_key"), priv, 0o600)
+		pub, _ := rsa.MarshalPublicKey(rsa.Public(key))
+
+		err := cmd.Execute("", cmd.WithArgs("keys", "public", "rsa"), cmd.WithStdout(&stdout))
+		if err != nil {
+			t.Error(err)
+		}
+		if !bytes.Equal(stdout.Bytes(), pub) {
+			t.Error("rsa public keys should be equal")
 		}
 	}
 }
@@ -90,16 +105,19 @@ func TestKeysPublicCmdErrors(t *testing.T) {
 			args: []string{"keys", "public", "ed25519"},
 			want: "key not found",
 		},
+		{
+			args: []string{"keys", "public", "rsa"},
+			want: "key not found",
+		},
 	}
 
-	stderr := capture(t, os.Stderr)
 	t.Setenv("APPCAST_PATH", t.TempDir())
 
 	for _, test := range tests {
-		err := cmd.Execute("", test.args)
+		var stderr bytes.Buffer
+		err := cmd.Execute("", cmd.WithArgs(test.args...), cmd.WithStderr(&stderr), cmd.WithStdout(io.Discard))
 		if err == nil || !strings.Contains(stderr.String(), test.want) {
-			t.Errorf("%s should fail with %q:\n%s", test.args, test.want, stderr)
+			t.Errorf("%s should fail with %q:\n%s", test.args, test.want, &stderr)
 		}
-		stderr.Reset()
 	}
 }

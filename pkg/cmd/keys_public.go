@@ -1,70 +1,60 @@
 package cmd
 
 import (
-	"os"
-
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
+	"github.com/abemedia/appcast/pkg/crypto/rsa"
 	"github.com/abemedia/appcast/pkg/secret"
 	"github.com/spf13/cobra"
 )
 
 func keysPublicCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:       "public (dsa|ed25519|pgp)",
+		Use:       "public (dsa|ed25519|pgp|rsa)",
 		Short:     "Output public key",
 		Aliases:   []string{"p"},
 		Args:      cobra.ExactArgs(1),
-		ValidArgs: []string{"dsa", "ed25519", "pgp"},
-		RunE: func(_ *cobra.Command, args []string) error {
-			var pub []byte
+		ValidArgs: []string{"dsa", "ed25519", "pgp", "rsa"},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var (
+				pub []byte
+				err error
+			)
 			switch args[0] {
 			case "dsa":
-				priv, err := secret.Get("dsa_key")
-				if err != nil {
-					return err
-				}
-				key, err := dsa.UnmarshalPrivateKey(priv)
-				if err != nil {
-					return err
-				}
-				pub, err = dsa.MarshalPublicKey(dsa.Public(key))
-				if err != nil {
-					return err
-				}
+				pub, err = getPublicKey("dsa_key", dsa.UnmarshalPrivateKey, dsa.Public, dsa.MarshalPublicKey)
 			case "ed25519":
-				priv, err := secret.Get("ed25519_key")
-				if err != nil {
-					return err
-				}
-				key, err := ed25519.UnmarshalPrivateKey(priv)
-				if err != nil {
-					return err
-				}
-				pub, err = ed25519.MarshalPublicKey(ed25519.Public(key))
-				if err != nil {
-					return err
-				}
+				pub, err = getPublicKey("ed25519_key", ed25519.UnmarshalPrivateKey, ed25519.Public, ed25519.MarshalPublicKey)
 			case "pgp":
-				priv, err := secret.Get("pgp_key")
-				if err != nil {
-					return err
-				}
-				key, err := pgp.UnmarshalPrivateKey(priv)
-				if err != nil {
-					return err
-				}
-				pub, err = pgp.MarshalPublicKey(pgp.Public(key))
-				if err != nil {
-					return err
-				}
+				pub, err = getPublicKey("pgp_key", pgp.UnmarshalPrivateKey, pgp.Public, pgp.MarshalPublicKey)
+			case "rsa":
+				pub, err = getPublicKey("rsa_key", rsa.UnmarshalPrivateKey, rsa.Public, rsa.MarshalPublicKey)
 			}
-
-			_, err := os.Stdout.Write(pub)
+			if err != nil {
+				return err
+			}
+			_, err = cmd.OutOrStdout().Write(pub)
 			return err
 		},
 	}
 
 	return cmd
+}
+
+func getPublicKey[Private, Public any](
+	name string,
+	unmarshal func([]byte) (Private, error),
+	public func(Private) Public,
+	marshal func(Public) ([]byte, error),
+) ([]byte, error) {
+	priv, err := secret.Get(name)
+	if err != nil {
+		return nil, err
+	}
+	key, err := unmarshal(priv)
+	if err != nil {
+		return nil, err
+	}
+	return marshal(public(key))
 }
