@@ -27,7 +27,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.5
 	github.com/imdario/mergo v0.3.16
 	github.com/joho/godotenv v1.5.1
-	github.com/klauspost/compress v1.17.3
+	github.com/klauspost/compress v1.17.4
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pierrec/lz4 v2.6.1+incompatible
 	github.com/russross/blackfriday/v2 v2.1.0
