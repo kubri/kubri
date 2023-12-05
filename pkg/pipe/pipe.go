@@ -3,6 +3,7 @@ package pipe
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -52,7 +53,7 @@ func (p *Pipe) Run(ctx context.Context) error {
 		g.Go(func() error {
 			log.Print("Publishing App Installer packages...")
 			if err := appinstaller.Build(ctx, p.Appinstaller); err != nil {
-				return err
+				return fmt.Errorf("failed to publish App Installer packages: %w", err)
 			}
 			log.Print("Completed publishing App Installer packages.")
 			return nil
@@ -63,7 +64,7 @@ func (p *Pipe) Run(ctx context.Context) error {
 		g.Go(func() error {
 			log.Print("Publishing APT packages...")
 			if err := apt.Build(ctx, p.Apt); err != nil {
-				return err
+				return fmt.Errorf("failed to publish APT packages: %w", err)
 			}
 			log.Print("Completed publishing APT packages.")
 			return nil
@@ -74,7 +75,7 @@ func (p *Pipe) Run(ctx context.Context) error {
 		g.Go(func() error {
 			log.Print("Publishing YUM packages...")
 			if err := yum.Build(ctx, p.Yum); err != nil {
-				return err
+				return fmt.Errorf("failed to publish YUM packages: %w", err)
 			}
 			log.Print("Completed publishing YUM packages.")
 			return nil
@@ -85,7 +86,7 @@ func (p *Pipe) Run(ctx context.Context) error {
 		g.Go(func() error {
 			log.Print("Publishing Sparkle packages...")
 			if err := sparkle.Build(ctx, p.Sparkle); err != nil {
-				return err
+				return fmt.Errorf("failed to publish Sparkle packages: %w", err)
 			}
 			log.Print("Completed publishing Sparkle packages.")
 			return nil
