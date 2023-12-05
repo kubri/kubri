@@ -174,14 +174,14 @@ func signAsset(c *Config, os OS, b []byte) (edSig, dsaSig string, err error) {
 		if err != nil {
 			return "", "", err
 		}
-		edSig = base64.RawStdEncoding.EncodeToString(sig)
+		edSig = base64.StdEncoding.EncodeToString(sig)
 	} else if c.DSAKey != nil {
 		sum := sha1.Sum(b)
 		sig, err := dsa.Sign(c.DSAKey, sum[:])
 		if err != nil {
 			return "", "", err
 		}
-		dsaSig = base64.RawStdEncoding.EncodeToString(sig)
+		dsaSig = base64.StdEncoding.EncodeToString(sig)
 	}
 	return
 }

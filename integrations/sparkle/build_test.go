@@ -286,7 +286,7 @@ func TestBuildSign(t *testing.T) {
 						Version: "1.0.0",
 						EDSignature: func() string {
 							sig, _ := ed25519.Sign(edKey, data)
-							return base64.RawStdEncoding.EncodeToString(sig)
+							return base64.StdEncoding.EncodeToString(sig)
 						}(),
 						Length: 4,
 						Type:   "application/x-apple-diskimage",
@@ -303,7 +303,7 @@ func TestBuildSign(t *testing.T) {
 						DSASignature: func() string {
 							sum := sha1.Sum(data)
 							sig, _ := dsa.Sign(dsaKey, sum[:])
-							return base64.RawStdEncoding.EncodeToString(sig)
+							return base64.StdEncoding.EncodeToString(sig)
 						}(),
 						Length: 4,
 						Type:   "application/x-msi",
@@ -334,8 +334,8 @@ func TestBuildSign(t *testing.T) {
 		if a == "" || b == "" {
 			return a == b
 		}
-		x, _ := base64.RawStdEncoding.DecodeString(a)
-		y, _ := base64.RawStdEncoding.DecodeString(b)
+		x, _ := base64.StdEncoding.DecodeString(a)
+		y, _ := base64.StdEncoding.DecodeString(b)
 		pub := dsa.Public(dsaKey)
 		sum := sha1.Sum(data)
 		return dsa.Verify(pub, sum[:], x) && dsa.Verify(pub, sum[:], y)
@@ -347,8 +347,8 @@ func TestBuildSign(t *testing.T) {
 		if a == "" || b == "" {
 			return a == b
 		}
-		x, _ := base64.RawStdEncoding.DecodeString(a)
-		y, _ := base64.RawStdEncoding.DecodeString(b)
+		x, _ := base64.StdEncoding.DecodeString(a)
+		y, _ := base64.StdEncoding.DecodeString(b)
 		pub := ed25519.Public(edKey)
 		return ed25519.Verify(pub, data, x) && ed25519.Verify(pub, data, y)
 	}))
