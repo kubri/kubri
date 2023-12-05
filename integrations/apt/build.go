@@ -10,12 +10,12 @@ import (
 	"os"
 	"path"
 	"strings"
+	"unsafe"
 
 	"github.com/abemedia/appcast/integrations/apt/deb"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
-	"golang.org/x/mod/semver"
 )
 
 type Config struct {
@@ -31,8 +31,8 @@ func Build(ctx context.Context, c *Config) error {
 	pkgs := read(ctx, c)
 
 	version := c.Version
-	if v := getLatestVersion(pkgs); v != "" {
-		version = ">" + v + "," + version
+	if v := getVersionConstraint(pkgs); v != "" {
+		version += "," + v
 	}
 
 	releases, err := c.Source.ListReleases(ctx, &source.ListOptions{
@@ -114,15 +114,19 @@ func read(ctx context.Context, c *Config) []*Package {
 	return pkgs
 }
 
-func getLatestVersion(pkgs []*Package) string {
-	var v string
-	for _, p := range pkgs {
-		s := "v" + p.Version
-		if semver.Compare(s, v) == 1 {
-			v = s
-		}
+func getVersionConstraint(pkgs []*Package) string {
+	if len(pkgs) == 0 {
+		return ""
 	}
-	return v
+
+	v := make([]byte, 0, len(pkgs)*len("!=0.0.0,"))
+	for _, p := range pkgs {
+		v = append(v, '!', '=')
+		v = append(v, strings.Replace(p.Version, "~", "-", 1)...)
+		v = append(v, ',')
+	}
+
+	return unsafe.String(unsafe.SliceData(v), len(v)-1)
 }
 
 func getPackages(ctx context.Context, c *Config, releases []*source.Release) ([]*Package, error) {

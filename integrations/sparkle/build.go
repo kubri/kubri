@@ -8,21 +8,21 @@ import (
 	"path"
 	"strings"
 	"time"
+	"unsafe"
 
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/source"
 	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/russross/blackfriday/v2"
-	"golang.org/x/mod/semver"
 )
 
 func Build(ctx context.Context, c *Config) error {
 	items := read(ctx, c)
 
 	version := c.Version
-	if v := getLatestVersion(items); v != "" {
-		version = ">" + v + "," + version
+	if v := getVersionConstraint(items); v != "" {
+		version += "," + v
 	}
 
 	releases, err := c.Source.ListReleases(ctx, &source.ListOptions{
@@ -70,15 +70,19 @@ func read(ctx context.Context, c *Config) []*Item {
 	return rss.Channels[0].Items
 }
 
-func getLatestVersion(items []*Item) string {
-	var v string
-	for _, item := range items {
-		s := "v" + item.Version
-		if semver.Compare(s, v) == 1 {
-			v = s
-		}
+func getVersionConstraint(items []*Item) string {
+	if len(items) == 0 {
+		return ""
 	}
-	return v
+
+	v := make([]byte, 0, len(items)*len("!=0.0.0,"))
+	for _, item := range items {
+		v = append(v, '!', '=')
+		v = append(v, item.Version...)
+		v = append(v, ',')
+	}
+
+	return unsafe.String(unsafe.SliceData(v), len(v)-1)
 }
 
 func getItems(ctx context.Context, c *Config, releases []*source.Release) ([]*Item, error) {
