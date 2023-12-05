@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 	"unsafe"
 
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
@@ -108,7 +109,7 @@ func getVersionConstraint(pkgs []Package) string {
 	v := make([]byte, 0, len(pkgs)*len("!=0.0.0,"))
 	for _, p := range pkgs {
 		v = append(v, '!', '=')
-		v = append(v, p.Version.Ver...)
+		v = append(v, strings.Replace(p.Version.Ver, "~", "-", 1)...)
 		v = append(v, ',')
 	}
 
