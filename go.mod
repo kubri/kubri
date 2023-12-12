@@ -34,7 +34,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/testcontainers/testcontainers-go v0.26.0
 	github.com/ulikunitz/xz v0.5.11
-	github.com/xanzy/go-gitlab v0.95.0
+	github.com/xanzy/go-gitlab v0.95.1
 	gitlab.alpinelinux.org/alpine/go v0.8.0
 	gocloud.dev v0.35.0
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
