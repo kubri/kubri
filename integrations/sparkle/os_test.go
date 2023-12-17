@@ -7,7 +7,7 @@ import (
 	"github.com/abemedia/appcast/integrations/sparkle"
 )
 
-func TestMarshalText(t *testing.T) {
+func TestOS_MarshalText(t *testing.T) {
 	tests := []struct {
 		in   sparkle.OS
 		want string
@@ -31,7 +31,7 @@ func TestMarshalText(t *testing.T) {
 	}
 }
 
-func TestUnmarshalText(t *testing.T) {
+func TestOS_UnmarshalText(t *testing.T) {
 	tests := []struct {
 		in   string
 		want sparkle.OS
@@ -66,6 +66,7 @@ func TestIsOS(t *testing.T) {
 		{sparkle.Windows32, sparkle.Windows, true},
 		{sparkle.Windows64, sparkle.Windows, true},
 		{sparkle.Unknown, sparkle.MacOS, false},
+		{sparkle.MacOS, sparkle.Unknown, true},
 	}
 
 	for _, test := range tests {

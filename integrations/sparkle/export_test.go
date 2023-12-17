@@ -1,4 +1,8 @@
 package sparkle
 
 //nolint:gochecknoglobals
-var GetSettings = getSettings
+var (
+	GetSettings = getSettings
+	IsOS        = isOS
+	DetectOS    = detectOS
+)

@@ -110,7 +110,7 @@ func getReleaseItems(ctx context.Context, c *Config, release *source.Release) ([
 	for _, asset := range release.Assets {
 		detect := c.DetectOS
 		if detect == nil {
-			detect = DetectOS
+			detect = detectOS
 		}
 		os := detect(asset.Name)
 		if os == Unknown {
