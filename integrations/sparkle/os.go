@@ -53,7 +53,7 @@ func (os *OS) UnmarshalText(text []byte) error {
 	return fmt.Errorf("%w: %s", ErrUnknownOS, text)
 }
 
-func IsOS(os, target OS) bool {
+func isOS(os, target OS) bool {
 	switch target {
 	case os, Unknown:
 		return true
@@ -69,7 +69,7 @@ var (
 	reWin32 = regexp2.MustCompile(`386|x86(?![\W_]?64)|ia32|32[\W_]?bit`, regexp2.IgnoreCase)
 )
 
-func DetectOS(name string) OS {
+func detectOS(name string) OS {
 	ext := path.Ext(name)
 	switch ext {
 	case "":
