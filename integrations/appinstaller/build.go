@@ -14,9 +14,7 @@ import (
 )
 
 type Config struct {
-	HoursBetweenUpdateChecks  int
-	UpdateBlocksActivation    bool
-	ShowPrompt                bool
+	OnLaunch                  *OnLaunchConfig
 	AutomaticBackgroundTask   bool
 	ForceUpdateFromAnyVersion bool
 
@@ -25,6 +23,12 @@ type Config struct {
 	Version        string
 	Prerelease     bool
 	UploadPackages bool
+}
+
+type OnLaunchConfig struct {
+	HoursBetweenUpdateChecks int
+	ShowPrompt               bool
+	UpdateBlocksActivation   bool
 }
 
 var ErrNotValid = errors.New("not a valid bundle")
@@ -139,29 +143,28 @@ func newXML(c *Config) *AppInstaller {
 
 	// Get minimum required namespace.
 	switch {
-	case c.ForceUpdateFromAnyVersion, c.ShowPrompt, c.UpdateBlocksActivation:
+	case c.ForceUpdateFromAnyVersion,
+		c.OnLaunch != nil && c.OnLaunch.ShowPrompt,
+		c.OnLaunch != nil && c.OnLaunch.UpdateBlocksActivation:
 		appInstaller.XMLName.Space = "http://schemas.microsoft.com/appx/appinstaller/2018"
-	case c.AutomaticBackgroundTask, c.HoursBetweenUpdateChecks > 0:
+	case c.AutomaticBackgroundTask,
+		c.OnLaunch != nil && c.OnLaunch.HoursBetweenUpdateChecks >= 0:
 		appInstaller.XMLName.Space = "http://schemas.microsoft.com/appx/appinstaller/2017/2"
 	default:
 		appInstaller.XMLName.Space = "http://schemas.microsoft.com/appx/appinstaller/2017"
 		return appInstaller
 	}
 
-	if c.AutomaticBackgroundTask || c.ForceUpdateFromAnyVersion {
-		appInstaller.UpdateSettings = &UpdateSettings{
-			AutomaticBackgroundTask:   Bool(c.AutomaticBackgroundTask),
-			ForceUpdateFromAnyVersion: c.ForceUpdateFromAnyVersion,
+	if c.OnLaunch != nil || c.AutomaticBackgroundTask || c.ForceUpdateFromAnyVersion {
+		appInstaller.UpdateSettings = &UpdateSettings{}
+		if c.AutomaticBackgroundTask {
+			appInstaller.UpdateSettings.AutomaticBackgroundTask = Bool(c.AutomaticBackgroundTask)
 		}
-	}
-	if c.HoursBetweenUpdateChecks > 0 || c.ShowPrompt || c.UpdateBlocksActivation {
-		if appInstaller.UpdateSettings == nil {
-			appInstaller.UpdateSettings = &UpdateSettings{}
+		if c.ForceUpdateFromAnyVersion {
+			appInstaller.UpdateSettings.ForceUpdateFromAnyVersion = c.ForceUpdateFromAnyVersion
 		}
-		appInstaller.UpdateSettings.OnLaunch = &OnLaunch{
-			HoursBetweenUpdateChecks: c.HoursBetweenUpdateChecks,
-			UpdateBlocksActivation:   c.UpdateBlocksActivation,
-			ShowPrompt:               c.ShowPrompt,
+		if c.OnLaunch != nil {
+			appInstaller.UpdateSettings.OnLaunch = (*OnLaunch)(c.OnLaunch)
 		}
 	}
 

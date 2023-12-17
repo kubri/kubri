@@ -115,11 +115,12 @@ target:
   path: ` + dir + `
 appinstaller:
   folder: .
-  hours-between-update-checks: 12
-  update-blocks-activation: true
-  show-prompt: true
+  on-launch:
+    hours-between-update-checks: 12
+    show-prompt: true
+    update-blocks-activation: true
   automatic-background-task: true
-  force-update-from-any-version: true	
+  force-update-from-any-version: true  
 apt:
   folder: .
 sparkle:
@@ -142,12 +143,14 @@ sparkle:
 `,
 			want: &pipe.Pipe{
 				Appinstaller: &appinstaller.Config{
-					Source:                    src,
-					Target:                    tgt,
-					Version:                   "latest",
-					HoursBetweenUpdateChecks:  12,
-					UpdateBlocksActivation:    true,
-					ShowPrompt:                true,
+					Source:  src,
+					Target:  tgt,
+					Version: "latest",
+					OnLaunch: &appinstaller.OnLaunchConfig{
+						HoursBetweenUpdateChecks: 12,
+						ShowPrompt:               true,
+						UpdateBlocksActivation:   true,
+					},
 					AutomaticBackgroundTask:   true,
 					ForceUpdateFromAnyVersion: true,
 				},
