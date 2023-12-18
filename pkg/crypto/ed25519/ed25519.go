@@ -3,8 +3,7 @@ package ed25519
 import (
 	"crypto/ed25519"
 	"crypto/rand"
-	"crypto/x509"
-	"encoding/pem"
+	"encoding/base64"
 
 	"github.com/abemedia/appcast/pkg/crypto"
 )
@@ -34,30 +33,11 @@ func NewPrivateKey() (PrivateKey, error) {
 }
 
 func MarshalPrivateKey(key PrivateKey) ([]byte, error) {
-	if l := len(key); l != ed25519.PrivateKeySize {
-		return nil, crypto.ErrInvalidKey
-	}
-	b, err := x509.MarshalPKCS8PrivateKey(key)
-	if err != nil {
-		return nil, err
-	}
-	return pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: b}), nil
+	return marshal(key, ed25519.PrivateKeySize)
 }
 
 func UnmarshalPrivateKey(b []byte) (PrivateKey, error) {
-	block, _ := pem.Decode(b)
-	if block == nil {
-		return nil, crypto.ErrInvalidKey
-	}
-	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, crypto.ErrInvalidKey
-	}
-	edKey, ok := key.(PrivateKey)
-	if !ok {
-		return nil, crypto.ErrWrongKeyType
-	}
-	return edKey, nil
+	return unmarshal(b, ed25519.PrivateKeySize)
 }
 
 func Public(key PrivateKey) PublicKey {
@@ -65,28 +45,27 @@ func Public(key PrivateKey) PublicKey {
 }
 
 func MarshalPublicKey(key PublicKey) ([]byte, error) {
-	if l := len(key); l != ed25519.PublicKeySize {
-		return nil, crypto.ErrInvalidKey
-	}
-	b, err := x509.MarshalPKIXPublicKey(key)
-	if err != nil {
-		return nil, err
-	}
-	return pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: b}), nil
+	return marshal(key, ed25519.PublicKeySize)
 }
 
 func UnmarshalPublicKey(b []byte) (PublicKey, error) {
-	block, _ := pem.Decode(b)
-	if block == nil {
+	return unmarshal(b, ed25519.PublicKeySize)
+}
+
+func marshal(key []byte, size int) ([]byte, error) {
+	if len(key) != size {
 		return nil, crypto.ErrInvalidKey
 	}
-	key, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
+	b := make([]byte, base64.StdEncoding.EncodedLen(size))
+	base64.StdEncoding.Encode(b, key)
+	return b, nil
+}
+
+func unmarshal(b []byte, size int) ([]byte, error) {
+	key := make([]byte, base64.StdEncoding.DecodedLen(len(b)))
+	n, err := base64.StdEncoding.Decode(key, b)
+	if err != nil || n != size {
 		return nil, crypto.ErrInvalidKey
 	}
-	edKey, ok := key.(PublicKey)
-	if !ok {
-		return nil, crypto.ErrWrongKeyType
-	}
-	return edKey, nil
+	return key[:n], nil
 }

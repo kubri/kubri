@@ -280,6 +280,10 @@ func Test[PrivateKey, PublicKey any](t *testing.T, i Implementation[PrivateKey, 
 
 	if opt.opensslArgs != nil {
 		t.Run("OpenSSL", func(t *testing.T) {
+			if _, err := exec.LookPath("openssl"); err != nil {
+				t.Skip("openssl not in path")
+			}
+
 			dir := t.TempDir()
 			_ = os.WriteFile(filepath.Join(dir, "public.pem"), pubBytes, 0o600)
 			_ = os.WriteFile(filepath.Join(dir, "data.txt"), data, 0o600)
