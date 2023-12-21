@@ -23,7 +23,7 @@ require (
 	github.com/go-xmlfmt/xmlfmt v1.1.2
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/goreleaser/nfpm/v2 v2.34.0
+	github.com/goreleaser/nfpm/v2 v2.35.0
 	github.com/hashicorp/go-retryablehttp v0.7.5
 	github.com/imdario/mergo v0.3.16
 	github.com/joho/godotenv v1.5.1
@@ -37,7 +37,7 @@ require (
 	github.com/xanzy/go-gitlab v0.95.2
 	gitlab.alpinelinux.org/alpine/go v0.8.0
 	gocloud.dev v0.35.0
-	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
+	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb
 	golang.org/x/mod v0.14.0
 	golang.org/x/oauth2 v0.15.0
 	golang.org/x/sync v0.5.0
@@ -162,7 +162,7 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.4.0 // indirect
-	golang.org/x/tools v0.13.0 // indirect
+	golang.org/x/tools v0.16.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/api v0.151.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
