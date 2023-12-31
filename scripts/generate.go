@@ -105,11 +105,6 @@ func buildPackages(packager string, config nfpm.Config) error {
 		return err
 	}
 
-	// TODO: Remove once fix is merged: https://github.com/goreleaser/nfpm/pull/742
-	if packager == "deb" {
-		info.Description = strings.ReplaceAll(info.Description, "\n\n", "\n.\n")
-	}
-
 	if packager == "apk" {
 		d := strings.Split(info.Description, "\n")
 		for i, l := range d {
