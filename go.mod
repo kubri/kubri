@@ -23,7 +23,7 @@ require (
 	github.com/go-xmlfmt/xmlfmt v1.1.2
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/goreleaser/nfpm/v2 v2.35.1
+	github.com/goreleaser/nfpm/v2 v2.35.2
 	github.com/hashicorp/go-retryablehttp v0.7.5
 	github.com/imdario/mergo v0.3.16
 	github.com/joho/godotenv v1.5.1
