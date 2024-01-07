@@ -1,6 +1,9 @@
 package pipe_test
 
 import (
+	"context"
+	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -8,232 +11,184 @@ import (
 	"github.com/abemedia/appcast/integrations/appinstaller"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/sparkle"
+	"github.com/abemedia/appcast/integrations/yum"
 	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
+	"github.com/abemedia/appcast/internal/testsource"
 	"github.com/abemedia/appcast/pkg/pipe"
-	source "github.com/abemedia/appcast/source/file"
+	"github.com/abemedia/appcast/source"
 	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 )
 
+func TestLoad(t *testing.T) {
+	tests := []struct {
+		config string
+		path   string
+		err    error
+		mode   fs.FileMode
+	}{
+		{path: "appcast.yml"},
+		{path: "appcast.yaml"},
+		{path: ".appcast.yml"},
+		{path: ".appcast.yaml"},
+		{path: filepath.Join(".github", "appcast.yml")},
+		{path: filepath.Join(".github", "appcast.yaml")},
+		{
+			path: "foo.yml",
+			err:  errors.New("no config file found"),
+		},
+		{
+			path: "appcast.yml",
+			err:  errors.New("open appcast.yml: permission denied"),
+			mode: 0o200,
+		},
+		{
+			path:   "appcast.yml",
+			err:    errors.New("yaml: did not find expected alphabetic or numeric character"),
+			config: `*&%^`,
+		},
+		{
+			path: "appcast.yml",
+			err:  errors.New("invalid source type: nope"),
+			config: `
+				source:
+					type: nope
+				target:
+					type: file
+					path: ` + t.TempDir(),
+		},
+		{
+			path: "appcast.yml",
+			err:  errors.New("invalid target type: nope"),
+			config: `
+				source:
+					type: file
+					path: ` + t.TempDir() + `
+				target:
+					type: nope`,
+		},
+	}
+
+	opts := cmp.Options{
+		test.ExportAll(),
+		test.CompareErrorMessages(),
+	}
+
+	for _, test := range tests {
+		if test.config == "" {
+			test.config = `
+				source:
+					type: file
+					path: ` + t.TempDir() + `
+				target:
+					type: file
+					path: ` + t.TempDir()
+		}
+		if test.mode == 0 {
+			test.mode = os.ModePerm
+		}
+
+		os.Chdir(t.TempDir())
+		os.MkdirAll(filepath.Dir(test.path), os.ModePerm)
+		os.WriteFile(test.path, clean(test.config), test.mode)
+
+		_, err := pipe.Load("")
+
+		if diff := cmp.Diff(test.err, err, opts); diff != "" {
+			t.Errorf("%s:\n%s", test.path, diff)
+		}
+	}
+}
+
 func TestPipe(t *testing.T) {
 	dir := t.TempDir()
-
-	src, err := source.New(source.Config{Path: dir})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	tgt, err := target.New(target.Config{Path: dir})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	dsaKey, _ := dsa.NewPrivateKey()
-	edKey, _ := ed25519.NewPrivateKey()
+	src := testsource.New([]*source.Release{{Version: "v1.0.0"}})
+	tgt, _ := target.New(target.Config{Path: dir})
 
 	tests := []struct {
-		in   string
-		want *pipe.Pipe
+		desc string
+		pipe *pipe.Pipe
+		err  error
 	}{
 		{
-			in: `
-title: test
-description: test
-source:
-  type: file
-  path: ` + dir + `
-target:
-  type: file
-  path: ` + dir + `
-appinstaller:
-  disabled: true
-apt:
-  disabled: true
-sparkle:
-  disabled: true
-`,
-			want: &pipe.Pipe{},
+			desc: "empty",
+			pipe: &pipe.Pipe{},
+			err:  errors.New("no integrations configured"),
 		},
 		{
-			in: `
-title: test
-description: test
-source:
-  type: file
-  path: ` + dir + `
-target:
-  type: file
-  path: ` + dir + `
-`,
-			want: &pipe.Pipe{},
-		},
-		{
-			in: `
-title: test
-description: test
-source:
-  type: file
-  path: ` + dir + `
-target:
-  type: file
-  path: ` + dir + `
-appinstaller: {}
-apt: {}
-sparkle: {}
-`,
-			want: &pipe.Pipe{
+			desc: "all",
+			pipe: &pipe.Pipe{
 				Appinstaller: &appinstaller.Config{
 					Source: src,
-					Target: tgt.Sub("appinstaller"),
+					Target: tgt,
 				},
 				Apt: &apt.Config{
 					Source: src,
-					Target: tgt.Sub("apt"),
+					Target: tgt,
 				},
 				Sparkle: &sparkle.Config{
-					Title:       "test",
-					Description: "test",
-					Source:      src,
-					Target:      tgt.Sub("sparkle"),
-					FileName:    "appcast.xml",
-					Settings:    []sparkle.Rule{},
+					FileName: "appcast.xml",
+					Source:   src,
+					Target:   tgt,
+				},
+				Yum: &yum.Config{
+					Source: src,
+					Target: tgt,
 				},
 			},
 		},
 		{
-			in: `
-title: test
-description: test
-version: latest
-source:
-  type: file
-  path: ` + dir + `
-target:
-  type: file
-  path: ` + dir + `
-appinstaller:
-  folder: .
-  on-launch:
-    hours-between-update-checks: 12
-    show-prompt: true
-    update-blocks-activation: true
-  automatic-background-task: true
-  force-update-from-any-version: true  
-apt:
-  folder: .
-sparkle:
-  folder: .
-  filename: updates.xml
-  title: foo
-  description: bar
-  params:
-    - os: windows
-      installer-arguments: /passive
-    - os: macos
-      minimum-system-version: '10.13.0'
-    - version: '1.0.0'
-      critical-update: true
-    - version: '> 1.0.0'
-      critical-update-below-version: '1.0.0'
-      minimum-autoupdate-version: '1.0.0'
-    - version: '1.1.0'
-      ignore-skipped-upgrades-below-version: '1.1.0'
-`,
-			want: &pipe.Pipe{
+			desc: "appinstaller error",
+			pipe: &pipe.Pipe{
 				Appinstaller: &appinstaller.Config{
-					Source:  src,
-					Target:  tgt,
-					Version: "latest",
-					OnLaunch: &appinstaller.OnLaunchConfig{
-						HoursBetweenUpdateChecks: 12,
-						ShowPrompt:               true,
-						UpdateBlocksActivation:   true,
-					},
-					AutomaticBackgroundTask:   true,
-					ForceUpdateFromAnyVersion: true,
-				},
-				Apt: &apt.Config{
-					Source:  src,
-					Target:  tgt,
-					Version: "latest",
-				},
-				Sparkle: &sparkle.Config{
-					Title:       "foo",
-					Description: "bar",
-					Source:      src,
-					Target:      tgt,
-					FileName:    "updates.xml",
-					Version:     "latest",
-					DSAKey:      dsaKey,
-					Ed25519Key:  edKey,
-					Settings: []sparkle.Rule{
-						{
-							OS: sparkle.Windows,
-							Settings: &sparkle.Settings{
-								InstallerArguments: "/passive",
-							},
-						},
-						{
-							OS: sparkle.MacOS,
-							Settings: &sparkle.Settings{
-								MinimumSystemVersion: "10.13.0",
-							},
-						},
-						{
-							Version: "1.0.0",
-							Settings: &sparkle.Settings{
-								CriticalUpdate: true,
-							},
-						},
-						{
-							Version: "> 1.0.0",
-							Settings: &sparkle.Settings{
-								CriticalUpdateBelowVersion: "1.0.0",
-								MinimumAutoupdateVersion:   "1.0.0",
-							},
-						},
-						{
-							Version: "1.1.0",
-							Settings: &sparkle.Settings{
-								IgnoreSkippedUpgradesBelowVersion: "1.1.0",
-							},
-						},
-					},
+					Source: source.New(nil),
+					Target: tgt,
 				},
 			},
+			err: errors.New("failed to publish App Installer packages: missing source"),
+		},
+		{
+			desc: "apt error",
+			pipe: &pipe.Pipe{
+				Apt: &apt.Config{
+					Source: source.New(nil),
+					Target: tgt,
+				},
+			},
+			err: errors.New("failed to publish APT packages: missing source"),
+		},
+		{
+			desc: "sparkle error",
+			pipe: &pipe.Pipe{
+				Sparkle: &sparkle.Config{
+					FileName: "appcast.xml",
+					Source:   source.New(nil),
+					Target:   tgt,
+				},
+			},
+			err: errors.New("failed to publish Sparkle packages: missing source"),
+		},
+		{
+			desc: "yum error",
+			pipe: &pipe.Pipe{
+				Yum: &yum.Config{
+					Source: source.New(nil),
+					Target: tgt,
+				},
+			},
+			err: errors.New("failed to publish YUM packages: missing source"),
 		},
 	}
 
-	opts := test.ExportAll()
+	opts := cmp.Options{
+		test.ExportAll(),
+		test.CompareErrorMessages(),
+	}
 
-	for i, test := range tests {
-		dir := t.TempDir()
-		t.Setenv("APPCAST_PATH", dir)
-
-		if test.want.Sparkle != nil {
-			if test.want.Sparkle.DSAKey != nil {
-				b, _ := dsa.MarshalPrivateKey(test.want.Sparkle.DSAKey)
-				os.WriteFile(filepath.Join(dir, "dsa_key"), b, 0o600)
-			}
-			if test.want.Sparkle.Ed25519Key != nil {
-				b, _ := ed25519.MarshalPrivateKey(test.want.Sparkle.Ed25519Key)
-				os.WriteFile(filepath.Join(dir, "ed25519_key"), b, 0o600)
-			}
-		}
-
-		path := filepath.Join(t.TempDir(), "appcast.yml")
-		os.WriteFile(path, []byte(test.in), os.ModePerm)
-
-		c, err := pipe.Load(path)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
-
-		if diff := cmp.Diff(test.want, c, opts); diff != "" {
-			t.Error(i, diff)
+	for _, test := range tests {
+		err := test.pipe.Run(context.Background())
+		if diff := cmp.Diff(test.err, err, opts); diff != "" {
+			t.Errorf("%s:\n%s", test.desc, diff)
 		}
 	}
 }

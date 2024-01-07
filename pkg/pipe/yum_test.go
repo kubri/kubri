@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/apt"
+	"github.com/abemedia/appcast/integrations/yum"
 	"github.com/abemedia/appcast/pkg/crypto"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"github.com/abemedia/appcast/pkg/pipe"
@@ -13,7 +13,7 @@ import (
 	target "github.com/abemedia/appcast/target/file"
 )
 
-func TestApt(t *testing.T) {
+func TestYum(t *testing.T) {
 	dir := t.TempDir()
 	src, _ := source.New(source.Config{Path: dir})
 	tgt, _ := target.New(target.Config{Path: dir})
@@ -30,7 +30,7 @@ func TestApt(t *testing.T) {
 				target:
 					type: file
 					path: ` + dir + `
-				apt:
+				yum:
 					disabled: true
 			`,
 			want: &pipe.Pipe{},
@@ -44,32 +44,12 @@ func TestApt(t *testing.T) {
 				target:
 					type: file
 					path: ` + dir + `
-				apt: {}
+				yum: {}
 			`,
 			want: &pipe.Pipe{
-				Apt: &apt.Config{
+				Yum: &yum.Config{
 					Source: src,
-					Target: tgt.Sub("apt"),
-				},
-			},
-		},
-		{
-			desc: "no compression",
-			in: `
-				source:
-					type: file
-					path: ` + dir + `
-				target:
-					type: file
-					path: ` + dir + `
-				apt:
-					compress: [none]
-			`,
-			want: &pipe.Pipe{
-				Apt: &apt.Config{
-					Source:   src,
-					Target:   tgt.Sub("apt"),
-					Compress: apt.NoCompression,
+					Target: tgt.Sub("yum"),
 				},
 			},
 		},
@@ -84,41 +64,19 @@ func TestApt(t *testing.T) {
 				target:
 					type: file
 					path: ` + dir + `
-				apt:
+				yum:
 					folder: test
-					compress:
-						- gzip
-						- bzip2
-						- xz
-						- lzma
-						- lz4
-						- zstd
 			`,
 			hook: func() { secret.Put("pgp_key", keyBytes) },
 			want: &pipe.Pipe{
-				Apt: &apt.Config{
+				Yum: &yum.Config{
 					Source:     src,
 					Target:     tgt.Sub("test"),
 					Version:    "latest",
 					Prerelease: true,
 					PGPKey:     key,
-					Compress:   apt.GZIP | apt.BZIP2 | apt.XZ | apt.LZMA | apt.LZ4 | apt.ZSTD,
 				},
 			},
-		},
-		{
-			desc: "invalid compression",
-			in: `
-				source:
-					type: file
-					path: ` + dir + `
-				target:
-					type: file
-					path: ` + dir + `
-				apt:
-					compress: [invalid]
-			`,
-			err: fmt.Errorf("unknown compression algorithm: invalid"),
 		},
 		{
 			desc: "invalid pgp key",
@@ -129,7 +87,7 @@ func TestApt(t *testing.T) {
 				target:
 					type: file
 					path: ` + dir + `
-				apt: {}
+				yum: {}
 			`,
 			hook: func() { secret.Put("pgp_key", []byte("nope")) },
 			err:  fmt.Errorf("%w: no armored data found", crypto.ErrInvalidKey),

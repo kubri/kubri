@@ -61,6 +61,6 @@ func getSource(c sourceConfig) (*source.Source, error) {
 		}
 		return local.New(*opt)
 	default:
-		return nil, fmt.Errorf("invalid target type: %s", c["type"])
+		return nil, fmt.Errorf("invalid source type: %s", c["type"])
 	}
 }
