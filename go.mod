@@ -17,7 +17,7 @@ require (
 	github.com/cavaliergopher/rpm v1.2.0
 	github.com/dlclark/regexp2 v1.10.0
 	github.com/docker/docker v24.0.7+incompatible
-	github.com/docker/go-connections v0.4.0
+	github.com/docker/go-connections v0.5.0
 	github.com/dsnet/compress v0.0.1
 	github.com/fullstorydev/emulators/storage v0.0.0-20221201134230-39d0d46cb7ba
 	github.com/go-xmlfmt/xmlfmt v1.1.2
