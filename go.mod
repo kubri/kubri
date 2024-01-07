@@ -12,6 +12,7 @@ require (
 	bou.ke/monkey v1.0.2
 	dario.cat/mergo v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.2.1
+	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/ProtonMail/go-crypto v0.0.0-20230923063757-afb1ddc0824c
 	github.com/ProtonMail/gopenpgp/v2 v2.7.4
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
@@ -58,7 +59,6 @@ require (
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.0 // indirect
-	github.com/MakeNowJust/heredoc/v2 v2.0.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
