@@ -1,12 +1,12 @@
 package sparkle
 
 import (
+	"dario.cat/mergo"
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
 	"github.com/abemedia/appcast/pkg/version"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/target"
-	"github.com/imdario/mergo"
 )
 
 type Config struct {
