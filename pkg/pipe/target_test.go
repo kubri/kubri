@@ -14,6 +14,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	gh "github.com/google/go-github/github"
+	"github.com/mitchellh/mapstructure"
 )
 
 func TestTarget(t *testing.T) {
@@ -22,6 +23,7 @@ func TestTarget(t *testing.T) {
 	tests := []struct {
 		in   targetConfig
 		want func() (target.Target, error)
+		err  error
 	}{
 		{
 			in: targetConfig{
@@ -31,6 +33,13 @@ func TestTarget(t *testing.T) {
 			want: func() (target.Target, error) {
 				return file.New(file.Config{Path: dir})
 			},
+		},
+		{
+			in: targetConfig{
+				"type": "file",
+				"path": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Path' expected type 'string', got unconvertible type 'int', value: '1'"}},
 		},
 		{
 			in: targetConfig{
@@ -44,6 +53,13 @@ func TestTarget(t *testing.T) {
 		},
 		{
 			in: targetConfig{
+				"type":   "s3",
+				"bucket": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
+		},
+		{
+			in: targetConfig{
 				"type":   "gcs",
 				"bucket": "test",
 				"folder": "test",
@@ -52,6 +68,13 @@ func TestTarget(t *testing.T) {
 				t.Setenv("STORAGE_EMULATOR_HOST", "test")
 				return gcs.New(gcs.Config{Bucket: "test", Folder: "test"})
 			},
+		},
+		{
+			in: targetConfig{
+				"type":   "gcs",
+				"bucket": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
 		},
 		{
 			in: targetConfig{
@@ -67,6 +90,13 @@ func TestTarget(t *testing.T) {
 		},
 		{
 			in: targetConfig{
+				"type":   "azureblob",
+				"bucket": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
+		},
+		{
+			in: targetConfig{
 				"type":  "github",
 				"owner": "abemedia",
 				"repo":  "appcast",
@@ -74,6 +104,13 @@ func TestTarget(t *testing.T) {
 			want: func() (target.Target, error) {
 				return github.New(github.Config{Owner: "abemedia", Repo: "appcast"})
 			},
+		},
+		{
+			in: targetConfig{
+				"type":  "github",
+				"owner": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Owner' expected type 'string', got unconvertible type 'int', value: '1'"}},
 		},
 	}
 
@@ -89,20 +126,22 @@ func TestTarget(t *testing.T) {
 		cmpopts.IgnoreTypes(gh.Rate{}),
 	}
 
-	for i, test := range tests {
-		want, err := test.want()
-		if err != nil {
-			t.Fatal(err)
+	for _, test := range tests {
+		var want target.Target
+		if test.want != nil {
+			w, err := test.want()
+			if err != nil {
+				t.Fatal(err)
+			}
+			want = w
 		}
 
-		s, err := getTarget(test.in)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
+		got, err := getTarget(test.in)
 
-		if diff := cmp.Diff(want, s, opts); diff != "" {
-			t.Error(i, diff)
+		if diff := cmp.Diff(test.err, err, opts); diff != "" {
+			t.Errorf("%s:\n%s", test.in["type"], diff)
+		} else if diff := cmp.Diff(want, got, opts); diff != "" {
+			t.Errorf("%s:\n%s", test.in["type"], diff)
 		}
 	}
 }
