@@ -1,6 +1,7 @@
 package test
 
 import (
+	"crypto/rsa"
 	"log"
 	"reflect"
 
@@ -39,6 +40,16 @@ func ComparePGPKeys() cmp.Option {
 			return a == b
 		}
 		return a.GetFingerprint() == b.GetFingerprint()
+	})
+}
+
+// CompareRSAPrivateKeys compares RSA private keys.
+func CompareRSAPrivateKeys() cmp.Option {
+	return cmp.Comparer(func(a, b *rsa.PrivateKey) bool {
+		if a == nil || b == nil {
+			return a == b
+		}
+		return a.Equal(b)
 	})
 }
 

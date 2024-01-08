@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/abemedia/appcast/integrations/apk"
 	"github.com/abemedia/appcast/integrations/appinstaller"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/sparkle"
@@ -27,6 +28,7 @@ type config struct {
 	UploadPackages bool                `yaml:"upload-packages"`
 	Source         sourceConfig        `yaml:"source"`
 	Target         targetConfig        `yaml:"target"`
+	Apk            *apkConfig          `yaml:"apk"`
 	Apt            *aptConfig          `yaml:"apt"`
 	Yum            *yumConfig          `yaml:"yum"`
 	Sparkle        *sparkleConfig      `yaml:"sparkle"`
@@ -37,17 +39,30 @@ type config struct {
 }
 
 type Pipe struct {
+	Apk          *apk.Config
 	Appinstaller *appinstaller.Config
 	Apt          *apt.Config
 	Yum          *yum.Config
 	Sparkle      *sparkle.Config
 }
 
+//nolint:funlen
 func (p *Pipe) Run(ctx context.Context) error {
 	var n int
 	start := time.Now()
 	g, ctx := errgroup.WithContext(ctx)
 
+	if p.Apk != nil {
+		n++
+		g.Go(func() error {
+			log.Print("Publishing APK packages...")
+			if err := apk.Build(ctx, p.Apk); err != nil {
+				return fmt.Errorf("failed to publish APK packages: %w", err)
+			}
+			log.Print("Completed publishing APK packages.")
+			return nil
+		})
+	}
 	if p.Appinstaller != nil {
 		n++
 		g.Go(func() error {
@@ -124,6 +139,11 @@ func Load(path string) (*Pipe, error) {
 	}
 
 	var p Pipe
+	if c.Apk != nil && !c.Apk.Disabled {
+		if p.Apk, err = getApk(c); err != nil {
+			return nil, err
+		}
+	}
 	if c.Appinstaller != nil && !c.Appinstaller.Disabled {
 		p.Appinstaller = getAppinstaller(c)
 	}

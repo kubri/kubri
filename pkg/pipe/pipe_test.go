@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/abemedia/appcast/integrations/apk"
 	"github.com/abemedia/appcast/integrations/appinstaller"
 	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/abemedia/appcast/integrations/sparkle"
@@ -118,6 +119,10 @@ func TestPipe(t *testing.T) {
 		{
 			desc: "all",
 			pipe: &pipe.Pipe{
+				Apk: &apk.Config{
+					Source: src,
+					Target: tgt,
+				},
 				Appinstaller: &appinstaller.Config{
 					Source: src,
 					Target: tgt,
@@ -146,6 +151,16 @@ func TestPipe(t *testing.T) {
 				},
 			},
 			err: errors.New("failed to publish App Installer packages: missing source"),
+		},
+		{
+			desc: "apk error",
+			pipe: &pipe.Pipe{
+				Apk: &apk.Config{
+					Source: source.New(nil),
+					Target: tgt,
+				},
+			},
+			err: errors.New("failed to publish APK packages: missing source"),
 		},
 		{
 			desc: "apt error",

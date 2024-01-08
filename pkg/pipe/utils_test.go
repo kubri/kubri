@@ -30,6 +30,7 @@ func runTest(t *testing.T, tests []testCase) {
 	opts := cmp.Options{
 		test.ExportAll(),
 		test.ComparePGPKeys(),
+		test.CompareRSAPrivateKeys(),
 	}
 
 	for _, test := range tests {
