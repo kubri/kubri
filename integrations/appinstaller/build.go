@@ -47,7 +47,7 @@ func Build(ctx context.Context, c *Config) error {
 		var ok bool
 		for _, asset := range r.Assets {
 			switch path.Ext(asset.Name) {
-			case ".msix", ".appx", ".msixbundle", "appxbundle":
+			case ".msix", ".appx", ".msixbundle", ".appxbundle":
 				ok = true
 				if err := build(ctx, c, r.Version, asset); err != nil {
 					return err
