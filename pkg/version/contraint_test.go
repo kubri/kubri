@@ -96,5 +96,8 @@ func TestConstraintError(t *testing.T) {
 		if err == nil {
 			t.Errorf("%q should return error", v)
 		}
+		if version.Check(v, "1.0.0") {
+			t.Errorf("%q should return false", v)
+		}
 	}
 }

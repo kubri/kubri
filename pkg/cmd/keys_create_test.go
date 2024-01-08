@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/abemedia/appcast/pkg/cmd"
@@ -19,6 +20,15 @@ func TestKeysCreateCmd(t *testing.T) {
 		_, err := secret.Get(s + "_key")
 		if err == nil {
 			t.Fatalf("should not have %s key: %s", s, err)
+		}
+	}
+
+	{
+		wantErr := "generating PGP key requires either name or email"
+		var stderr bytes.Buffer
+		err := cmd.Execute("", cmd.WithArgs("keys", "create"), cmd.WithStderr(&stderr))
+		if err == nil || !strings.Contains(stderr.String(), wantErr) {
+			t.Errorf("should fail with %q:\n%s", wantErr, &stderr)
 		}
 	}
 
