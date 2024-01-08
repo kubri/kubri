@@ -15,6 +15,7 @@ import (
 	"github.com/abemedia/appcast/source/s3"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/mitchellh/mapstructure"
 )
 
 func TestSource(t *testing.T) {
@@ -23,6 +24,7 @@ func TestSource(t *testing.T) {
 	tests := []struct {
 		in   sourceConfig
 		want func() (*source.Source, error)
+		err  error
 	}{
 		{
 			in: sourceConfig{
@@ -32,6 +34,13 @@ func TestSource(t *testing.T) {
 			want: func() (*source.Source, error) {
 				return file.New(file.Config{Path: dir})
 			},
+		},
+		{
+			in: sourceConfig{
+				"type": "file",
+				"path": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Path' expected type 'string', got unconvertible type 'int', value: '1'"}},
 		},
 		{
 			in: sourceConfig{
@@ -45,6 +54,13 @@ func TestSource(t *testing.T) {
 		},
 		{
 			in: sourceConfig{
+				"type":   "s3",
+				"bucket": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
+		},
+		{
+			in: sourceConfig{
 				"type":   "gcs",
 				"bucket": "test",
 				"folder": "test",
@@ -53,6 +69,13 @@ func TestSource(t *testing.T) {
 				t.Setenv("STORAGE_EMULATOR_HOST", "test")
 				return gcs.New(gcs.Config{Bucket: "test", Folder: "test"})
 			},
+		},
+		{
+			in: sourceConfig{
+				"type":   "gcs",
+				"bucket": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
 		},
 		{
 			in: sourceConfig{
@@ -68,6 +91,13 @@ func TestSource(t *testing.T) {
 		},
 		{
 			in: sourceConfig{
+				"type":   "azureblob",
+				"bucket": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
+		},
+		{
+			in: sourceConfig{
 				"type":  "github",
 				"owner": "test",
 				"repo":  "test",
@@ -75,6 +105,13 @@ func TestSource(t *testing.T) {
 			want: func() (*source.Source, error) {
 				return github.New(github.Config{Owner: "test", Repo: "test"})
 			},
+		},
+		{
+			in: sourceConfig{
+				"type":  "github",
+				"owner": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Owner' expected type 'string', got unconvertible type 'int', value: '1'"}},
 		},
 		{
 			in: sourceConfig{
@@ -88,6 +125,13 @@ func TestSource(t *testing.T) {
 		},
 		{
 			in: sourceConfig{
+				"type":  "gitlab",
+				"owner": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Owner' expected type 'string', got unconvertible type 'int', value: '1'"}},
+		},
+		{
+			in: sourceConfig{
 				"type":    "local",
 				"path":    dir,
 				"version": "v1.0.0",
@@ -95,6 +139,13 @@ func TestSource(t *testing.T) {
 			want: func() (*source.Source, error) {
 				return local.New(local.Config{Path: dir, Version: "v1.0.0"})
 			},
+		},
+		{
+			in: sourceConfig{
+				"type": "local",
+				"path": 1,
+			},
+			err: &mapstructure.Error{Errors: []string{"'Path' expected type 'string', got unconvertible type 'int', value: '1'"}},
 		},
 	}
 
@@ -107,20 +158,22 @@ func TestSource(t *testing.T) {
 		cmpopts.IgnoreFields(container.Client{}, "inner.internal.pl"),
 	}
 
-	for i, test := range tests {
-		want, err := test.want()
-		if err != nil {
-			t.Fatal(err)
+	for _, test := range tests {
+		var want *source.Source
+		if test.want != nil {
+			w, err := test.want()
+			if err != nil {
+				t.Fatal(err)
+			}
+			want = w
 		}
 
-		s, err := getSource(test.in)
-		if err != nil {
-			t.Error(err)
-			continue
-		}
+		got, err := getSource(test.in)
 
-		if diff := cmp.Diff(want, s, opts); diff != "" {
-			t.Error(i, diff)
+		if diff := cmp.Diff(test.err, err, opts); diff != "" {
+			t.Errorf("%s:\n%s", test.in["type"], diff)
+		} else if diff := cmp.Diff(want, got, opts); diff != "" {
+			t.Errorf("%s:\n%s", test.in["type"], diff)
 		}
 	}
 }
