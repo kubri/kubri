@@ -1,0 +1,464 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "prerelease": {
+      "type": "boolean"
+    },
+    "upload-packages": {
+      "type": "boolean"
+    },
+    "source": {
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "azureblob"
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "bucket"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "gcs"
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "bucket"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "s3"
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            },
+            "endpoint": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "disable-ssl": {
+              "type": "boolean"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "bucket"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "file"
+            },
+            "path": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "path"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "github"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "repo": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "owner",
+            "repo"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "gitlab"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "repo": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "owner",
+            "repo"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "local"
+            },
+            "path": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "path",
+            "version"
+          ]
+        }
+      ]
+    },
+    "target": {
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "azureblob"
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "bucket"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "gcs"
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "bucket"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "s3"
+            },
+            "bucket": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            },
+            "endpoint": {
+              "type": "string"
+            },
+            "region": {
+              "type": "string"
+            },
+            "disable-ssl": {
+              "type": "boolean"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "bucket"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "file"
+            },
+            "path": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "path"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "github"
+            },
+            "owner": {
+              "type": "string"
+            },
+            "repo": {
+              "type": "string"
+            },
+            "branch": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "owner",
+            "repo"
+          ]
+        }
+      ]
+    },
+    "apk": {
+      "properties": {
+        "disabled": {
+          "type": "boolean"
+        },
+        "folder": {
+          "type": "string"
+        },
+        "key-name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "apt": {
+      "properties": {
+        "disabled": {
+          "type": "boolean"
+        },
+        "folder": {
+          "type": "string"
+        },
+        "compress": {
+          "items": {
+            "type": "string",
+            "enum": [
+              "none",
+              "gzip",
+              "bzip2",
+              "xz",
+              "lzma",
+              "lz4",
+              "zstd"
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "yum": {
+      "properties": {
+        "disabled": {
+          "type": "boolean"
+        },
+        "folder": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "sparkle": {
+      "properties": {
+        "disabled": {
+          "type": "boolean"
+        },
+        "folder": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "detect-os": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "params": {
+          "items": {
+            "properties": {
+              "os": {
+                "type": "string",
+                "enum": [
+                  "macos",
+                  "windows",
+                  "windows-x86",
+                  "windows-x64"
+                ]
+              },
+              "version": {
+                "type": "string"
+              },
+              "installer-arguments": {
+                "type": "string"
+              },
+              "minimum-system-version": {
+                "type": "string"
+              },
+              "minimum-autoupdate-version": {
+                "type": "string"
+              },
+              "ignore-skipped-upgrades-below-version": {
+                "type": "string"
+              },
+              "critical-update": {
+                "type": "boolean"
+              },
+              "critical-update-below-version": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "appinstaller": {
+      "properties": {
+        "disabled": {
+          "type": "boolean"
+        },
+        "folder": {
+          "type": "string"
+        },
+        "on-launch": {
+          "properties": {
+            "hours-between-update-checks": {
+              "type": "integer"
+            },
+            "show-prompt": {
+              "type": "boolean"
+            },
+            "update-blocks-activation": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object"
+        },
+        "automatic-background-task": {
+          "type": "boolean"
+        },
+        "force-update-from-any-version": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "source",
+    "target"
+  ]
+}

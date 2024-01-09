@@ -10,24 +10,24 @@ import (
 )
 
 type sparkleConfig struct {
-	Disabled    bool                  `yaml:"disabled"`
-	Folder      string                `yaml:"folder"`
-	Title       string                `yaml:"title"`
-	Description string                `yaml:"description"`
-	Filename    string                `yaml:"filename"`
-	DetectOS    map[sparkle.OS]string `yaml:"detect-os"`
+	Disabled    bool                  `yaml:"disabled,omitempty"`
+	Folder      string                `yaml:"folder,omitempty"`
+	Title       string                `yaml:"title,omitempty"`
+	Description string                `yaml:"description,omitempty"`
+	Filename    string                `yaml:"filename,omitempty"`
+	DetectOS    map[sparkle.OS]string `yaml:"detect-os,omitempty"`
 	Params      []struct {
-		OS       sparkle.OS `yaml:"os"`
-		Version  string     `yaml:"version"`
+		OS       sparkle.OS `yaml:"os,omitempty"      jsonschema:"type=string,enum=macos,enum=windows,enum=windows-x86,enum=windows-x64"` //nolint:lll
+		Version  string     `yaml:"version,omitempty"`
 		Settings *struct {
-			InstallerArguments                string `yaml:"installer-arguments"`
-			MinimumSystemVersion              string `yaml:"minimum-system-version"`
-			MinimumAutoupdateVersion          string `yaml:"minimum-autoupdate-version"`
-			IgnoreSkippedUpgradesBelowVersion string `yaml:"ignore-skipped-upgrades-below-version"`
-			CriticalUpdate                    bool   `yaml:"critical-update"`
-			CriticalUpdateBelowVersion        string `yaml:"critical-update-below-version"`
+			InstallerArguments                string `yaml:"installer-arguments,omitempty"`
+			MinimumSystemVersion              string `yaml:"minimum-system-version,omitempty"`
+			MinimumAutoupdateVersion          string `yaml:"minimum-autoupdate-version,omitempty"`
+			IgnoreSkippedUpgradesBelowVersion string `yaml:"ignore-skipped-upgrades-below-version,omitempty"`
+			CriticalUpdate                    bool   `yaml:"critical-update,omitempty"`
+			CriticalUpdateBelowVersion        string `yaml:"critical-update-below-version,omitempty"`
 		} `yaml:",inline"`
-	} `yaml:"params"`
+	} `yaml:"params,omitempty"`
 }
 
 func getSparkle(c *config) (*sparkle.Config, error) {

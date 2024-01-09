@@ -107,20 +107,6 @@ func TestApt(t *testing.T) {
 			},
 		},
 		{
-			desc: "invalid compression",
-			in: `
-				source:
-					type: file
-					path: ` + dir + `
-				target:
-					type: file
-					path: ` + dir + `
-				apt:
-					compress: [invalid]
-			`,
-			err: fmt.Errorf("unknown compression algorithm: invalid"),
-		},
-		{
 			desc: "invalid pgp key",
 			in: `
 				source:

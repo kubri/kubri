@@ -54,7 +54,7 @@ func rootCmd(version string) *cobra.Command {
 
 	cmd.PersistentFlags().BoolVarP(&silent, "silent", "s", false, "only log fatal errors")
 
-	cmd.AddCommand(buildCmd(), keysCmd(), versionCmd(version))
+	cmd.AddCommand(buildCmd(), keysCmd(), jsonschemaCmd(), versionCmd(version))
 
 	return cmd
 }

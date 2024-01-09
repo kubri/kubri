@@ -9,9 +9,9 @@ import (
 )
 
 type aptConfig struct {
-	Disabled bool     `yaml:"disabled"`
-	Folder   string   `yaml:"folder"`
-	Compress []string `yaml:"compress"`
+	Disabled bool     `yaml:"disabled,omitempty"`
+	Folder   string   `yaml:"folder,omitempty"`
+	Compress []string `yaml:"compress,omitempty" jsonschema:"enum=none,enum=gzip,enum=bzip2,enum=xz,enum=lzma,enum=lz4,enum=zstd"` //nolint:lll
 }
 
 func getApt(c *config) (*apt.Config, error) {

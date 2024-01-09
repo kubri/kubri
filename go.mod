@@ -2,11 +2,12 @@ module github.com/abemedia/appcast
 
 go 1.21
 
-// TODO: Remove and enable gomoddirectives linter when the following PRs are merged:
-// https://github.com/cavaliergopher/rpm/pull/29
-// https://github.com/cavaliergopher/rpm/pull/30
-// https://github.com/cavaliergopher/rpm/pull/31
-replace github.com/cavaliergopher/rpm => github.com/abemedia/rpm v0.0.0-20230903161415-49b78cf4b264
+// TODO: Remove when v1.3.0 is released:
+replace github.com/cavaliergopher/rpm v1.2.0 => github.com/abemedia/rpm v0.0.0-20230903161415-49b78cf4b264
+
+// TODO: Remove when the following PR is merged:
+// https://github.com/invopop/jsonschema/pull/126
+replace github.com/invopop/jsonschema v0.12.0 => github.com/abemedia/jsonschema v0.0.0-20240108235924-6da915f1869e
 
 require (
 	bou.ke/monkey v1.0.2
@@ -27,14 +28,15 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/goreleaser/nfpm/v2 v2.35.2
 	github.com/hashicorp/go-retryablehttp v0.7.5
+	github.com/invopop/jsonschema v0.12.0
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.17.4
-	github.com/mitchellh/mapstructure v1.5.0
 	github.com/pierrec/lz4 v2.6.1+incompatible
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.8.0
 	github.com/testcontainers/testcontainers-go v0.27.0
 	github.com/ulikunitz/xz v0.5.11
+	github.com/wk8/go-ordered-map/v2 v2.1.8
 	github.com/xanzy/go-gitlab v0.95.2
 	gitlab.alpinelinux.org/alpine/go v0.8.0
 	gocloud.dev v0.36.0
@@ -85,7 +87,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.21.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.26.5 // indirect
 	github.com/aws/smithy-go v1.19.0 // indirect
+	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
+	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cavaliergopher/cpio v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
@@ -128,6 +132,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect

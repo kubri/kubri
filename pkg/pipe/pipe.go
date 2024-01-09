@@ -1,6 +1,7 @@
 package pipe
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -21,18 +22,18 @@ import (
 )
 
 type config struct {
-	Title          string              `yaml:"title"`
-	Description    string              `yaml:"description"`
-	Version        string              `yaml:"version"`
-	Prerelease     bool                `yaml:"prerelease"`
-	UploadPackages bool                `yaml:"upload-packages"`
-	Source         sourceConfig        `yaml:"source"`
-	Target         targetConfig        `yaml:"target"`
-	Apk            *apkConfig          `yaml:"apk"`
-	Apt            *aptConfig          `yaml:"apt"`
-	Yum            *yumConfig          `yaml:"yum"`
-	Sparkle        *sparkleConfig      `yaml:"sparkle"`
-	Appinstaller   *appinstallerConfig `yaml:"appinstaller"`
+	Title          string              `yaml:"title,omitempty"`
+	Description    string              `yaml:"description,omitempty"`
+	Version        string              `yaml:"version,omitempty"`
+	Prerelease     bool                `yaml:"prerelease,omitempty"`
+	UploadPackages bool                `yaml:"upload-packages,omitempty"`
+	Source         *sourceConfig       `yaml:"source"`
+	Target         *targetConfig       `yaml:"target"`
+	Apk            *apkConfig          `yaml:"apk,omitempty"`
+	Apt            *aptConfig          `yaml:"apt,omitempty"`
+	Yum            *yumConfig          `yaml:"yum,omitempty"`
+	Sparkle        *sparkleConfig      `yaml:"sparkle,omitempty"`
+	Appinstaller   *appinstallerConfig `yaml:"appinstaller,omitempty"`
 
 	source *source.Source
 	target target.Target
@@ -127,8 +128,11 @@ func Load(path string) (*Pipe, error) {
 		return nil, err
 	}
 
+	dec := yaml.NewDecoder(bytes.NewReader(b))
+	dec.KnownFields(true)
+
 	c := &config{}
-	if err = yaml.Unmarshal(b, c); err != nil {
+	if err = dec.Decode(c); err != nil {
 		return nil, err
 	}
 	if c.source, err = getSource(c.Source); err != nil {

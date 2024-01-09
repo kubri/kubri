@@ -19,14 +19,15 @@ import (
 	"github.com/abemedia/appcast/source"
 	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
+	"gopkg.in/yaml.v3"
 )
 
 func TestLoad(t *testing.T) {
 	tests := []struct {
 		config string
 		path   string
-		err    error
 		mode   fs.FileMode
+		err    error
 	}{
 		{path: "appcast.yml"},
 		{path: "appcast.yaml"},
@@ -49,24 +50,9 @@ func TestLoad(t *testing.T) {
 			config: `*&%^`,
 		},
 		{
-			path: "appcast.yml",
-			err:  errors.New("invalid source type: nope"),
-			config: `
-				source:
-					type: nope
-				target:
-					type: file
-					path: ` + t.TempDir(),
-		},
-		{
-			path: "appcast.yml",
-			err:  errors.New("invalid target type: nope"),
-			config: `
-				source:
-					type: file
-					path: ` + t.TempDir() + `
-				target:
-					type: nope`,
+			path:   "appcast.yml",
+			config: `foo: bar`,
+			err:    &yaml.TypeError{Errors: []string{"line 1: field foo not found in type pipe.config"}},
 		},
 	}
 
@@ -74,6 +60,9 @@ func TestLoad(t *testing.T) {
 		test.ExportAll(),
 		test.CompareErrorMessages(),
 	}
+
+	wd, _ := os.Getwd()
+	defer os.Chdir(wd)
 
 	for _, test := range tests {
 		if test.config == "" {
