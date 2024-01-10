@@ -9,9 +9,9 @@ import (
 )
 
 type apkConfig struct {
-	Disabled bool   `yaml:"disabled"`
-	Folder   string `yaml:"folder"`
-	KeyName  string `yaml:"key-name"`
+	Disabled bool   `yaml:"disabled,omitempty"`
+	Folder   string `yaml:"folder,omitempty"`
+	KeyName  string `yaml:"key-name,omitempty"`
 }
 
 func getApk(c *config) (*apk.Config, error) {

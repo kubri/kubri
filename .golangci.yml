@@ -84,7 +84,10 @@ linters-settings:
       rules:
         yaml: kebab
         deb: header
-
+  tagalign:
+    order:
+      - yaml
+      - jsonschema
 issues:
   fix: true
   exclude-rules:

@@ -1,10 +1,14 @@
-package pipe //nolint:testpackage
+package pipe_test
 
 import (
+	"errors"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	"github.com/abemedia/appcast/internal/test"
+	"github.com/abemedia/appcast/pkg/pipe"
 	"github.com/abemedia/appcast/target"
 	"github.com/abemedia/appcast/target/azureblob"
 	"github.com/abemedia/appcast/target/file"
@@ -14,74 +18,62 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	gh "github.com/google/go-github/github"
-	"github.com/mitchellh/mapstructure"
+	"gopkg.in/yaml.v3"
 )
 
 func TestTarget(t *testing.T) {
 	dir := t.TempDir()
 
 	tests := []struct {
-		in   targetConfig
+		desc string
+		in   string
 		want func() (target.Target, error)
 		err  error
 	}{
 		{
-			in: targetConfig{
-				"type": "file",
-				"path": dir,
-			},
+			desc: "file",
+			in: `
+				target:
+					type: file
+					path: ` + dir + `
+			`,
 			want: func() (target.Target, error) {
 				return file.New(file.Config{Path: dir})
 			},
 		},
 		{
-			in: targetConfig{
-				"type": "file",
-				"path": 1,
-			},
-			err: &mapstructure.Error{Errors: []string{"'Path' expected type 'string', got unconvertible type 'int', value: '1'"}},
-		},
-		{
-			in: targetConfig{
-				"type":   "s3",
-				"bucket": "test",
-				"folder": "test",
-			},
+			desc: "s3",
+			in: `
+				target:
+					type: s3
+					bucket: test
+					folder: test
+			`,
 			want: func() (target.Target, error) {
 				return s3.New(s3.Config{Bucket: "test", Folder: "test"})
 			},
 		},
 		{
-			in: targetConfig{
-				"type":   "s3",
-				"bucket": 1,
-			},
-			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
-		},
-		{
-			in: targetConfig{
-				"type":   "gcs",
-				"bucket": "test",
-				"folder": "test",
-			},
+			desc: "gcs",
+			in: `
+				target:
+					type: gcs
+					bucket: test
+					folder: test
+			`,
 			want: func() (target.Target, error) {
 				t.Setenv("STORAGE_EMULATOR_HOST", "test")
 				return gcs.New(gcs.Config{Bucket: "test", Folder: "test"})
 			},
 		},
 		{
-			in: targetConfig{
-				"type":   "gcs",
-				"bucket": 1,
-			},
-			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
-		},
-		{
-			in: targetConfig{
-				"type":   "azureblob",
-				"bucket": "test",
-				"folder": "test",
-			},
+			desc: "azureblob",
+			in: `
+				target:
+					type: azureblob
+					bucket: test
+					folder: test
+			`,
 			want: func() (target.Target, error) {
 				t.Setenv("AZURE_STORAGE_ACCOUNT", "test")
 				t.Setenv("AZURE_STORAGE_KEY", "test")
@@ -89,28 +81,34 @@ func TestTarget(t *testing.T) {
 			},
 		},
 		{
-			in: targetConfig{
-				"type":   "azureblob",
-				"bucket": 1,
-			},
-			err: &mapstructure.Error{Errors: []string{"'Bucket' expected type 'string', got unconvertible type 'int', value: '1'"}},
-		},
-		{
-			in: targetConfig{
-				"type":  "github",
-				"owner": "abemedia",
-				"repo":  "appcast",
-			},
+			desc: "github",
+			in: `
+				target:
+					type: github
+					owner: abemedia
+					repo: appcast
+					branch: master
+					folder: test
+			`,
 			want: func() (target.Target, error) {
-				return github.New(github.Config{Owner: "abemedia", Repo: "appcast"})
+				return github.New(github.Config{Owner: "abemedia", Repo: "appcast", Branch: "master", Folder: "test"})
 			},
 		},
 		{
-			in: targetConfig{
-				"type":  "github",
-				"owner": 1,
-			},
-			err: &mapstructure.Error{Errors: []string{"'Owner' expected type 'string', got unconvertible type 'int', value: '1'"}},
+			desc: "invalid type",
+			in: `
+				target:
+					type: nope
+			`,
+			err: errors.New("target: invalid type"),
+		},
+		{
+			desc: "unmarshal error",
+			in: `
+				target:
+					type: {}
+			`,
+			err: &yaml.TypeError{Errors: []string{"line 2: cannot unmarshal !!map into string"}},
 		},
 	}
 
@@ -136,12 +134,29 @@ func TestTarget(t *testing.T) {
 			want = w
 		}
 
-		got, err := getTarget(test.in)
+		baseConfig := `
+			source:
+				type: file
+				path: ` + dir + `
+			apk:
+				folder: .
+		`
+
+		config := append(clean(test.in), clean(baseConfig)...)
+		path := filepath.Join(t.TempDir(), "appcast.yml")
+		os.WriteFile(path, config, os.ModePerm)
+
+		p, err := pipe.Load(path)
+
+		var got target.Target
+		if p != nil && p.Apk != nil {
+			got = p.Apk.Target
+		}
 
 		if diff := cmp.Diff(test.err, err, opts); diff != "" {
-			t.Errorf("%s:\n%s", test.in["type"], diff)
+			t.Errorf("%s:\n%s", test.desc, diff)
 		} else if diff := cmp.Diff(want, got, opts); diff != "" {
-			t.Errorf("%s:\n%s", test.in["type"], diff)
+			t.Errorf("%s:\n%s", test.desc, diff)
 		}
 	}
 }

@@ -3,15 +3,15 @@ package pipe
 import "github.com/abemedia/appcast/integrations/appinstaller"
 
 type appinstallerConfig struct {
-	Disabled bool   `yaml:"disabled"`
-	Folder   string `yaml:"folder"`
+	Disabled bool   `yaml:"disabled,omitempty"`
+	Folder   string `yaml:"folder,omitempty"`
 	OnLaunch *struct {
-		HoursBetweenUpdateChecks int  `yaml:"hours-between-update-checks"`
-		ShowPrompt               bool `yaml:"show-prompt"`
-		UpdateBlocksActivation   bool `yaml:"update-blocks-activation"`
-	} `yaml:"on-launch"`
-	AutomaticBackgroundTask   bool `yaml:"automatic-background-task"`
-	ForceUpdateFromAnyVersion bool `yaml:"force-update-from-any-version"`
+		HoursBetweenUpdateChecks int  `yaml:"hours-between-update-checks,omitempty"`
+		ShowPrompt               bool `yaml:"show-prompt,omitempty"`
+		UpdateBlocksActivation   bool `yaml:"update-blocks-activation,omitempty"`
+	} `yaml:"on-launch,omitempty"`
+	AutomaticBackgroundTask   bool `yaml:"automatic-background-task,omitempty"`
+	ForceUpdateFromAnyVersion bool `yaml:"force-update-from-any-version,omitempty"`
 }
 
 func getAppinstaller(c *config) *appinstaller.Config {

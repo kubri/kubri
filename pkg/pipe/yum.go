@@ -7,8 +7,8 @@ import (
 )
 
 type yumConfig struct {
-	Disabled bool   `yaml:"disabled"`
-	Folder   string `yaml:"folder"`
+	Disabled bool   `yaml:"disabled,omitempty"`
+	Folder   string `yaml:"folder,omitempty"`
 }
 
 func getYum(c *config) (*yum.Config, error) {
