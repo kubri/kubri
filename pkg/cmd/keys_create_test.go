@@ -2,6 +2,7 @@ package cmd_test
 
 import (
 	"bytes"
+	"io"
 	"strings"
 	"testing"
 
@@ -26,7 +27,7 @@ func TestKeysCreateCmd(t *testing.T) {
 	{
 		wantErr := "generating PGP key requires either name or email"
 		var stderr bytes.Buffer
-		err := cmd.Execute("", cmd.WithArgs("keys", "create"), cmd.WithStderr(&stderr))
+		err := cmd.Execute("", cmd.WithArgs("keys", "create"), cmd.WithStderr(&stderr), cmd.WithStdout(io.Discard))
 		if err == nil || !strings.Contains(stderr.String(), wantErr) {
 			t.Errorf("should fail with %q:\n%s", wantErr, &stderr)
 		}
@@ -74,7 +75,7 @@ func TestKeysCreateCmd(t *testing.T) {
 	}
 
 	// Run again to ensure existing keys aren't overwritten.
-	err = cmd.Execute("", cmd.WithArgs("keys", "create"))
+	err = cmd.Execute("", cmd.WithArgs("keys", "create", "--name", "test", "--email", "test@example.com"))
 	if err != nil {
 		t.Fatal(err)
 	}
