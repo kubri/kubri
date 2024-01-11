@@ -107,6 +107,26 @@ func TestApt(t *testing.T) {
 			},
 		},
 		{
+			desc: "validation",
+			in: `
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				apt:
+					folder: '*'
+					compress: [invalid]
+			`,
+			err: &pipe.Error{
+				Errors: []string{
+					"apt.folder must be a valid folder name",
+					"apt.compress[0] must be one of [none gzip bzip2 xz lzma lz4 zstd]",
+				},
+			},
+		},
+		{
 			desc: "invalid pgp key",
 			in: `
 				source:

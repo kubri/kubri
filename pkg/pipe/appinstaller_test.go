@@ -86,5 +86,51 @@ func TestAppInstaller(t *testing.T) {
 				},
 			},
 		},
+		{
+			desc: "invalid folder",
+			in: `
+				version: latest
+				prerelease: true
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				appinstaller:
+					folder: '*'
+			`,
+			err: &pipe.Error{Errors: []string{"appinstaller.folder must be a valid folder name"}},
+		},
+		{
+			desc: "hours-between-update-checks below 0",
+			in: `
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				appinstaller:
+					on-launch:
+						hours-between-update-checks: -1
+			`,
+			err: &pipe.Error{Errors: []string{"appinstaller.on-launch.hours-between-update-checks must be 0 or greater"}},
+		},
+		{
+			desc: "hours-between-update-checks above 255",
+			in: `
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				appinstaller:
+					on-launch:
+						hours-between-update-checks: 256
+			`,
+			err: &pipe.Error{Errors: []string{"appinstaller.on-launch.hours-between-update-checks must be 255 or less"}},
+		},
 	})
 }

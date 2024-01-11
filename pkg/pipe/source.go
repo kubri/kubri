@@ -1,8 +1,6 @@
 package pipe
 
 import (
-	"errors"
-
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/source/azureblob"
 	"github.com/abemedia/appcast/source/file"
@@ -14,8 +12,6 @@ import (
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
 )
-
-var errInvalidSource = errors.New("source: invalid type")
 
 type sourceConfig struct {
 	*azureblobSource
@@ -51,7 +47,7 @@ func (tc *sourceConfig) UnmarshalYAML(node *yaml.Node) error {
 	case "local":
 		return node.Decode(&tc.localSource)
 	default:
-		return errInvalidSource
+		return nil
 	}
 }
 
@@ -70,45 +66,45 @@ func (tc sourceConfig) JSONSchema() *jsonschema.Schema {
 }
 
 type azureblobSource struct {
-	Bucket string `yaml:"bucket"`
-	Folder string `yaml:"folder,omitempty"`
-	URL    string `yaml:"url,omitempty"`
+	Bucket string `yaml:"bucket"           validate:"required"`
+	Folder string `yaml:"folder,omitempty" validate:"omitempty,dirname"`
+	URL    string `yaml:"url,omitempty"    validate:"omitempty,http_url"`
 }
 
 type gcsSource struct {
-	Bucket string `yaml:"bucket"`
-	Folder string `yaml:"folder,omitempty"`
-	URL    string `yaml:"url,omitempty"`
+	Bucket string `yaml:"bucket"           validate:"required"`
+	Folder string `yaml:"folder,omitempty" validate:"omitempty,dirname"`
+	URL    string `yaml:"url,omitempty"    validate:"omitempty,http_url"`
 }
 
 type s3Source struct {
-	Bucket     string `yaml:"bucket"`
-	Folder     string `yaml:"folder,omitempty"`
-	Endpoint   string `yaml:"endpoint,omitempty"`
+	Bucket     string `yaml:"bucket"                validate:"required"`
+	Folder     string `yaml:"folder,omitempty"      validate:"omitempty,dirname"`
+	Endpoint   string `yaml:"endpoint,omitempty"    validate:"omitempty,fqdn|http_url"`
 	Region     string `yaml:"region,omitempty"`
 	DisableSSL bool   `yaml:"disable-ssl,omitempty"`
-	URL        string `yaml:"url,omitempty"`
+	URL        string `yaml:"url,omitempty"         validate:"omitempty,http_url"`
 }
 
 type fileSource struct {
-	Path string `yaml:"path"`
-	URL  string `yaml:"url,omitempty"`
+	Path string `yaml:"path"          validate:"required,dir"`
+	URL  string `yaml:"url,omitempty" validate:"omitempty,http_url"`
 }
 
 type githubSource struct {
-	Owner string `yaml:"owner"`
-	Repo  string `yaml:"repo"`
+	Owner string `yaml:"owner" validate:"required"`
+	Repo  string `yaml:"repo"  validate:"required"`
 }
 
 type gitlabSource struct {
-	Owner string `yaml:"owner"`
-	Repo  string `yaml:"repo"`
-	URL   string `yaml:"url,omitempty"`
+	Owner string `yaml:"owner"         validate:"required"`
+	Repo  string `yaml:"repo"          validate:"required"`
+	URL   string `yaml:"url,omitempty" validate:"omitempty,http_url"`
 }
 
 type localSource struct {
-	Path    string `yaml:"path"`
-	Version string `yaml:"version"`
+	Path    string `yaml:"path"    validate:"required,dir"`
+	Version string `yaml:"version" validate:"required,version"`
 }
 
 func getSource(c *sourceConfig) (*source.Source, error) {
@@ -128,6 +124,6 @@ func getSource(c *sourceConfig) (*source.Source, error) {
 	case c.localSource != nil:
 		return local.New(local.Config(*c.localSource))
 	default:
-		return nil, errInvalidSource
+		return nil, &Error{Errors: []string{"source.type must be one of [azureblob gcs s3 file github gitlab local]"}}
 	}
 }

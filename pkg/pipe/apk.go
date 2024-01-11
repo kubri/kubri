@@ -10,7 +10,7 @@ import (
 
 type apkConfig struct {
 	Disabled bool   `yaml:"disabled,omitempty"`
-	Folder   string `yaml:"folder,omitempty"`
+	Folder   string `yaml:"folder,omitempty"   validate:"omitempty,dirname"`
 	KeyName  string `yaml:"key-name,omitempty"`
 }
 

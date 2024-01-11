@@ -1,7 +1,6 @@
 package pipe_test
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -25,14 +24,14 @@ func TestTarget(t *testing.T) {
 	dir := t.TempDir()
 
 	tests := []struct {
-		desc string
-		in   string
-		want func() (target.Target, error)
-		err  error
+		desc   string
+		config string
+		want   func() (target.Target, error)
+		err    error
 	}{
 		{
 			desc: "file",
-			in: `
+			config: `
 				target:
 					type: file
 					path: ` + dir + `
@@ -42,8 +41,22 @@ func TestTarget(t *testing.T) {
 			},
 		},
 		{
+			desc: "file invalid",
+			config: `
+				target:
+					type: file
+					url: invalid
+			`,
+			err: &pipe.Error{
+				Errors: []string{
+					"target.path is a required field",
+					"target.url must be a valid URL",
+				},
+			},
+		},
+		{
 			desc: "s3",
-			in: `
+			config: `
 				target:
 					type: s3
 					bucket: test
@@ -54,8 +67,26 @@ func TestTarget(t *testing.T) {
 			},
 		},
 		{
+			desc: "s3 invalid",
+			config: `
+				target:
+					type: s3
+					folder: '*'
+					endpoint: invalid
+					url: invalid
+			`,
+			err: &pipe.Error{
+				Errors: []string{
+					"target.bucket is a required field",
+					"target.folder must be a valid folder name",
+					"target.endpoint must be a valid URL or FQDN",
+					"target.url must be a valid URL",
+				},
+			},
+		},
+		{
 			desc: "gcs",
-			in: `
+			config: `
 				target:
 					type: gcs
 					bucket: test
@@ -67,8 +98,24 @@ func TestTarget(t *testing.T) {
 			},
 		},
 		{
+			desc: "gcs invalid",
+			config: `
+				target:
+					type: gcs
+					folder: '*'
+					url: invalid
+			`,
+			err: &pipe.Error{
+				Errors: []string{
+					"target.bucket is a required field",
+					"target.folder must be a valid folder name",
+					"target.url must be a valid URL",
+				},
+			},
+		},
+		{
 			desc: "azureblob",
-			in: `
+			config: `
 				target:
 					type: azureblob
 					bucket: test
@@ -81,8 +128,24 @@ func TestTarget(t *testing.T) {
 			},
 		},
 		{
+			desc: "azureblob invalid",
+			config: `
+				target:
+					type: azureblob
+					folder: '*'
+					url: invalid
+			`,
+			err: &pipe.Error{
+				Errors: []string{
+					"target.bucket is a required field",
+					"target.folder must be a valid folder name",
+					"target.url must be a valid URL",
+				},
+			},
+		},
+		{
 			desc: "github",
-			in: `
+			config: `
 				target:
 					type: github
 					owner: abemedia
@@ -95,16 +158,31 @@ func TestTarget(t *testing.T) {
 			},
 		},
 		{
+			desc: "github invalid",
+			config: `
+				target:
+					type: github
+					folder: '*'
+			`,
+			err: &pipe.Error{
+				Errors: []string{
+					"target.owner is a required field",
+					"target.repo is a required field",
+					"target.folder must be a valid folder name",
+				},
+			},
+		},
+		{
 			desc: "invalid type",
-			in: `
+			config: `
 				target:
 					type: nope
 			`,
-			err: errors.New("target: invalid type"),
+			err: &pipe.Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github]"}},
 		},
 		{
 			desc: "unmarshal error",
-			in: `
+			config: `
 				target:
 					type: {}
 			`,
@@ -142,7 +220,7 @@ func TestTarget(t *testing.T) {
 				folder: .
 		`
 
-		config := append(clean(test.in), clean(baseConfig)...)
+		config := append(clean(test.config), clean(baseConfig)...)
 		path := filepath.Join(t.TempDir(), "appcast.yml")
 		os.WriteFile(path, config, os.ModePerm)
 

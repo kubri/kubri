@@ -1,8 +1,6 @@
 package pipe
 
 import (
-	"errors"
-
 	"github.com/abemedia/appcast/target"
 	"github.com/abemedia/appcast/target/azureblob"
 	"github.com/abemedia/appcast/target/file"
@@ -12,8 +10,6 @@ import (
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
 )
-
-var errInvalidTarget = errors.New("target: invalid type")
 
 type targetConfig struct {
 	*azureblobTarget
@@ -43,7 +39,7 @@ func (tc *targetConfig) UnmarshalYAML(node *yaml.Node) error {
 	case "github":
 		return node.Decode(&tc.githubTarget)
 	default:
-		return errInvalidTarget
+		return nil
 	}
 }
 
@@ -62,36 +58,36 @@ func (tc targetConfig) JSONSchema() *jsonschema.Schema {
 }
 
 type azureblobTarget struct {
-	Bucket string `yaml:"bucket"`
-	Folder string `yaml:"folder,omitempty"`
-	URL    string `yaml:"url,omitempty"`
+	Bucket string `yaml:"bucket"           validate:"required"`
+	Folder string `yaml:"folder,omitempty" validate:"omitempty,dirname"`
+	URL    string `yaml:"url,omitempty"    validate:"omitempty,http_url"`
 }
 
 type gcsTarget struct {
-	Bucket string `yaml:"bucket"`
-	Folder string `yaml:"folder,omitempty"`
-	URL    string `yaml:"url,omitempty"`
+	Bucket string `yaml:"bucket"           validate:"required"`
+	Folder string `yaml:"folder,omitempty" validate:"omitempty,dirname"`
+	URL    string `yaml:"url,omitempty"    validate:"omitempty,http_url"`
 }
 
 type s3Target struct {
-	Bucket     string `yaml:"bucket"`
-	Folder     string `yaml:"folder,omitempty"`
-	Endpoint   string `yaml:"endpoint,omitempty"`
+	Bucket     string `yaml:"bucket"                validate:"required"`
+	Folder     string `yaml:"folder,omitempty"      validate:"omitempty,dirname"`
+	Endpoint   string `yaml:"endpoint,omitempty"    validate:"omitempty,fqdn|http_url"`
 	Region     string `yaml:"region,omitempty"`
 	DisableSSL bool   `yaml:"disable-ssl,omitempty"`
-	URL        string `yaml:"url,omitempty"`
+	URL        string `yaml:"url,omitempty"         validate:"omitempty,http_url"`
 }
 
 type fileTarget struct {
-	Path string `yaml:"path"`
-	URL  string `yaml:"url,omitempty"`
+	Path string `yaml:"path"          validate:"required"`
+	URL  string `yaml:"url,omitempty" validate:"omitempty,http_url"`
 }
 
 type githubTarget struct {
-	Owner  string `yaml:"owner"`
-	Repo   string `yaml:"repo"`
+	Owner  string `yaml:"owner"            validate:"required"`
+	Repo   string `yaml:"repo"             validate:"required"`
 	Branch string `yaml:"branch,omitempty"`
-	Folder string `yaml:"folder,omitempty"`
+	Folder string `yaml:"folder,omitempty" validate:"omitempty,dirname"`
 }
 
 func getTarget(c *targetConfig) (target.Target, error) {
@@ -107,6 +103,6 @@ func getTarget(c *targetConfig) (target.Target, error) {
 	case c.githubTarget != nil:
 		return github.New(github.Config(*c.githubTarget))
 	default:
-		return nil, errInvalidTarget
+		return nil, &Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github]"}}
 	}
 }

@@ -4,9 +4,9 @@ import "github.com/abemedia/appcast/integrations/appinstaller"
 
 type appinstallerConfig struct {
 	Disabled bool   `yaml:"disabled,omitempty"`
-	Folder   string `yaml:"folder,omitempty"`
+	Folder   string `yaml:"folder,omitempty"   validate:"omitempty,dirname"`
 	OnLaunch *struct {
-		HoursBetweenUpdateChecks int  `yaml:"hours-between-update-checks,omitempty"`
+		HoursBetweenUpdateChecks int  `yaml:"hours-between-update-checks,omitempty" validate:"gte=0,lte=255" jsonschema:"minimum=0,maximum=255"` //nolint:lll
 		ShowPrompt               bool `yaml:"show-prompt,omitempty"`
 		UpdateBlocksActivation   bool `yaml:"update-blocks-activation,omitempty"`
 	} `yaml:"on-launch,omitempty"`

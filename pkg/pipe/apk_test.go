@@ -108,5 +108,21 @@ func TestApk(t *testing.T) {
 			hook: func() { secret.Put("rsa_key", []byte("nope")) },
 			err:  crypto.ErrInvalidKey,
 		},
+		{
+			desc: "invalid folder",
+			in: `
+				version: latest
+				prerelease: true
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				apk:
+					folder: '*'
+			`,
+			err: &pipe.Error{Errors: []string{"apk.folder must be a valid folder name"}},
+		},
 	})
 }

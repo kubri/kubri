@@ -9,6 +9,10 @@ replace github.com/cavaliergopher/rpm v1.2.0 => github.com/abemedia/rpm v0.0.0-2
 // https://github.com/invopop/jsonschema/pull/126
 replace github.com/invopop/jsonschema v0.12.0 => github.com/abemedia/jsonschema v0.0.0-20240108235924-6da915f1869e
 
+// TODO: Remove when the following PR is merged:
+// https://github.com/go-playground/validator/pull/1211
+replace github.com/go-playground/validator/v10 => github.com/abemedia/validator/v10 v10.0.0-20240110181639-80db7adbfa70
+
 require (
 	bou.ke/monkey v1.0.2
 	dario.cat/mergo v1.0.0
@@ -23,6 +27,9 @@ require (
 	github.com/docker/go-connections v0.5.0
 	github.com/dsnet/compress v0.0.1
 	github.com/fullstorydev/emulators/storage v0.0.0-20221201134230-39d0d46cb7ba
+	github.com/go-playground/locales v0.14.1
+	github.com/go-playground/universal-translator v0.18.1
+	github.com/go-playground/validator/v10 v10.16.0
 	github.com/go-xmlfmt/xmlfmt v1.1.2
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
@@ -101,6 +108,7 @@ require (
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.5.0 // indirect
 	github.com/go-git/go-git/v5 v5.11.0 // indirect
@@ -130,6 +138,7 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
+	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

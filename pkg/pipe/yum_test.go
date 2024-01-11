@@ -92,5 +92,19 @@ func TestYum(t *testing.T) {
 			hook: func() { secret.Put("pgp_key", []byte("nope")) },
 			err:  fmt.Errorf("%w: no armored data found", crypto.ErrInvalidKey),
 		},
+		{
+			desc: "invalid folder",
+			in: `
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				yum:
+					folder: '*'
+			`,
+			err: &pipe.Error{Errors: []string{"yum.folder must be a valid folder name"}},
+		},
 	})
 }
