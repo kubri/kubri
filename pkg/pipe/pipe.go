@@ -24,11 +24,11 @@ import (
 type config struct {
 	Title          string              `yaml:"title,omitempty"`
 	Description    string              `yaml:"description,omitempty"`
-	Version        string              `yaml:"version,omitempty"`
+	Version        string              `yaml:"version,omitempty"         validate:"omitempty,version_constraint"`
 	Prerelease     bool                `yaml:"prerelease,omitempty"`
 	UploadPackages bool                `yaml:"upload-packages,omitempty"`
-	Source         *sourceConfig       `yaml:"source"`
-	Target         *targetConfig       `yaml:"target"`
+	Source         *sourceConfig       `yaml:"source"                    validate:"required"`
+	Target         *targetConfig       `yaml:"target"                    validate:"required"`
 	Apk            *apkConfig          `yaml:"apk,omitempty"`
 	Apt            *aptConfig          `yaml:"apt,omitempty"`
 	Yum            *yumConfig          `yaml:"yum,omitempty"`
@@ -135,6 +135,11 @@ func Load(path string) (*Pipe, error) {
 	if err = dec.Decode(c); err != nil {
 		return nil, err
 	}
+
+	if err = Validate(c); err != nil {
+		return nil, err
+	}
+
 	if c.source, err = getSource(c.Source); err != nil {
 		return nil, err
 	}

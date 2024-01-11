@@ -87,6 +87,7 @@ linters-settings:
   tagalign:
     order:
       - yaml
+      - validate
       - jsonschema
 issues:
   fix: true
@@ -99,6 +100,7 @@ issues:
         - gocognit
         - goconst
         - lll
+        - maintidx
     - linters:
         - govet
       text: 'shadow: declaration of "err" shadows declaration'

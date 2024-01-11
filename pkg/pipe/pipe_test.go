@@ -24,6 +24,7 @@ import (
 
 func TestLoad(t *testing.T) {
 	tests := []struct {
+		desc   string
 		config string
 		path   string
 		mode   fs.FileMode
@@ -40,19 +41,34 @@ func TestLoad(t *testing.T) {
 			err:  errors.New("no config file found"),
 		},
 		{
+			desc: "permission denied",
 			path: "appcast.yml",
 			err:  errors.New("open appcast.yml: permission denied"),
 			mode: 0o200,
 		},
 		{
+			desc:   "invalid yaml",
+			config: `*&%^`,
 			path:   "appcast.yml",
 			err:    errors.New("yaml: did not find expected alphabetic or numeric character"),
-			config: `*&%^`,
 		},
 		{
-			path:   "appcast.yml",
+			desc:   "non-existent field",
 			config: `foo: bar`,
+			path:   "appcast.yml",
 			err:    &yaml.TypeError{Errors: []string{"line 1: field foo not found in type pipe.config"}},
+		},
+		{
+			desc:   "failed validation",
+			config: `version: invalid`,
+			path:   "appcast.yml",
+			err: &pipe.Error{
+				Errors: []string{
+					"version must be a valid version constraint",
+					"source is a required field",
+					"target is a required field",
+				},
+			},
 		},
 	}
 
@@ -65,6 +81,9 @@ func TestLoad(t *testing.T) {
 	defer os.Chdir(wd)
 
 	for _, test := range tests {
+		if test.desc == "" {
+			test.desc = test.path
+		}
 		if test.config == "" {
 			test.config = `
 				source:

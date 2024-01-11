@@ -432,7 +432,9 @@
         "on-launch": {
           "properties": {
             "hours-between-update-checks": {
-              "type": "integer"
+              "type": "integer",
+              "maximum": 255,
+              "minimum": 0
             },
             "show-prompt": {
               "type": "boolean"
