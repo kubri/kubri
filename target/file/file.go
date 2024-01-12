@@ -21,12 +21,11 @@ type fileTarget struct {
 }
 
 func New(c Config) (target.Target, error) {
-	err := os.MkdirAll(c.Path, 0o755)
+	path, err := filepath.Abs(c.Path)
 	if err != nil {
 		return nil, err
 	}
-	path, err := filepath.Abs(c.Path)
-	if err != nil {
+	if err = os.MkdirAll(path, 0o755); err != nil {
 		return nil, err
 	}
 	if c.URL == "" {
