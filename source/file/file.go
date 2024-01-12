@@ -19,10 +19,7 @@ func New(c Config) (*source.Source, error) {
 	if err != nil {
 		return nil, err
 	}
-	url, err := url.JoinPath("file:///", filepath.ToSlash(path))
-	if err != nil {
-		return nil, err
-	}
+	url, _ := url.JoinPath("file:///", filepath.ToSlash(path))
 	if c.URL == "" {
 		c.URL = url
 	}

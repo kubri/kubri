@@ -2,6 +2,7 @@ package file_test
 
 import (
 	"net/url"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -37,4 +38,18 @@ func TestFile(t *testing.T) {
 			})
 		})
 	}
+
+	t.Run("New_ResolvePathError", func(t *testing.T) {
+		wd, _ := os.Getwd()
+		defer os.Chdir(wd)
+
+		dir := t.TempDir()
+		os.Chdir(dir)
+		os.Remove(dir)
+
+		_, err := file.New(file.Config{})
+		if err == nil {
+			t.Fatal("should error")
+		}
+	})
 }

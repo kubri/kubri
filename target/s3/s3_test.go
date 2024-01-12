@@ -15,6 +15,7 @@ func TestS3(t *testing.T) {
 		Bucket:     "bucket",
 		Folder:     "folder",
 		Endpoint:   host,
+		Region:     "us-east-1",
 		DisableSSL: true,
 	})
 	if err != nil {

@@ -1,7 +1,7 @@
 package blob_test
 
 import (
-	"path"
+	"net/url"
 	"testing"
 
 	"github.com/abemedia/appcast/internal/blob"
@@ -10,12 +10,24 @@ import (
 )
 
 func TestSource(t *testing.T) {
-	s, err := blob.NewSource("mem://", "", "mem://")
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name   string
+		prefix string
+	}{
+		{"Default", ""},
+		{"Prefix", "/test/"},
 	}
+	for _, testCase := range tests {
+		t.Run(testCase.name, func(t *testing.T) {
+			s, err := blob.NewSource("mem://", testCase.prefix, "http://example.com/downloads")
+			if err != nil {
+				t.Fatal(err)
+			}
 
-	test.Source(t, s, func(version, asset string) string {
-		return "mem://" + path.Join(version, asset)
-	})
+			test.Source(t, s, func(version, asset string) string {
+				u, _ := url.JoinPath("http://example.com/downloads", testCase.prefix, version, asset)
+				return u
+			})
+		})
+	}
 }
