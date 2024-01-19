@@ -18,7 +18,7 @@ require (
 	dario.cat/mergo v1.0.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.2.1
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
-	github.com/ProtonMail/go-crypto v0.0.0-20230923063757-afb1ddc0824c
+	github.com/ProtonMail/go-crypto v1.1.0-alpha.0
 	github.com/ProtonMail/gopenpgp/v2 v2.7.4
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 	github.com/cavaliergopher/rpm v1.2.0
