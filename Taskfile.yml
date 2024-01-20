@@ -60,6 +60,14 @@ tasks:
     cmds:
       - gotestsum -- -cover ./...
 
+  golden:
+    desc: Update golden test files
+    aliases: [g]
+    env:
+      UPDATE_GOLDEN: '1'
+    cmds:
+      - gotestsum -- -cover ./...
+
   acceptance:
     desc: Run acceptance tests
     aliases: [a]
