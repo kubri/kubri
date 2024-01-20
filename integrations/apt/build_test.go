@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/apt"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	source "github.com/abemedia/appcast/source/file"
 	"github.com/abemedia/appcast/target"
@@ -24,8 +25,12 @@ import (
 func TestBuild(t *testing.T) {
 	want := readTestData(t, ".gz", ".xz")
 	now := time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC)
+
+	dir := t.TempDir() + "/apt"
 	src, _ := source.New(source.Config{Path: "../../testdata"})
-	tgt, _ := ftarget.New(ftarget.Config{Path: t.TempDir()})
+	tgt, _ := ftarget.New(ftarget.Config{Path: dir})
+
+	test.Golden(t, "testdata", dir)
 
 	t.Run("New", func(t *testing.T) {
 		c := &apt.Config{Source: src, Target: tgt}

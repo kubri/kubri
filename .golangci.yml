@@ -99,6 +99,7 @@ issues:
         - funlen
         - gocognit
         - goconst
+        - gosec
         - lll
         - maintidx
     - linters:

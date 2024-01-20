@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/abemedia/appcast/integrations/yum"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	source "github.com/abemedia/appcast/source/file"
 	target "github.com/abemedia/appcast/target/file"
@@ -20,9 +21,12 @@ func TestBuild(t *testing.T) {
 	want := readTestData(t)
 	now := time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC)
 
+	dir := t.TempDir() + "/rpm"
 	src, _ := source.New(source.Config{Path: "../../testdata"})
-	tgt, _ := target.New(target.Config{Path: t.TempDir() + "/rpm"})
+	tgt, _ := target.New(target.Config{Path: dir})
 	key, _ := pgp.NewPrivateKey("test", "test@example.com")
+
+	test.Golden(t, "testdata", dir)
 
 	c := &yum.Config{
 		Source: src,

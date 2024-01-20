@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/apk"
+	"github.com/abemedia/appcast/internal/test"
 	"github.com/abemedia/appcast/pkg/crypto/rsa"
 	source "github.com/abemedia/appcast/source/file"
 	target "github.com/abemedia/appcast/target/file"
@@ -19,8 +20,11 @@ import (
 func TestBuild(t *testing.T) {
 	want := readTestData(t)
 
+	dir := t.TempDir() + "/rpm"
 	src, _ := source.New(source.Config{Path: "../../testdata"})
-	tgt, _ := target.New(target.Config{Path: t.TempDir() + "/rpm"})
+	tgt, _ := target.New(target.Config{Path: dir})
+
+	test.Golden(t, "testdata", dir)
 
 	c := &apk.Config{
 		Source: src,
