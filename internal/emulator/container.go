@@ -21,7 +21,9 @@ func (c *Container) Exec(t *testing.T, script string) string {
 
 	var buf bytes.Buffer
 	opt := exec.ProcessOptionFunc(func(opts *exec.ProcessOptions) {
-		_, _ = stdcopy.StdCopy(&buf, &buf, opts.Reader)
+		if opts.Reader != nil {
+			_, _ = stdcopy.StdCopy(&buf, &buf, opts.Reader)
+		}
 	})
 
 	code, _, err := c.Container.Exec(context.Background(), []string{"sh", "-c", script}, opt)
