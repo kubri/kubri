@@ -124,5 +124,21 @@ func TestApk(t *testing.T) {
 			`,
 			err: &pipe.Error{Errors: []string{"apk.folder must be a valid folder name"}},
 		},
+		{
+			desc: "absolute folder",
+			in: `
+				version: latest
+				prerelease: true
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				apk:
+					folder: '/foo/bar'
+			`,
+			err: &pipe.Error{Errors: []string{"apk.folder must be a valid folder name"}},
+		},
 	})
 }

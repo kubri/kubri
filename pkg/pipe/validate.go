@@ -2,6 +2,7 @@ package pipe
 
 import (
 	"fmt"
+	"io/fs"
 	"reflect"
 	"strings"
 	"unicode"
@@ -110,8 +111,9 @@ func registerTranslations(v *validator.Validate, trans ut.Translator) error {
 //   - S3 forbids \ { ^ } % ` ] " > [ ~ < # | (See https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-keys.html#object-key-guidelines-avoid-characters)
 //   - This leaves us with letters, numbers and - . _ ! $ ' ( ) + , ; = @
 func isDirname(fl validator.FieldLevel) bool {
-	return strings.ContainsFunc(fl.Field().String(), func(r rune) bool {
-		return unicode.IsLetter(r) || unicode.IsNumber(r) || strings.ContainsRune("/-._!$&'()+,;=@ ", r)
+	s := fl.Field().String()
+	return fs.ValidPath(s) && !strings.ContainsFunc(s, func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsNumber(r) && !strings.ContainsRune("/-._!$&'()+,;=@ ", r)
 	})
 }
 
