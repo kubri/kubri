@@ -1,3 +1,3 @@
 #!/bin/bash
 
-golangci-lint run --new
+golangci-lint run --fast
