@@ -3,6 +3,7 @@ package apk
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -36,8 +37,10 @@ func openRepo(ctx context.Context, t target.Target) (*repo, error) {
 	for _, arch := range archs {
 		r, err := t.NewReader(ctx, arch+"/APKINDEX.tar.gz")
 		if err != nil {
-			// TODO: only continue on not found.
-			continue
+			if errors.Is(err, fs.ErrNotExist) {
+				continue
+			}
+			return nil, err
 		}
 		index, err := repository.IndexFromArchive(r)
 		if err != nil {
@@ -79,7 +82,7 @@ func (r *repo) Write(rsaKey *rsa.PrivateKey, publicKeyName string) error {
 		}
 
 		if rsaKey != nil {
-			rd, err = sign(rd, rsaKey, publicKeyName)
+			rd, err = repository.SignArchive(rd, rsaKey, publicKeyName)
 			if err != nil {
 				return err
 			}

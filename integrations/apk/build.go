@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"strings"
 	"unsafe"
 
 	"github.com/abemedia/appcast/pkg/crypto/rsa"
@@ -100,11 +101,12 @@ func getVersionConstraint(repo map[string]*repository.ApkIndex) string {
 		return ""
 	}
 
+	replace := strings.NewReplacer("_p", "+", "_", "-")
 	v := make([]byte, 0)
 	for _, r := range repo {
 		for _, p := range r.Packages {
 			v = append(v, '!', '=')
-			v = append(v, p.Version...)
+			v = append(v, replace.Replace(p.Version)...)
 			v = append(v, ',')
 		}
 	}
