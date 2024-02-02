@@ -4,8 +4,6 @@ package apk_test
 
 import (
 	"context"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/apk"
@@ -37,7 +35,7 @@ func TestAcceptance(t *testing.T) {
 			rsaKey, _ := rsa.NewPrivateKey()
 			src, _ := source.New(source.Config{Path: "../../testdata"})
 			tgt, _ := target.New(target.Config{Path: dir})
-			s := httptest.NewServer(http.FileServer(http.Dir(dir)))
+			url := emulator.FileServer(t, dir)
 			c := emulator.Image(t, distro.image)
 
 			for i, test := range tests {
@@ -48,9 +46,9 @@ func TestAcceptance(t *testing.T) {
 					}
 
 					if i == 0 {
-						c.Exec(t, "echo '"+s.URL+"' >> /etc/apk/repositories")
+						c.Exec(t, "echo '"+url+"' >> /etc/apk/repositories")
 						c.Exec(t, "apk add --no-cache wget")
-						c.Exec(t, "wget -q -O /etc/apk/keys/"+config.KeyName+" "+s.URL+"/"+config.KeyName)
+						c.Exec(t, "wget -q -O /etc/apk/keys/"+config.KeyName+" "+url+"/"+config.KeyName)
 						c.Exec(t, "apk add --no-cache appcast-test")
 					} else {
 						c.Exec(t, "apk upgrade --no-cache appcast-test")

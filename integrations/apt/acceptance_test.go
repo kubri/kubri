@@ -4,8 +4,6 @@ package apt_test
 
 import (
 	"context"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/apt"
@@ -41,7 +39,7 @@ func TestAcceptance(t *testing.T) {
 			key, _ := pgp.MarshalPublicKey(pgp.Public(pgpKey))
 			src, _ := source.New(source.Config{Path: "../../testdata"})
 			tgt, _ := ftarget.New(ftarget.Config{Path: dir})
-			s := httptest.NewServer(http.FileServer(http.Dir(dir)))
+			url := emulator.FileServer(t, dir)
 			c := emulator.Build(t, `
 				FROM `+distro.image+`
 				ENV DEBIAN_FRONTEND=noninteractive
@@ -51,7 +49,7 @@ func TestAcceptance(t *testing.T) {
 
 			c.CopyToContainer(context.Background(), key, "appcast-test.asc", 0o644)
 			c.Exec(t, "gpg --dearmor --yes --output /usr/share/keyrings/appcast-test.gpg < appcast-test.asc")
-			c.Exec(t, "echo 'deb [signed-by=/usr/share/keyrings/appcast-test.gpg] "+s.URL+" stable main' > /etc/apt/sources.list.d/appcast-test.list")
+			c.Exec(t, "echo 'deb [signed-by=/usr/share/keyrings/appcast-test.gpg] "+url+" stable main' > /etc/apt/sources.list.d/appcast-test.list")
 
 			for i, test := range tests {
 				t.Run(test.name, func(t *testing.T) {
