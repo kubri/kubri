@@ -5,8 +5,6 @@ package yum_test
 import (
 	"context"
 	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/yum"
@@ -51,7 +49,7 @@ func TestAcceptance(t *testing.T) {
 			pgpKey, _ := pgp.NewPrivateKey("test", "test@example.com")
 			src, _ := source.New(source.Config{Path: "../../testdata"})
 			tgt, _ := target.New(target.Config{Path: dir})
-			s := httptest.NewServer(http.FileServer(http.Dir(dir)))
+			url := emulator.FileServer(t, dir)
 			c := emulator.Image(t, distro.image)
 
 			for i, test := range tests {
@@ -64,7 +62,7 @@ func TestAcceptance(t *testing.T) {
 					switch distro.pkg {
 					case "dnf":
 						if i == 0 {
-							c.Exec(t, "echo '"+fmt.Sprintf(conf, s.URL, s.URL)+"' > /etc/yum.repos.d/appcast-test.repo")
+							c.Exec(t, "echo '"+fmt.Sprintf(conf, url, url)+"' > /etc/yum.repos.d/appcast-test.repo")
 							c.Exec(t, "dnf install -yq appcast-test")
 						} else {
 							c.Exec(t, "dnf clean expire-cache")
@@ -72,7 +70,7 @@ func TestAcceptance(t *testing.T) {
 						}
 					case "zypper":
 						if i == 0 {
-							c.Exec(t, "zypper addrepo --refresh "+s.URL+" appcast-test")
+							c.Exec(t, "zypper addrepo --refresh "+url+" appcast-test")
 							c.Exec(t, "zypper --gpg-auto-import-keys refresh")
 							c.Exec(t, "zypper --non-interactive install appcast-test")
 						} else {
