@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.4.0](https://github.com/abemedia/appcast/compare/v0.3.0...v0.4.0) (2024-02-04)
+
+
+### Features
+
+* **apk:** apk repository builder ([#237](https://github.com/abemedia/appcast/issues/237)) ([007d18d](https://github.com/abemedia/appcast/commit/007d18d7f543d310cf7fe86b394d25e757f31473))
+* **apk:** implement apk pipe ([#281](https://github.com/abemedia/appcast/issues/281)) ([d8e5b38](https://github.com/abemedia/appcast/commit/d8e5b38e1e32ebe916b872206de511f1085b60f0))
+* **appinstaller:** group on-launch config under single parent ([#242](https://github.com/abemedia/appcast/issues/242)) ([dc08d28](https://github.com/abemedia/appcast/commit/dc08d28412446f8cb2bd64e7dcbca0203e9dc742))
+* better error messages on failed integration ([#250](https://github.com/abemedia/appcast/issues/250)) ([e08fde5](https://github.com/abemedia/appcast/commit/e08fde5b180201b3b8127488695d5fb548557f93))
+* better version constraints ([#249](https://github.com/abemedia/appcast/issues/249)) ([2755b2c](https://github.com/abemedia/appcast/commit/2755b2cfce1e47ddcccdfadbb03c72217cd0b5ba))
+* **cli:** manage RSA keys ([#244](https://github.com/abemedia/appcast/issues/244)) ([cb5de41](https://github.com/abemedia/appcast/commit/cb5de41d7a2c623cca7b51c6166457275f5eb14e))
+* generate jsonschema from config ([#287](https://github.com/abemedia/appcast/issues/287)) ([fe5e907](https://github.com/abemedia/appcast/commit/fe5e9070743e664e160acfa88c4abdfd4b3e9160))
+* **source/gitlab:** allow setting custom URL (for self-hosted) ([#240](https://github.com/abemedia/appcast/issues/240)) ([3ed31b4](https://github.com/abemedia/appcast/commit/3ed31b4b66a12511b20737b258e232fefdb6239e))
+* use raw base64 ed25519 keys ([#262](https://github.com/abemedia/appcast/issues/262)) ([b18608a](https://github.com/abemedia/appcast/commit/b18608aa6e8cbf3b6b6ea8fc445feed714fde7ea))
+* validate config ([#290](https://github.com/abemedia/appcast/issues/290)) ([fd12557](https://github.com/abemedia/appcast/commit/fd125570f07107072adb659d3b2c8938eb3294c9))
+
+
+### Bug Fixes
+
+* **apk:** incorrect version constraint, handle target errors ([#305](https://github.com/abemedia/appcast/issues/305)) ([8c5b11e](https://github.com/abemedia/appcast/commit/8c5b11e1bf00c85ba01c07ebf94bad55bf5e715d))
+* **appinstaller:** wrong extension for appxbundle ([#282](https://github.com/abemedia/appcast/issues/282)) ([591f90d](https://github.com/abemedia/appcast/commit/591f90d9c32abf9f14262e93a217e0981e2e1ad2))
+* dirname validation ([#297](https://github.com/abemedia/appcast/issues/297)) ([416b2df](https://github.com/abemedia/appcast/commit/416b2df3650057c42b36ef9f1be391e580ad6db6))
+* **pgp:** invalid signature on fedora 39 ([#227](https://github.com/abemedia/appcast/issues/227)) ([9c2049f](https://github.com/abemedia/appcast/commit/9c2049f03bd83478eff84d0611080484e54d3c40))
+* **sparkle:** invalid ed signature ([#248](https://github.com/abemedia/appcast/issues/248)) ([04e0ae6](https://github.com/abemedia/appcast/commit/04e0ae64560d2b2aefa8e15fc07adc9e487a2221))
+
 ## [0.3.0](https://github.com/abemedia/appcast/compare/v0.2.0...v0.3.0) (2023-11-24)
 
 
