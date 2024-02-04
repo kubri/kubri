@@ -25,7 +25,7 @@ const (
 
 func compressionExtensions(algo CompressionAlgo) []string {
 	if algo == 0 {
-		return []string{"", ".xz", ".gz"} // default compression
+		return []string{"", ".xz", ".gz"} // See https://wiki.debian.org/DebianRepository/Format#Compression_of_indices
 	}
 
 	a := []string{""} // Always start with blank string for uncompressed data.

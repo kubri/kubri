@@ -17,10 +17,12 @@ type (
 	PublicKey  = pgpcrypto.Key
 )
 
+// NewPrivateKey returns a new private key.
 func NewPrivateKey(name, email string) (*PrivateKey, error) {
 	return pgpcrypto.GenerateKey(name, email, "x25519", 0)
 }
 
+// MarshalPrivateKey returns the armored private key.
 func MarshalPrivateKey(key *PrivateKey) ([]byte, error) {
 	if key == nil {
 		return nil, crypto.ErrInvalidKey
@@ -35,6 +37,7 @@ func MarshalPrivateKey(key *PrivateKey) ([]byte, error) {
 	return []byte(s), nil
 }
 
+// UnmarshalPrivateKey returns a private key from an armored key.
 func UnmarshalPrivateKey(b []byte) (*PrivateKey, error) {
 	key, err := pgpcrypto.NewKeyFromArmoredReader(bytes.NewReader(b))
 	if err != nil {
@@ -46,6 +49,7 @@ func UnmarshalPrivateKey(b []byte) (*PrivateKey, error) {
 	return key, nil
 }
 
+// Public extracts the public key from a private key.
 func Public(key *PrivateKey) *PublicKey {
 	pub, err := key.ToPublic()
 	if err != nil {
@@ -54,6 +58,7 @@ func Public(key *PrivateKey) *PublicKey {
 	return pub
 }
 
+// MarshalPublicKey returns the armored public key.
 func MarshalPublicKey(key *PublicKey) ([]byte, error) {
 	if key == nil {
 		return nil, crypto.ErrInvalidKey
@@ -68,6 +73,7 @@ func MarshalPublicKey(key *PublicKey) ([]byte, error) {
 	return []byte(s), nil
 }
 
+// UnmarshalPublicKey returns a public key from an armored key.
 func UnmarshalPublicKey(b []byte) (*PublicKey, error) {
 	key, err := pgpcrypto.NewKeyFromArmoredReader(bytes.NewReader(b))
 	if err != nil {
@@ -79,10 +85,13 @@ func UnmarshalPublicKey(b []byte) (*PublicKey, error) {
 	return key, nil
 }
 
+// Sign signs the data with the private key.
 func Sign(key *PrivateKey, data []byte) ([]byte, error) {
 	return sign(key, data, false)
 }
 
+// SignText signs the data with the private key and wraps it in a signed message.
+// Data is considered text and canonicalised with CRLF line endings.
 func SignText(key *PrivateKey, data []byte) ([]byte, error) {
 	data = bytes.ReplaceAll(data, lf, crlf)
 	sig, err := sign(key, data, true)
@@ -128,6 +137,7 @@ func sign(key *PrivateKey, data []byte, text bool) ([]byte, error) {
 	return []byte(sig), nil
 }
 
+// Verify verifies the signature of the data with the public key.
 func Verify(key *PublicKey, data, sig []byte) bool {
 	signature, err := pgpcrypto.NewPGPSignatureFromArmored(string(sig))
 	if err != nil {
@@ -147,6 +157,7 @@ func Verify(key *PublicKey, data, sig []byte) bool {
 	return err == nil
 }
 
+// Split splits a signed message into data and signature.
 func Split(msg []byte) (data, sig []byte, _ error) {
 	start := bytes.Index(msg, startText)
 	end := bytes.Index(msg, endText)

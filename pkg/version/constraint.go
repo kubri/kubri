@@ -74,8 +74,10 @@ func parseOperator(v string) (operator, string, bool) {
 	return 0, v, false
 }
 
+// Constraint represents a version constraint.
 type Constraint []constraint
 
+// NewConstraint returns a new version constraint.
 func NewConstraint(v string) (Constraint, error) {
 	switch v {
 	case "", "*", "latest":
@@ -119,6 +121,7 @@ func NewConstraint(v string) (Constraint, error) {
 	return res, nil
 }
 
+// Check returns true if the version satisfies the constraint.
 func (c Constraint) Check(v string) bool {
 	v = clean(v)
 	for _, c := range c {
@@ -171,6 +174,7 @@ func (c constraint) check(v string) bool {
 	}
 }
 
+// Check returns true if the version satisfies the constraint.
 func Check(constraint, version string) bool {
 	c, err := NewConstraint(constraint)
 	if err != nil {
