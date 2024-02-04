@@ -27,6 +27,7 @@ type signature struct {
 	R, S *big.Int
 }
 
+// Sign signs the data with the private key.
 func Sign(key *PrivateKey, data []byte) ([]byte, error) {
 	if key == nil {
 		return nil, crypto.ErrInvalidKey
@@ -39,6 +40,7 @@ func Sign(key *PrivateKey, data []byte) ([]byte, error) {
 	return asn1.Marshal(signature{r, s})
 }
 
+// Verify verifies the signature of the data with the public key.
 func Verify(key *PublicKey, data, sig []byte) bool {
 	if key == nil {
 		return false
@@ -51,6 +53,7 @@ func Verify(key *PublicKey, data, sig []byte) bool {
 	return dsa.Verify(key, sum[:], s.R, s.S)
 }
 
+// NewPrivateKey returns a new private key.
 func NewPrivateKey() (*PrivateKey, error) {
 	var key PrivateKey
 	err := dsa.GenerateParameters(&key.Parameters, rand.Reader, dsa.L3072N256)
@@ -64,6 +67,7 @@ func NewPrivateKey() (*PrivateKey, error) {
 	return &key, nil
 }
 
+// MarshalPrivateKey returns the PEM encoded private key.
 func MarshalPrivateKey(key *PrivateKey) ([]byte, error) {
 	if key == nil {
 		return nil, crypto.ErrInvalidKey
@@ -75,6 +79,7 @@ func MarshalPrivateKey(key *PrivateKey) ([]byte, error) {
 	return pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: b}), nil
 }
 
+// UnmarshalPrivateKey returns a private key from a PEM encoded key.
 func UnmarshalPrivateKey(b []byte) (*PrivateKey, error) {
 	block, _ := pem.Decode(b)
 	if block == nil {
@@ -94,10 +99,12 @@ func UnmarshalPrivateKey(b []byte) (*PrivateKey, error) {
 	}, nil
 }
 
+// Public extracts the public key from a private key.
 func Public(key *PrivateKey) *PublicKey {
 	return &key.PublicKey
 }
 
+// MarshalPublicKey returns the PEM encoded public key.
 func MarshalPublicKey(key *PublicKey) ([]byte, error) {
 	if key == nil {
 		return nil, crypto.ErrInvalidKey
@@ -120,6 +127,7 @@ func MarshalPublicKey(key *PublicKey) ([]byte, error) {
 	return pem.EncodeToMemory(&pem.Block{Type: "PUBLIC KEY", Bytes: b}), nil
 }
 
+// UnmarshalPublicKey returns a public key from a PEM encoded key.
 func UnmarshalPublicKey(b []byte) (*PublicKey, error) {
 	block, _ := pem.Decode(b)
 	if block == nil {

@@ -1,5 +1,6 @@
 package slices
 
+// Filter returns a slice containing only the elements that satisfy the predicate.
 func Filter[S ~[]E, E any](s S, filter func(E) bool) S {
 	var i int
 	for _, e := range s {
