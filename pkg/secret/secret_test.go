@@ -25,6 +25,8 @@ func TestSecrets(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test, func(t *testing.T) {
 			switch test {
+			case "ConfigDir":
+				t.Setenv("APPCAST_PATH", "")
 			case "Path":
 				t.Setenv("APPCAST_PATH", dir)
 			case "SecretPath":
