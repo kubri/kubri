@@ -1,4 +1,4 @@
-package pipe_test
+package config_test
 
 import (
 	"os"
@@ -8,10 +8,10 @@ import (
 
 	"github.com/MakeNowJust/heredoc/v2"
 	"github.com/abemedia/appcast/integrations/sparkle"
+	"github.com/abemedia/appcast/pkg/config"
 	"github.com/abemedia/appcast/pkg/crypto"
 	"github.com/abemedia/appcast/pkg/crypto/dsa"
 	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/pkg/pipe"
 	"github.com/abemedia/appcast/pkg/secret"
 	source "github.com/abemedia/appcast/source/file"
 	target "github.com/abemedia/appcast/target/file"
@@ -40,7 +40,7 @@ func TestSparkle(t *testing.T) {
 				sparkle:
 					disabled: true
 			`,
-			want: &pipe.Pipe{},
+			want: &config.Config{},
 		},
 		{
 			desc: "defaults",
@@ -55,7 +55,7 @@ func TestSparkle(t *testing.T) {
 					path: ` + dir + `
 				sparkle: {}
 			`,
-			want: &pipe.Pipe{
+			want: &config.Config{
 				Sparkle: &sparkle.Config{
 					Title:       "title",
 					Description: "description",
@@ -102,7 +102,7 @@ func TestSparkle(t *testing.T) {
 				secret.Put("dsa_key", dsaBytes)
 				secret.Put("ed25519_key", edBytes)
 			},
-			want: &pipe.Pipe{
+			want: &config.Config{
 				Sparkle: &sparkle.Config{
 					Title:       "title",
 					Description: "description",
@@ -217,7 +217,7 @@ func TestSparkleDetectOS(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "appcast.yml")
 	os.WriteFile(path, []byte(strings.ReplaceAll(heredoc.Doc(c), "\t", "  ")), os.ModePerm)
 
-	p, err := pipe.Load(path)
+	p, err := config.Load(path)
 	if err != nil {
 		t.Fatal(err)
 	}

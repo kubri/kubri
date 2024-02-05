@@ -1,19 +1,19 @@
-package pipe_test
+package config_test
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/apt"
+	"github.com/abemedia/appcast/integrations/yum"
+	"github.com/abemedia/appcast/pkg/config"
 	"github.com/abemedia/appcast/pkg/crypto"
 	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/pkg/pipe"
 	"github.com/abemedia/appcast/pkg/secret"
 	source "github.com/abemedia/appcast/source/file"
 	target "github.com/abemedia/appcast/target/file"
 )
 
-func TestApt(t *testing.T) {
+func TestYum(t *testing.T) {
 	dir := t.TempDir()
 	src, _ := source.New(source.Config{Path: dir})
 	tgt, _ := target.New(target.Config{Path: dir})
@@ -30,10 +30,10 @@ func TestApt(t *testing.T) {
 				target:
 					type: file
 					path: ` + dir + `
-				apt:
+				yum:
 					disabled: true
 			`,
-			want: &pipe.Pipe{},
+			want: &config.Config{},
 		},
 		{
 			desc: "defaults",
@@ -44,32 +44,12 @@ func TestApt(t *testing.T) {
 				target:
 					type: file
 					path: ` + dir + `
-				apt: {}
+				yum: {}
 			`,
-			want: &pipe.Pipe{
-				Apt: &apt.Config{
+			want: &config.Config{
+				Yum: &yum.Config{
 					Source: src,
-					Target: tgt.Sub("apt"),
-				},
-			},
-		},
-		{
-			desc: "no compression",
-			in: `
-				source:
-					type: file
-					path: ` + dir + `
-				target:
-					type: file
-					path: ` + dir + `
-				apt:
-					compress: [none]
-			`,
-			want: &pipe.Pipe{
-				Apt: &apt.Config{
-					Source:   src,
-					Target:   tgt.Sub("apt"),
-					Compress: apt.NoCompression,
+					Target: tgt.Sub("yum"),
 				},
 			},
 		},
@@ -84,45 +64,17 @@ func TestApt(t *testing.T) {
 				target:
 					type: file
 					path: ` + dir + `
-				apt:
+				yum:
 					folder: test
-					compress:
-						- gzip
-						- bzip2
-						- xz
-						- lzma
-						- lz4
-						- zstd
 			`,
 			hook: func() { secret.Put("pgp_key", keyBytes) },
-			want: &pipe.Pipe{
-				Apt: &apt.Config{
+			want: &config.Config{
+				Yum: &yum.Config{
 					Source:     src,
 					Target:     tgt.Sub("test"),
 					Version:    "latest",
 					Prerelease: true,
 					PGPKey:     key,
-					Compress:   apt.GZIP | apt.BZIP2 | apt.XZ | apt.LZMA | apt.LZ4 | apt.ZSTD,
-				},
-			},
-		},
-		{
-			desc: "validation",
-			in: `
-				source:
-					type: file
-					path: ` + dir + `
-				target:
-					type: file
-					path: ` + dir + `
-				apt:
-					folder: '*'
-					compress: [invalid]
-			`,
-			err: &pipe.Error{
-				Errors: []string{
-					"apt.folder must be a valid folder name",
-					"apt.compress[0] must be one of [none gzip bzip2 xz lzma lz4 zstd]",
 				},
 			},
 		},
@@ -135,10 +87,24 @@ func TestApt(t *testing.T) {
 				target:
 					type: file
 					path: ` + dir + `
-				apt: {}
+				yum: {}
 			`,
 			hook: func() { secret.Put("pgp_key", []byte("nope")) },
 			err:  fmt.Errorf("%w: no armored data found", crypto.ErrInvalidKey),
+		},
+		{
+			desc: "invalid folder",
+			in: `
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				yum:
+					folder: '*'
+			`,
+			err: &config.Error{Errors: []string{"yum.folder must be a valid folder name"}},
 		},
 	})
 }

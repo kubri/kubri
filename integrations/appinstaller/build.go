@@ -38,6 +38,9 @@ func Build(ctx context.Context, c *Config) error {
 		Version:    c.Version,
 		Prerelease: c.Prerelease,
 	})
+	if err == source.ErrNoReleaseFound {
+		return nil
+	}
 	if err != nil {
 		return err
 	}

@@ -1,16 +1,16 @@
-package pipe_test
+package config_test
 
 import (
 	"os"
 	"testing"
 
 	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/pipe"
+	"github.com/abemedia/appcast/pkg/config"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestSchema(t *testing.T) {
-	got := pipe.Schema()
+	got := config.Schema()
 	want, _ := os.ReadFile("testdata/jsonschema.json")
 
 	if diff := cmp.Diff(want, got); diff != "" {

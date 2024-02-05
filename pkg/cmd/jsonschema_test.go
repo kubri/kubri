@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/abemedia/appcast/pkg/cmd"
-	"github.com/abemedia/appcast/pkg/pipe"
+	"github.com/abemedia/appcast/pkg/config"
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestJsonschemaCmd(t *testing.T) {
-	want := string(pipe.Schema())
+	want := string(config.Schema())
 
 	var stdout bytes.Buffer
 	err := cmd.Execute("", cmd.WithArgs("jsonschema"), cmd.WithStdout(&stdout))

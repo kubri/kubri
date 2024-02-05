@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/abemedia/appcast/pkg/pipe"
+	"github.com/abemedia/appcast/pkg/config"
 	"github.com/spf13/cobra"
 )
 
@@ -11,7 +11,7 @@ func jsonschemaCmd() *cobra.Command {
 		Short: "Print config file jsonschema",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			_, err := cmd.OutOrStdout().Write(pipe.Schema())
+			_, err := cmd.OutOrStdout().Write(config.Schema())
 			return err
 		},
 	}
