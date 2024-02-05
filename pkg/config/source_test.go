@@ -1,4 +1,4 @@
-package pipe_test
+package config_test
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/pipe"
+	"github.com/abemedia/appcast/pkg/config"
 	"github.com/abemedia/appcast/source"
 	"github.com/abemedia/appcast/source/azureblob"
 	"github.com/abemedia/appcast/source/file"
@@ -49,7 +49,7 @@ func TestSource(t *testing.T) {
 					path: nope
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"source.path must be a valid path to a directory",
 					"source.url must be a valid URL",
@@ -62,7 +62,7 @@ func TestSource(t *testing.T) {
 				source:
 					type: file
 			`,
-			err: &pipe.Error{Errors: []string{"source.path is a required field"}},
+			err: &config.Error{Errors: []string{"source.path is a required field"}},
 		},
 		{
 			desc: "s3",
@@ -96,7 +96,7 @@ func TestSource(t *testing.T) {
 					endpoint: invalid
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"source.bucket is a required field",
 					"source.folder must be a valid folder name",
@@ -126,7 +126,7 @@ func TestSource(t *testing.T) {
 					folder: '*'
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"source.bucket is a required field",
 					"source.folder must be a valid folder name",
@@ -156,7 +156,7 @@ func TestSource(t *testing.T) {
 					folder: '*'
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"source.bucket is a required field",
 					"source.folder must be a valid folder name",
@@ -182,7 +182,7 @@ func TestSource(t *testing.T) {
 				source:
 					type: github
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"source.owner is a required field",
 					"source.repo is a required field",
@@ -209,7 +209,7 @@ func TestSource(t *testing.T) {
 					type: gitlab
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"source.owner is a required field",
 					"source.repo is a required field",
@@ -237,7 +237,7 @@ func TestSource(t *testing.T) {
 					path: nope
 					version: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"source.path must be a valid path to a directory",
 					"source.version must be a valid semver version",
@@ -250,7 +250,7 @@ func TestSource(t *testing.T) {
 				source:
 					type: local
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"source.path is a required field",
 					"source.version is a required field",
@@ -263,7 +263,7 @@ func TestSource(t *testing.T) {
 				source:
 					type: nope
 			`,
-			err: &pipe.Error{Errors: []string{"source.type must be one of [azureblob gcs s3 file github gitlab local]"}},
+			err: &config.Error{Errors: []string{"source.type must be one of [azureblob gcs s3 file github gitlab local]"}},
 		},
 		{
 			desc: "unmarshal error",
@@ -284,10 +284,10 @@ func TestSource(t *testing.T) {
 		cmpopts.IgnoreFields(container.Client{}, "inner.internal.pl"),
 	}
 
-	for _, test := range tests {
+	for _, tc := range tests {
 		var want *source.Source
-		if test.want != nil {
-			w, err := test.want()
+		if tc.want != nil {
+			w, err := tc.want()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -302,21 +302,20 @@ func TestSource(t *testing.T) {
 				folder: .
 		`
 
-		config := append(clean(test.config), clean(baseConfig)...)
 		path := filepath.Join(t.TempDir(), "appcast.yml")
-		os.WriteFile(path, config, os.ModePerm)
+		os.WriteFile(path, test.JoinYAML(tc.config, baseConfig), os.ModePerm)
 
-		p, err := pipe.Load(path)
+		p, err := config.Load(path)
 
 		var got *source.Source
 		if p != nil && p.Apk != nil {
 			got = p.Apk.Source
 		}
 
-		if diff := cmp.Diff(test.err, err, opts); diff != "" {
-			t.Errorf("%s:\n%s", test.desc, diff)
+		if diff := cmp.Diff(tc.err, err, opts); diff != "" {
+			t.Errorf("%s:\n%s", tc.desc, diff)
 		} else if diff := cmp.Diff(want, got, opts); diff != "" {
-			t.Errorf("%s:\n%s", test.desc, diff)
+			t.Errorf("%s:\n%s", tc.desc, diff)
 		}
 	}
 }

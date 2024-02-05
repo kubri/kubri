@@ -1,4 +1,4 @@
-package pipe_test
+package config_test
 
 import (
 	"os"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/pipe"
+	"github.com/abemedia/appcast/pkg/config"
 	"github.com/abemedia/appcast/target"
 	"github.com/abemedia/appcast/target/azureblob"
 	"github.com/abemedia/appcast/target/file"
@@ -47,7 +47,7 @@ func TestTarget(t *testing.T) {
 					type: file
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"target.path is a required field",
 					"target.url must be a valid URL",
@@ -75,7 +75,7 @@ func TestTarget(t *testing.T) {
 					endpoint: invalid
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"target.bucket is a required field",
 					"target.folder must be a valid folder name",
@@ -105,7 +105,7 @@ func TestTarget(t *testing.T) {
 					folder: '*'
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"target.bucket is a required field",
 					"target.folder must be a valid folder name",
@@ -135,7 +135,7 @@ func TestTarget(t *testing.T) {
 					folder: '*'
 					url: invalid
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"target.bucket is a required field",
 					"target.folder must be a valid folder name",
@@ -164,7 +164,7 @@ func TestTarget(t *testing.T) {
 					type: github
 					folder: '*'
 			`,
-			err: &pipe.Error{
+			err: &config.Error{
 				Errors: []string{
 					"target.owner is a required field",
 					"target.repo is a required field",
@@ -178,7 +178,7 @@ func TestTarget(t *testing.T) {
 				target:
 					type: nope
 			`,
-			err: &pipe.Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github]"}},
+			err: &config.Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github]"}},
 		},
 		{
 			desc: "unmarshal error",
@@ -202,10 +202,10 @@ func TestTarget(t *testing.T) {
 		cmpopts.IgnoreTypes(gh.Rate{}),
 	}
 
-	for _, test := range tests {
+	for _, tc := range tests {
 		var want target.Target
-		if test.want != nil {
-			w, err := test.want()
+		if tc.want != nil {
+			w, err := tc.want()
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -220,21 +220,20 @@ func TestTarget(t *testing.T) {
 				folder: .
 		`
 
-		config := append(clean(test.config), clean(baseConfig)...)
 		path := filepath.Join(t.TempDir(), "appcast.yml")
-		os.WriteFile(path, config, os.ModePerm)
+		os.WriteFile(path, test.JoinYAML(tc.config, baseConfig), os.ModePerm)
 
-		p, err := pipe.Load(path)
+		p, err := config.Load(path)
 
 		var got target.Target
 		if p != nil && p.Apk != nil {
 			got = p.Apk.Target
 		}
 
-		if diff := cmp.Diff(test.err, err, opts); diff != "" {
-			t.Errorf("%s:\n%s", test.desc, diff)
+		if diff := cmp.Diff(tc.err, err, opts); diff != "" {
+			t.Errorf("%s:\n%s", tc.desc, diff)
 		} else if diff := cmp.Diff(want, got, opts); diff != "" {
-			t.Errorf("%s:\n%s", test.desc, diff)
+			t.Errorf("%s:\n%s", tc.desc, diff)
 		}
 	}
 }

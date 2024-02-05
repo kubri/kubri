@@ -1,10 +1,10 @@
-package pipe_test
+package config_test
 
 import (
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/appinstaller"
-	"github.com/abemedia/appcast/pkg/pipe"
+	"github.com/abemedia/appcast/pkg/config"
 	source "github.com/abemedia/appcast/source/file"
 	target "github.com/abemedia/appcast/target/file"
 )
@@ -27,7 +27,7 @@ func TestAppInstaller(t *testing.T) {
 				appinstaller:
 					disabled: true
 			`,
-			want: &pipe.Pipe{},
+			want: &config.Config{},
 		},
 		{
 			desc: "defaults",
@@ -40,7 +40,7 @@ func TestAppInstaller(t *testing.T) {
 					path: ` + dir + `
 				appinstaller: {}
 			`,
-			want: &pipe.Pipe{
+			want: &config.Config{
 				Appinstaller: &appinstaller.Config{
 					Source: src,
 					Target: tgt.Sub("appinstaller"),
@@ -68,7 +68,7 @@ func TestAppInstaller(t *testing.T) {
 					automatic-background-task: true
 					force-update-from-any-version: true
 			`,
-			want: &pipe.Pipe{
+			want: &config.Config{
 				Appinstaller: &appinstaller.Config{
 					OnLaunch: &appinstaller.OnLaunchConfig{
 						HoursBetweenUpdateChecks: 12,
@@ -100,7 +100,7 @@ func TestAppInstaller(t *testing.T) {
 				appinstaller:
 					folder: '*'
 			`,
-			err: &pipe.Error{Errors: []string{"appinstaller.folder must be a valid folder name"}},
+			err: &config.Error{Errors: []string{"appinstaller.folder must be a valid folder name"}},
 		},
 		{
 			desc: "hours-between-update-checks below 0",
@@ -115,7 +115,7 @@ func TestAppInstaller(t *testing.T) {
 					on-launch:
 						hours-between-update-checks: -1
 			`,
-			err: &pipe.Error{Errors: []string{"appinstaller.on-launch.hours-between-update-checks must be 0 or greater"}},
+			err: &config.Error{Errors: []string{"appinstaller.on-launch.hours-between-update-checks must be 0 or greater"}},
 		},
 		{
 			desc: "hours-between-update-checks above 255",
@@ -130,7 +130,7 @@ func TestAppInstaller(t *testing.T) {
 					on-launch:
 						hours-between-update-checks: 256
 			`,
-			err: &pipe.Error{Errors: []string{"appinstaller.on-launch.hours-between-update-checks must be 255 or less"}},
+			err: &config.Error{Errors: []string{"appinstaller.on-launch.hours-between-update-checks must be 255 or less"}},
 		},
 	})
 }

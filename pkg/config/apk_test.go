@@ -1,13 +1,13 @@
-package pipe_test
+package config_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/abemedia/appcast/integrations/apk"
+	"github.com/abemedia/appcast/pkg/config"
 	"github.com/abemedia/appcast/pkg/crypto"
 	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	"github.com/abemedia/appcast/pkg/pipe"
 	"github.com/abemedia/appcast/pkg/secret"
 	source "github.com/abemedia/appcast/source/file"
 	target "github.com/abemedia/appcast/target/file"
@@ -33,7 +33,7 @@ func TestApk(t *testing.T) {
 				apk:
 					disabled: true
 			`,
-			want: &pipe.Pipe{},
+			want: &config.Config{},
 		},
 		{
 			desc: "defaults",
@@ -46,7 +46,7 @@ func TestApk(t *testing.T) {
 					path: ` + dir + `
 				apk: {}
 			`,
-			want: &pipe.Pipe{
+			want: &config.Config{
 				Apk: &apk.Config{
 					Source: src,
 					Target: tgt.Sub("apk"),
@@ -69,7 +69,7 @@ func TestApk(t *testing.T) {
 					key-name: test@example.com.rsa.pub
 			`,
 			hook: func() { secret.Put("rsa_key", keyBytes) },
-			want: &pipe.Pipe{
+			want: &config.Config{
 				Apk: &apk.Config{
 					Source:     src,
 					Target:     tgt.Sub("test"),
@@ -122,7 +122,7 @@ func TestApk(t *testing.T) {
 				apk:
 					folder: '*'
 			`,
-			err: &pipe.Error{Errors: []string{"apk.folder must be a valid folder name"}},
+			err: &config.Error{Errors: []string{"apk.folder must be a valid folder name"}},
 		},
 		{
 			desc: "absolute folder",
@@ -138,7 +138,7 @@ func TestApk(t *testing.T) {
 				apk:
 					folder: '/foo/bar'
 			`,
-			err: &pipe.Error{Errors: []string{"apk.folder must be a valid folder name"}},
+			err: &config.Error{Errors: []string{"apk.folder must be a valid folder name"}},
 		},
 	})
 }
