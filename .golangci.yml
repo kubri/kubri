@@ -18,7 +18,6 @@ linters:
     - exhaustruct
     - exhaustruct_v5
     - goconst
-    - godox
     - gomodguard # deprecated
     - mnd
     - musttag
@@ -113,3 +112,10 @@ formatters:
         group-params: true
         clothe-returns: true
         balance-calls: true
+
+severity:
+  default: error
+  rules:
+    - linters:
+        - godox
+      severity: warning
