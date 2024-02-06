@@ -29,7 +29,6 @@ linters:
     - exhaustivestruct # deprecated
     - exhaustruct
     - gci
-    - godox
     - goerr113 # TODO: turn on and fix
     - golint # deprecated
     - gomoddirectives # TODO: remove when go-rpm is updated.
@@ -111,3 +110,10 @@ issues:
     - linters:
         - lll
       source: '^\s*//'
+
+severity:
+  default-severity: error
+  rules:
+    - linters:
+        - godox
+      severity: warning
