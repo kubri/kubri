@@ -78,6 +78,10 @@ linters-settings:
       - fieldalignment
   nolintlint:
     require-specific: true
+  staticcheck:
+    checks:
+      - all
+      - '-SA1019' # "crypto/dsa" has been deprecated'
   tagliatelle:
     case:
       use-field-name: true
@@ -105,9 +109,6 @@ issues:
     - linters:
         - govet
       text: 'shadow: declaration of "err" shadows declaration'
-    - linters:
-        - staticcheck
-      text: 'SA1019: "crypto/dsa" has been deprecated'
     - linters:
         - lll
       source: '^\s*//'
