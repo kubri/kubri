@@ -28,37 +28,51 @@ func TestGithub(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	owner := user.GetLogin()
-	repo := fmt.Sprintf("test_%d", time.Now().UnixNano())
 
-	_, _, err = client.Repositories.Create(ctx, "", &gh.Repository{Name: &repo})
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		_, err := client.Repositories.Delete(ctx, owner, repo)
-		if err != nil {
-			t.Fatal(err)
-		}
-	})
-
-	tgt, err := github.New(github.Config{Owner: owner, Repo: repo})
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		name   string
+		branch string
+	}{
+		{"DefaultBranch", ""},
+		{"WithBranch", "foo"},
 	}
 
-	test.Target(t, tgt, func(asset string) string {
-		return "https://raw.githubusercontent.com/" + path.Join(owner, repo, "main", asset)
-	}, test.WithDelay(time.Second))
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			repo := fmt.Sprintf("test_%d", time.Now().UnixNano())
 
-	_, err = github.New(github.Config{Owner: owner, Repo: repo, Branch: "foo"})
-	if err == nil {
-		t.Fatal("should fail for invalid branch")
-	}
+			r, _, err := client.Repositories.Create(ctx, "", &gh.Repository{Name: &repo})
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Cleanup(func() {
+				_, err := client.Repositories.Delete(ctx, owner, repo)
+				if err != nil {
+					t.Fatal(err)
+				}
+			})
 
-	_, err = github.New(github.Config{Owner: owner, Repo: "foo"})
-	if err == nil {
-		t.Fatal("should fail for invalid repo")
+			tgt, err := github.New(github.Config{Owner: user.GetLogin(), Repo: repo, Branch: tc.branch})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			branch := tc.branch
+			if branch == "" {
+				branch = r.GetDefaultBranch()
+			}
+
+			test.Target(t, tgt, func(asset string) string {
+				return "https://raw.githubusercontent.com/" + path.Join(owner, repo, branch, asset)
+			}, test.WithDelay(time.Second))
+
+			t.Run("Error", func(t *testing.T) {
+				_, err = github.New(github.Config{Owner: "owner", Repo: "repo", Branch: tc.branch})
+				if err == nil {
+					t.Fatal("should fail for invalid repo")
+				}
+			})
+		})
 	}
 }
