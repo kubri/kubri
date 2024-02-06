@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/secret"
+	"github.com/kubri/kubri/pkg/secret"
 )
 
 func TestSecrets(t *testing.T) {
@@ -26,11 +26,11 @@ func TestSecrets(t *testing.T) {
 		t.Run(test, func(t *testing.T) {
 			switch test {
 			case "ConfigDir":
-				t.Setenv("APPCAST_PATH", "")
+				t.Setenv("KUBRI_PATH", "")
 			case "Path":
-				t.Setenv("APPCAST_PATH", dir)
+				t.Setenv("KUBRI_PATH", dir)
 			case "SecretPath":
-				t.Setenv("APPCAST_MY_SECRET_PATH", filepath.Join(dir, "my-secret-file"))
+				t.Setenv("KUBRI_MY_SECRET_PATH", filepath.Join(dir, "my-secret-file"))
 			}
 
 			if _, err := secret.Get(key); err == nil {
@@ -64,7 +64,7 @@ func TestSecrets(t *testing.T) {
 	}
 
 	t.Run("Env", func(t *testing.T) {
-		t.Setenv("APPCAST_MY_SECRET", string(data))
+		t.Setenv("KUBRI_MY_SECRET", string(data))
 
 		got, err := secret.Get(key)
 		if err != nil {

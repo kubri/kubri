@@ -9,13 +9,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/integrations/sparkle"
-	"github.com/abemedia/appcast/internal/testsource"
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/source"
-	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/integrations/sparkle"
+	"github.com/kubri/kubri/internal/testsource"
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/source"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestBuild(t *testing.T) {

@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   test:
-    uses: abemedia/appcast/.github/workflows/test.yml@master
+    uses: kubri/kubri/.github/workflows/test.yml@master
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}

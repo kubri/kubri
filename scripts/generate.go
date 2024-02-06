@@ -11,11 +11,6 @@ import (
 	"time"
 
 	"bou.ke/monkey"
-	"github.com/abemedia/appcast/integrations/apk"
-	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/integrations/yum"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
 	"github.com/goreleaser/nfpm/v2"
 	"github.com/goreleaser/nfpm/v2/files"
 
@@ -23,6 +18,12 @@ import (
 	_ "github.com/goreleaser/nfpm/v2/arch" // archlinux packager
 	_ "github.com/goreleaser/nfpm/v2/deb"  // deb packager
 	_ "github.com/goreleaser/nfpm/v2/rpm"  // rpm packager
+
+	"github.com/kubri/kubri/integrations/apk"
+	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/integrations/yum"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 //nolint:gochecknoglobals
@@ -34,7 +35,7 @@ var (
 
 	config = nfpm.Config{
 		Info: nfpm.Info{
-			Name:        "appcast-test",
+			Name:        "kubri-test",
 			Platform:    "linux",
 			Section:     "utils",
 			Priority:    "optional",
@@ -44,16 +45,16 @@ var (
 			Homepage:    "http://example.com",
 			License:     "MIT",
 			Overridables: nfpm.Overridables{
-				Replaces:   []string{"appcast-test-old"},
-				Provides:   []string{"appcast-test-alt"},
+				Replaces:   []string{"kubri-test-old"},
+				Provides:   []string{"kubri-test-alt"},
 				Depends:    []string{"bash"},
 				Recommends: []string{"git"},
 				Suggests:   []string{"wget"},
-				Conflicts:  []string{"appcast-test-new"},
+				Conflicts:  []string{"kubri-test-new"},
 				Contents: files.Contents{
 					{
-						Source:      "./appcast-test",
-						Destination: "/usr/bin/appcast-test",
+						Source:      "./kubri-test",
+						Destination: "/usr/bin/kubri-test",
 					},
 				},
 				Deb: nfpm.Deb{Compression: "xz"},
@@ -93,9 +94,9 @@ func buildPackages(packager string, config nfpm.Config) error {
 	}
 	defer os.RemoveAll(srcDir)
 
-	binPath := filepath.Join(srcDir, "appcast-test")
+	binPath := filepath.Join(srcDir, "kubri-test")
 	bin := []byte(fmt.Sprintf("#/bin/bash\n\necho %q\n", config.Version))
-	if err = os.WriteFile(filepath.Join(srcDir, "appcast-test"), bin, 0o755); err != nil { //nolint:gosec
+	if err = os.WriteFile(filepath.Join(srcDir, "kubri-test"), bin, 0o755); err != nil { //nolint:gosec
 		return err
 	}
 	config.Contents[0].Source = binPath

@@ -5,10 +5,11 @@ import (
 	"io"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/appinstaller"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/integrations/appinstaller"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestBuild(t *testing.T) {

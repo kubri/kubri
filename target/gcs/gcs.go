@@ -1,9 +1,10 @@
 package gcs
 
 import (
-	"github.com/abemedia/appcast/internal/blob"
-	"github.com/abemedia/appcast/target"
 	_ "gocloud.dev/blob/gcsblob" // blob driver
+
+	"github.com/kubri/kubri/internal/blob"
+	"github.com/kubri/kubri/target"
 )
 
 type Config struct {

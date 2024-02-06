@@ -7,11 +7,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/crypto"
-	"github.com/abemedia/appcast/pkg/crypto/internal/cryptotest"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/crypto"
+	"github.com/kubri/kubri/pkg/crypto/internal/cryptotest"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
 )
 
 func TestPGP(t *testing.T) {

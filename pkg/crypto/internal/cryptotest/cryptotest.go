@@ -8,8 +8,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/crypto"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/pkg/crypto"
 )
 
 type Implementation[PrivateKey any, PublicKey any] struct {

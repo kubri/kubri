@@ -9,12 +9,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/integrations/yum"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/integrations/yum"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestBuild(t *testing.T) {

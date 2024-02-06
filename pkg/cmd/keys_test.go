@@ -4,7 +4,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/cmd"
+	"github.com/kubri/kubri/pkg/cmd"
 )
 
 func TestKeysCmd(t *testing.T) {

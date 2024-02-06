@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"github.com/abemedia/appcast/pkg/config"
 	"github.com/spf13/cobra"
+
+	"github.com/kubri/kubri/pkg/config"
 )
 
 func jsonschemaCmd() *cobra.Command {

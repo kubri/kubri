@@ -40,7 +40,7 @@ func rootCmd(version string) *cobra.Command {
 	var silent bool
 
 	cmd := &cobra.Command{
-		Use:  "appcast",
+		Use:  "kubri",
 		Long: "Sign and release software for common package managers and software update frameworks.",
 		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 			log.SetFlags(0)

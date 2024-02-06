@@ -9,8 +9,8 @@ import (
 	"path"
 	"strings"
 
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/target"
+	"github.com/kubri/kubri/source"
+	"github.com/kubri/kubri/target"
 )
 
 type Config struct {

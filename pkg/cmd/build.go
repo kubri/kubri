@@ -7,14 +7,15 @@ import (
 	"log"
 	"time"
 
-	"github.com/abemedia/appcast/integrations/apk"
-	"github.com/abemedia/appcast/integrations/appinstaller"
-	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/integrations/sparkle"
-	"github.com/abemedia/appcast/integrations/yum"
-	"github.com/abemedia/appcast/pkg/config"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/kubri/kubri/integrations/apk"
+	"github.com/kubri/kubri/integrations/appinstaller"
+	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/integrations/sparkle"
+	"github.com/kubri/kubri/integrations/yum"
+	"github.com/kubri/kubri/pkg/config"
 )
 
 func buildCmd() *cobra.Command {
@@ -22,7 +23,7 @@ func buildCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:     "build",
-		Short:   "Build appcast feed",
+		Short:   "Publish packages for common package managers and software update frameworks",
 		Aliases: []string{"b"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			p, err := config.Load(configPath)

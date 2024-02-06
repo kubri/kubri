@@ -4,13 +4,13 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/apk"
-	"github.com/abemedia/appcast/pkg/config"
-	"github.com/abemedia/appcast/pkg/crypto"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	"github.com/abemedia/appcast/pkg/secret"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
+	"github.com/kubri/kubri/integrations/apk"
+	"github.com/kubri/kubri/pkg/config"
+	"github.com/kubri/kubri/pkg/crypto"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
+	"github.com/kubri/kubri/pkg/secret"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestApk(t *testing.T) {

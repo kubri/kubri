@@ -7,8 +7,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/abemedia/appcast/integrations/apt/deb"
 	"github.com/blakesmith/ar"
+
+	"github.com/kubri/kubri/integrations/apt/deb"
 )
 
 func getControl(b []byte) (*Package, error) {

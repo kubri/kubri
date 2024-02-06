@@ -3,10 +3,10 @@ package config_test
 import (
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/appinstaller"
-	"github.com/abemedia/appcast/pkg/config"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
+	"github.com/kubri/kubri/integrations/appinstaller"
+	"github.com/kubri/kubri/pkg/config"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestAppInstaller(t *testing.T) {

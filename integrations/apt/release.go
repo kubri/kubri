@@ -12,9 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abemedia/appcast/integrations/apt/deb"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
 	"golang.org/x/mod/semver"
+
+	"github.com/kubri/kubri/integrations/apt/deb"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
 )
 
 func release(key *pgp.PrivateKey, algos CompressionAlgo, p []*Package) (string, error) {

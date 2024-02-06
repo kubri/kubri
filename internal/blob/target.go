@@ -9,9 +9,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/abemedia/appcast/target"
 	"gocloud.dev/blob"
 	"gocloud.dev/gcerrors"
+
+	"github.com/kubri/kubri/target"
 )
 
 type blobTarget struct {

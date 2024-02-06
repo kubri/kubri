@@ -5,7 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 
-	"github.com/abemedia/appcast/pkg/crypto"
+	"github.com/kubri/kubri/pkg/crypto"
 )
 
 type (

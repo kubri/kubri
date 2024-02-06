@@ -3,10 +3,10 @@ package config
 import (
 	"path"
 
-	"github.com/abemedia/appcast/integrations/sparkle"
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/pkg/secret"
+	"github.com/kubri/kubri/integrations/sparkle"
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/pkg/secret"
 )
 
 type sparkleConfig struct {

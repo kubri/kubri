@@ -1,14 +1,15 @@
 package config
 
 import (
-	"github.com/abemedia/appcast/target"
-	"github.com/abemedia/appcast/target/azureblob"
-	"github.com/abemedia/appcast/target/file"
-	"github.com/abemedia/appcast/target/gcs"
-	"github.com/abemedia/appcast/target/github"
-	"github.com/abemedia/appcast/target/s3"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
+
+	"github.com/kubri/kubri/target"
+	"github.com/kubri/kubri/target/azureblob"
+	"github.com/kubri/kubri/target/file"
+	"github.com/kubri/kubri/target/gcs"
+	"github.com/kubri/kubri/target/github"
+	"github.com/kubri/kubri/target/s3"
 )
 
 type targetConfig struct {

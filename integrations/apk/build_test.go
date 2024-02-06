@@ -8,13 +8,14 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/apk"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
 	"gitlab.alpinelinux.org/alpine/go/repository"
+
+	"github.com/kubri/kubri/integrations/apk"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestBuild(t *testing.T) {

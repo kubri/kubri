@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/blob"
-	"github.com/abemedia/appcast/internal/test"
+	"github.com/kubri/kubri/internal/blob"
+	"github.com/kubri/kubri/internal/test"
 )
 
 func TestTarget(t *testing.T) {

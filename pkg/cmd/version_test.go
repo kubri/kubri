@@ -6,13 +6,14 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/cmd"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/pkg/cmd"
 )
 
 func TestVersionCmd(t *testing.T) {
 	version := "v1.0.0"
-	want := fmt.Sprintf("appcast v1.0.0 %s/%s\n", runtime.GOOS, runtime.GOARCH)
+	want := fmt.Sprintf("kubri v1.0.0 %s/%s\n", runtime.GOOS, runtime.GOARCH)
 
 	var stdout bytes.Buffer
 

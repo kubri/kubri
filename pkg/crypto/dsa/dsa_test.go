@@ -4,9 +4,10 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/internal/cryptotest"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/internal/cryptotest"
 )
 
 func TestDSA(t *testing.T) {

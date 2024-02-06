@@ -3,9 +3,9 @@ package config
 import (
 	"errors"
 
-	"github.com/abemedia/appcast/integrations/apk"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	"github.com/abemedia/appcast/pkg/secret"
+	"github.com/kubri/kubri/integrations/apk"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
+	"github.com/kubri/kubri/pkg/secret"
 )
 
 type apkConfig struct {

@@ -6,18 +6,19 @@ import (
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/config"
-	"github.com/abemedia/appcast/target"
-	"github.com/abemedia/appcast/target/azureblob"
-	"github.com/abemedia/appcast/target/file"
-	"github.com/abemedia/appcast/target/gcs"
-	"github.com/abemedia/appcast/target/github"
-	"github.com/abemedia/appcast/target/s3"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	gh "github.com/google/go-github/github"
 	"gopkg.in/yaml.v3"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/config"
+	"github.com/kubri/kubri/target"
+	"github.com/kubri/kubri/target/azureblob"
+	"github.com/kubri/kubri/target/file"
+	"github.com/kubri/kubri/target/gcs"
+	"github.com/kubri/kubri/target/github"
+	"github.com/kubri/kubri/target/s3"
 )
 
 func TestTarget(t *testing.T) {
@@ -148,13 +149,13 @@ func TestTarget(t *testing.T) {
 			config: `
 				target:
 					type: github
-					owner: abemedia
-					repo: appcast
+					owner: kubri
+					repo: kubri
 					branch: master
 					folder: test
 			`,
 			want: func() (target.Target, error) {
-				return github.New(github.Config{Owner: "abemedia", Repo: "appcast", Branch: "master", Folder: "test"})
+				return github.New(github.Config{Owner: "kubri", Repo: "kubri", Branch: "master", Folder: "test"})
 			},
 		},
 		{
@@ -220,7 +221,7 @@ func TestTarget(t *testing.T) {
 				folder: .
 		`
 
-		path := filepath.Join(t.TempDir(), "appcast.yml")
+		path := filepath.Join(t.TempDir(), "kubri.yml")
 		os.WriteFile(path, test.JoinYAML(tc.config, baseConfig), os.ModePerm)
 
 		p, err := config.Load(path)

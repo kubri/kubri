@@ -1,9 +1,9 @@
 package config
 
 import (
-	"github.com/abemedia/appcast/integrations/yum"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/pkg/secret"
+	"github.com/kubri/kubri/integrations/yum"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	"github.com/kubri/kubri/pkg/secret"
 )
 
 type yumConfig struct {

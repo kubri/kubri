@@ -8,12 +8,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/cmd"
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	"github.com/abemedia/appcast/pkg/secret"
+	"github.com/kubri/kubri/pkg/cmd"
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
+	"github.com/kubri/kubri/pkg/secret"
 )
 
 func TestKeysImportCmd(t *testing.T) {
@@ -48,7 +48,7 @@ func TestKeysImportCmd(t *testing.T) {
 		{"keys", "import", "rsa", rsaPath, "--force"},
 	}
 
-	t.Setenv("APPCAST_PATH", t.TempDir())
+	t.Setenv("KUBRI_PATH", t.TempDir())
 
 	for _, test := range tests {
 		want, _ := os.ReadFile(test[3])
@@ -139,7 +139,7 @@ func TestKeysImportCmdErrors(t *testing.T) {
 		},
 	}
 
-	t.Setenv("APPCAST_PATH", t.TempDir())
+	t.Setenv("KUBRI_PATH", t.TempDir())
 	secret.Put("dsa_key", nil)
 	secret.Put("ed25519_key", nil)
 	secret.Put("pgp_key", nil)

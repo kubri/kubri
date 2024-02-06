@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/cmd"
-	"github.com/abemedia/appcast/pkg/config"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/pkg/cmd"
+	"github.com/kubri/kubri/pkg/config"
 )
 
 func TestJsonschemaCmd(t *testing.T) {

@@ -6,14 +6,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/abemedia/appcast/integrations/apk"
-	"github.com/abemedia/appcast/integrations/appinstaller"
-	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/integrations/sparkle"
-	"github.com/abemedia/appcast/integrations/yum"
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/target"
 	"gopkg.in/yaml.v3"
+
+	"github.com/kubri/kubri/integrations/apk"
+	"github.com/kubri/kubri/integrations/appinstaller"
+	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/integrations/sparkle"
+	"github.com/kubri/kubri/integrations/yum"
+	"github.com/kubri/kubri/source"
+	"github.com/kubri/kubri/target"
 )
 
 type Config struct {
@@ -83,12 +84,12 @@ func open(path string) ([]byte, error) {
 	}
 
 	paths := []string{
-		".appcast.yml",
-		".appcast.yaml",
-		"appcast.yml",
-		"appcast.yaml",
-		filepath.Join(".github", "appcast.yml"),
-		filepath.Join(".github", "appcast.yaml"),
+		".kubri.yml",
+		".kubri.yaml",
+		"kubri.yml",
+		"kubri.yaml",
+		filepath.Join(".github", "kubri.yml"),
+		filepath.Join(".github", "kubri.yaml"),
 	}
 
 	for _, path := range paths {

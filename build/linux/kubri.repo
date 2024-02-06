@@ -1,0 +1,7 @@
+[kubri]
+name=Kubri
+baseurl=https://dl.kubri.dev/rpm/
+enabled=1
+gpgcheck=0
+repo_gpgcheck=1
+gpgkey=https://dl.kubri.dev/rpm/repodata/repomd.xml.key

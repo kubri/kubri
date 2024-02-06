@@ -1,16 +1,17 @@
 package config
 
 import (
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/azureblob"
-	"github.com/abemedia/appcast/source/file"
-	"github.com/abemedia/appcast/source/gcs"
-	"github.com/abemedia/appcast/source/github"
-	"github.com/abemedia/appcast/source/gitlab"
-	"github.com/abemedia/appcast/source/local"
-	"github.com/abemedia/appcast/source/s3"
 	"github.com/invopop/jsonschema"
 	"gopkg.in/yaml.v3"
+
+	"github.com/kubri/kubri/source"
+	"github.com/kubri/kubri/source/azureblob"
+	"github.com/kubri/kubri/source/file"
+	"github.com/kubri/kubri/source/gcs"
+	"github.com/kubri/kubri/source/github"
+	"github.com/kubri/kubri/source/gitlab"
+	"github.com/kubri/kubri/source/local"
+	"github.com/kubri/kubri/source/s3"
 )
 
 type sourceConfig struct {

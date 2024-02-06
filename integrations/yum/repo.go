@@ -15,9 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/target"
 	"github.com/cavaliergopher/rpm"
+
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	"github.com/kubri/kubri/target"
 )
 
 type repo struct {

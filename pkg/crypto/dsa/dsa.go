@@ -10,7 +10,7 @@ import (
 	"encoding/pem"
 	"math/big"
 
-	"github.com/abemedia/appcast/pkg/crypto"
+	"github.com/kubri/kubri/pkg/crypto"
 )
 
 type (

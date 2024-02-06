@@ -7,15 +7,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/yum"
-	"github.com/abemedia/appcast/internal/emulator"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
+	"github.com/kubri/kubri/integrations/yum"
+	"github.com/kubri/kubri/internal/emulator"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
-const conf = `[appcast-test]
-name=appcast-test
+const conf = `[kubri-test]
+name=kubri-test
 baseurl=%s
 enabled=1
 gpgcheck=0
@@ -62,24 +62,24 @@ func TestAcceptance(t *testing.T) {
 					switch distro.pkg {
 					case "dnf":
 						if i == 0 {
-							c.Exec(t, "echo '"+fmt.Sprintf(conf, url, url)+"' > /etc/yum.repos.d/appcast-test.repo")
-							c.Exec(t, "dnf install -yq appcast-test")
+							c.Exec(t, "echo '"+fmt.Sprintf(conf, url, url)+"' > /etc/yum.repos.d/kubri-test.repo")
+							c.Exec(t, "dnf install -yq kubri-test")
 						} else {
 							c.Exec(t, "dnf clean expire-cache")
-							c.Exec(t, "dnf update -yq appcast-test")
+							c.Exec(t, "dnf update -yq kubri-test")
 						}
 					case "zypper":
 						if i == 0 {
-							c.Exec(t, "zypper addrepo --refresh "+url+" appcast-test")
+							c.Exec(t, "zypper addrepo --refresh "+url+" kubri-test")
 							c.Exec(t, "zypper --gpg-auto-import-keys refresh")
-							c.Exec(t, "zypper --non-interactive install appcast-test")
+							c.Exec(t, "zypper --non-interactive install kubri-test")
 						} else {
 							c.Exec(t, "zypper refresh")
-							c.Exec(t, "zypper --non-interactive update appcast-test")
+							c.Exec(t, "zypper --non-interactive update kubri-test")
 						}
 					}
 
-					if v := c.Exec(t, "appcast-test"); v != test.version {
+					if v := c.Exec(t, "kubri-test"); v != test.version {
 						t.Fatalf("expected version %q got %q", test.version, v)
 					}
 				})

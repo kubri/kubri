@@ -8,7 +8,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 
-	"github.com/abemedia/appcast/pkg/crypto"
+	"github.com/kubri/kubri/pkg/crypto"
 )
 
 type (

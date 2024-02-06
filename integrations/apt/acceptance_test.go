@@ -6,11 +6,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/internal/emulator"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	source "github.com/abemedia/appcast/source/file"
-	ftarget "github.com/abemedia/appcast/target/file"
+	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/internal/emulator"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	source "github.com/kubri/kubri/source/file"
+	ftarget "github.com/kubri/kubri/target/file"
 )
 
 func TestAcceptance(t *testing.T) {
@@ -47,9 +47,9 @@ func TestAcceptance(t *testing.T) {
 				ENTRYPOINT ["tail", "-f", "/dev/null"]
 			`)
 
-			c.CopyToContainer(context.Background(), key, "appcast-test.asc", 0o644)
-			c.Exec(t, "gpg --dearmor --yes --output /usr/share/keyrings/appcast-test.gpg < appcast-test.asc")
-			c.Exec(t, "echo 'deb [signed-by=/usr/share/keyrings/appcast-test.gpg] "+url+" stable main' > /etc/apt/sources.list.d/appcast-test.list")
+			c.CopyToContainer(context.Background(), key, "kubri-test.asc", 0o644)
+			c.Exec(t, "gpg --dearmor --yes --output /usr/share/keyrings/kubri-test.gpg < kubri-test.asc")
+			c.Exec(t, "echo 'deb [signed-by=/usr/share/keyrings/kubri-test.gpg] "+url+" stable main' > /etc/apt/sources.list.d/kubri-test.list")
 
 			for i, test := range tests {
 				t.Run(test.name, func(t *testing.T) {
@@ -61,12 +61,12 @@ func TestAcceptance(t *testing.T) {
 					c.Exec(t, "apt-get update -q")
 
 					if i == 0 {
-						c.Exec(t, "apt-get install -yq --no-install-recommends appcast-test")
+						c.Exec(t, "apt-get install -yq --no-install-recommends kubri-test")
 					} else {
 						c.Exec(t, "apt-get upgrade -yq")
 					}
 
-					if v := c.Exec(t, "appcast-test"); v != test.version {
+					if v := c.Exec(t, "kubri-test"); v != test.version {
 						t.Fatalf("expected version %q got %q", test, v)
 					}
 				})

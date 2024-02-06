@@ -3,12 +3,13 @@ package cmd
 import (
 	"errors"
 
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	"github.com/abemedia/appcast/pkg/secret"
 	"github.com/spf13/cobra"
+
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
+	"github.com/kubri/kubri/pkg/secret"
 )
 
 func keysCreateCmd() *cobra.Command {

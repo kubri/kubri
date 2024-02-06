@@ -1,6 +1,6 @@
 package config
 
-import "github.com/abemedia/appcast/integrations/appinstaller"
+import "github.com/kubri/kubri/integrations/appinstaller"
 
 type appinstallerConfig struct {
 	Disabled bool   `yaml:"disabled,omitempty"`
