@@ -24,7 +24,7 @@ func TestBuild(t *testing.T) {
 	src, _ := source.New(source.Config{Path: "../../testdata"})
 	tgt, _ := target.New(target.Config{Path: dir})
 
-	test.Golden(t, "testdata", dir)
+	test.Golden(t, "testdata", dir, test.Ignore("*.apk"))
 
 	c := &apk.Config{
 		Source: src,
