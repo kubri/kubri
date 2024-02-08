@@ -6,12 +6,13 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/abemedia/appcast/pkg/version"
 	locales "github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	translations "github.com/go-playground/validator/v10/translations/en"
 	"golang.org/x/mod/semver"
+
+	"github.com/kubri/kubri/pkg/version"
 )
 
 type Error struct{ Errors []string }

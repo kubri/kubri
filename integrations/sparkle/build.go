@@ -10,11 +10,12 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/source"
 	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/russross/blackfriday/v2"
+
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/source"
 )
 
 func Build(ctx context.Context, c *Config) error {

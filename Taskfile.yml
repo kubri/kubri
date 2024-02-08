@@ -40,7 +40,7 @@ tasks:
       - ./**/*.go
       - ./go.(mod|sum)
     generates:
-      - ./appcast
+      - ./kubri
     cmds:
       - go build
 
@@ -75,7 +75,7 @@ tasks:
       - gotestsum -- -tags acceptance -run ^TestAcceptance$ ./integrations/...
 
   install:
-    desc: Install AppCast
+    desc: Install Kubri
     aliases: [i]
     sources:
       - './**/*.go'

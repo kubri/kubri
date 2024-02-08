@@ -7,9 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/source"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
+	"github.com/kubri/kubri/source"
 )
 
 //nolint:funlen

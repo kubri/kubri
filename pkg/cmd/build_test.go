@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/cmd"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/cmd"
 )
 
 func TestBuild(t *testing.T) {
@@ -36,35 +36,35 @@ func TestBuild(t *testing.T) {
 		{
 			desc:   "apk",
 			args:   []string{"build"},
-			path:   "appcast.yml",
+			path:   "kubri.yml",
 			config: "apk: {}",
 			want:   "Completed publishing APK packages.",
 		},
 		{
 			desc:   "appinstaller",
 			args:   []string{"build"},
-			path:   "appcast.yml",
+			path:   "kubri.yml",
 			config: "appinstaller: {}",
 			want:   "Completed publishing App Installer packages.",
 		},
 		{
 			desc:   "apt",
 			args:   []string{"build"},
-			path:   "appcast.yml",
+			path:   "kubri.yml",
 			config: "apt: {}",
 			want:   "Completed publishing APT packages.",
 		},
 		{
 			desc:   "yum",
 			args:   []string{"build"},
-			path:   "appcast.yml",
+			path:   "kubri.yml",
 			config: "yum: {}",
 			want:   "Completed publishing YUM packages.",
 		},
 		{
 			desc:   "sparkle",
 			args:   []string{"build"},
-			path:   "appcast.yml",
+			path:   "kubri.yml",
 			config: "sparkle: {}",
 			want:   "Completed publishing Sparkle packages.",
 		},

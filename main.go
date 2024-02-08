@@ -3,8 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/abemedia/appcast/pkg/cmd"
 	_ "github.com/joho/godotenv/autoload"
+
+	"github.com/kubri/kubri/pkg/cmd"
 )
 
 var version = "dev"

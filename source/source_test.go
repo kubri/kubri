@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/testsource"
-	"github.com/abemedia/appcast/source"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/internal/testsource"
+	"github.com/kubri/kubri/source"
 )
 
 func TestSource(t *testing.T) {

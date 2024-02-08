@@ -6,16 +6,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/cmd"
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	"github.com/abemedia/appcast/pkg/secret"
+	"github.com/kubri/kubri/pkg/cmd"
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
+	"github.com/kubri/kubri/pkg/secret"
 )
 
 func TestKeysCreateCmd(t *testing.T) {
-	t.Setenv("APPCAST_PATH", t.TempDir())
+	t.Setenv("KUBRI_PATH", t.TempDir())
 
 	for _, s := range []string{"dsa", "ed25519", "pgp", "rsa"} {
 		_, err := secret.Get(s + "_key")

@@ -5,10 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/integrations/apt/deb"
-	"github.com/abemedia/appcast/internal/test"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
+	"github.com/kubri/kubri/integrations/apt/deb"
+	"github.com/kubri/kubri/internal/test"
 )
 
 func TestMarshal(t *testing.T) {

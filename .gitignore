@@ -4,4 +4,4 @@ dist/
 *.out
 .DS_Store
 .env
-/appcast
+/kubri

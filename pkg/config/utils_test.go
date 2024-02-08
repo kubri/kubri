@@ -5,9 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/config"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/config"
 )
 
 type testCase struct {
@@ -28,13 +29,13 @@ func runTest(t *testing.T, tests []testCase) {
 	}
 
 	for _, tc := range tests {
-		t.Setenv("APPCAST_PATH", t.TempDir())
+		t.Setenv("KUBRI_PATH", t.TempDir())
 
 		if tc.hook != nil {
 			tc.hook()
 		}
 
-		path := filepath.Join(t.TempDir(), "appcast.yml")
+		path := filepath.Join(t.TempDir(), "kubri.yml")
 		os.WriteFile(path, test.YAML(tc.in), os.ModePerm)
 
 		got, err := config.Load(path)

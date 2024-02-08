@@ -10,9 +10,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	"github.com/abemedia/appcast/target"
 	"gitlab.alpinelinux.org/alpine/go/repository"
+
+	"github.com/kubri/kubri/pkg/crypto/rsa"
+	"github.com/kubri/kubri/target"
 )
 
 type repo struct {

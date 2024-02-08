@@ -1,4 +1,4 @@
-module github.com/abemedia/appcast
+module github.com/kubri/kubri
 
 go 1.21
 

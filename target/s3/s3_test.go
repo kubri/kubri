@@ -3,9 +3,9 @@ package s3_test
 import (
 	"testing"
 
-	"github.com/abemedia/appcast/internal/emulator"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/target/s3"
+	"github.com/kubri/kubri/internal/emulator"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/target/s3"
 )
 
 func TestS3(t *testing.T) {

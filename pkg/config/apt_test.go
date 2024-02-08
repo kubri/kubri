@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/pkg/config"
-	"github.com/abemedia/appcast/pkg/crypto"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/pkg/secret"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
+	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/pkg/config"
+	"github.com/kubri/kubri/pkg/crypto"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	"github.com/kubri/kubri/pkg/secret"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestApt(t *testing.T) {

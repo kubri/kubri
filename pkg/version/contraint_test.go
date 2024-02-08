@@ -3,7 +3,7 @@ package version_test
 import (
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/version"
+	"github.com/kubri/kubri/pkg/version"
 )
 
 func TestConstraint(t *testing.T) {

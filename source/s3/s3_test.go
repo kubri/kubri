@@ -4,9 +4,9 @@ import (
 	"path"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/emulator"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/source/s3"
+	"github.com/kubri/kubri/internal/emulator"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/source/s3"
 )
 
 func TestS3(t *testing.T) {

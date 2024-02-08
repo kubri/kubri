@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/abemedia/appcast/target"
+	"github.com/kubri/kubri/target"
 )
 
 type Config struct {

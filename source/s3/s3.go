@@ -3,9 +3,10 @@ package s3
 import (
 	"net/url"
 
-	"github.com/abemedia/appcast/internal/blob"
-	"github.com/abemedia/appcast/source"
 	_ "gocloud.dev/blob/s3blob" // blob driver
+
+	"github.com/kubri/kubri/internal/blob"
+	"github.com/kubri/kubri/source"
 )
 
 type Config struct {

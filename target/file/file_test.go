@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/target/file"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/target/file"
 )
 
 func TestFile(t *testing.T) {

@@ -67,19 +67,19 @@ func Delete(key string) error {
 }
 
 func getEnv(key string) string {
-	return os.Getenv("APPCAST_" + strings.ToUpper(key))
+	return os.Getenv("KUBRI_" + strings.ToUpper(key))
 }
 
 func getPathEnv(key string) string {
-	return os.Getenv("APPCAST_" + strings.ToUpper(key) + "_PATH")
+	return os.Getenv("KUBRI_" + strings.ToUpper(key) + "_PATH")
 }
 
 func dir() string {
-	if dir := os.Getenv("APPCAST_PATH"); dir != "" {
+	if dir := os.Getenv("KUBRI_PATH"); dir != "" {
 		return dir
 	}
 	dir, _ := os.UserConfigDir()
-	dir = filepath.Join(dir, "appcast")
+	dir = filepath.Join(dir, "kubri")
 	_ = os.MkdirAll(dir, os.ModePerm)
 	return dir
 }

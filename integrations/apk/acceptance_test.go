@@ -6,11 +6,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/apk"
-	"github.com/abemedia/appcast/internal/emulator"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
+	"github.com/kubri/kubri/integrations/apk"
+	"github.com/kubri/kubri/internal/emulator"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestAcceptance(t *testing.T) {
@@ -49,12 +49,12 @@ func TestAcceptance(t *testing.T) {
 						c.Exec(t, "echo '"+url+"' >> /etc/apk/repositories")
 						c.Exec(t, "apk add --no-cache wget")
 						c.Exec(t, "wget -q -O /etc/apk/keys/"+config.KeyName+" "+url+"/"+config.KeyName)
-						c.Exec(t, "apk add --no-cache appcast-test")
+						c.Exec(t, "apk add --no-cache kubri-test")
 					} else {
-						c.Exec(t, "apk upgrade --no-cache appcast-test")
+						c.Exec(t, "apk upgrade --no-cache kubri-test")
 					}
 
-					if v := c.Exec(t, "appcast-test"); v != test.version {
+					if v := c.Exec(t, "kubri-test"); v != test.version {
 						t.Fatalf("expected version %q got %q", test.version, v)
 					}
 				})

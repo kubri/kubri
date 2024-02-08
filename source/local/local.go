@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abemedia/appcast/source"
+	"github.com/kubri/kubri/source"
 )
 
 type Config struct {

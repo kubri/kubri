@@ -5,8 +5,9 @@ import (
 	"io"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/apt"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/integrations/apt"
 )
 
 func TestCompress(t *testing.T) {

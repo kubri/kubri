@@ -4,9 +4,10 @@ import (
 	"net/url"
 	"path/filepath"
 
-	"github.com/abemedia/appcast/internal/blob"
-	"github.com/abemedia/appcast/source"
 	_ "gocloud.dev/blob/fileblob" // blob driver
+
+	"github.com/kubri/kubri/internal/blob"
+	"github.com/kubri/kubri/source"
 )
 
 type Config struct {

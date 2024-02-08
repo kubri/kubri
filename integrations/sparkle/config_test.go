@@ -3,8 +3,9 @@ package sparkle_test
 import (
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/sparkle"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/integrations/sparkle"
 )
 
 func TestConfigGetOptions(t *testing.T) {

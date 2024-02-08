@@ -1,63 +1,63 @@
-Package: appcast-test
+Package: kubri-test
 Version: 2.0.0
 Architecture: i386
 Maintainer: Test User <test@example.com>
 Depends: bash
 Recommends: git
-Conflicts: appcast-test-new
-Replaces: appcast-test-old
-Provides: appcast-test-alt
+Conflicts: kubri-test-new
+Replaces: kubri-test-old
+Provides: kubri-test-alt
 Priority: optional
 Section: utils
-Filename: pool/main/a/appcast-test/appcast-test_2.0.0_i386.deb
+Filename: pool/main/k/kubri-test/kubri-test_2.0.0_i386.deb
 Size: 860
-MD5sum: 1236f205442c2f783af83f91c2737f9f
-SHA1: e067a72ada9b115e18a5c87f1945bfe465b4f16f
-SHA256: 4ac66738a2d3436cc716788361e64e01d161dbddc98696d92f26ad5f35e93c05
+MD5sum: cd794ffeeaefc105fe2a2b67004a0a3f
+SHA1: 49ae593258926c210a2b0aec10e0d4b3af3b7955
+SHA256: c933375c525cb6afc0880e048365034d9f32eb6bba3871e7ae8f5e4e9bafa7e9
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.
  .
  Absolutely nothing.
 
-Package: appcast-test
+Package: kubri-test
 Version: 1.1.0
 Architecture: i386
 Maintainer: Test User <test@example.com>
 Depends: bash
 Recommends: git
-Conflicts: appcast-test-new
-Replaces: appcast-test-old
-Provides: appcast-test-alt
+Conflicts: kubri-test-new
+Replaces: kubri-test-old
+Provides: kubri-test-alt
 Priority: optional
 Section: utils
-Filename: pool/main/a/appcast-test/appcast-test_1.1.0_i386.deb
+Filename: pool/main/k/kubri-test/kubri-test_1.1.0_i386.deb
 Size: 862
-MD5sum: bdf5a5541a5a9ed7f56cb2722a2515dd
-SHA1: 99309ee5a6822ec6c5b1e5a8444c05ef6f18a48f
-SHA256: 2052d3d6a24d2ec3d182fe64ec4cef7d2cf9205fa388b53473393e4a4d0a23cf
+MD5sum: 02f1ed2e4aa3a4182bf93dbde953809e
+SHA1: 75775cdb445de0b3816126524addd04e9a7728a1
+SHA256: 31f128864ca0ec5ca80aedb35db5b5b59949c577bfebd29fd88afd87f1880447
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.
  .
  Absolutely nothing.
 
-Package: appcast-test
+Package: kubri-test
 Version: 1.0.0
 Architecture: i386
 Maintainer: Test User <test@example.com>
 Depends: bash
 Recommends: git
-Conflicts: appcast-test-new
-Replaces: appcast-test-old
-Provides: appcast-test-alt
+Conflicts: kubri-test-new
+Replaces: kubri-test-old
+Provides: kubri-test-alt
 Priority: optional
 Section: utils
-Filename: pool/main/a/appcast-test/appcast-test_1.0.0_i386.deb
-Size: 862
-MD5sum: 3b3aced8e6a09264b54bd750cba60327
-SHA1: 4026f621c30aab28af64b43c7c4ba722058825f2
-SHA256: 905085bc7be62e87389d5869df5e8c6cf7e1cfb15ea46130ad35ff3f533d91e3
+Filename: pool/main/k/kubri-test/kubri-test_1.0.0_i386.deb
+Size: 860
+MD5sum: a374cb07c98b780884fb8cd7e273b754
+SHA1: b315dec02a2a2a465d6ebdede610ce5dd9ac82a2
+SHA256: 15a50607c3e3ed65c55dba2b08839d794414660ead82c067df9519eee8ce601d
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.

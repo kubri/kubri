@@ -5,9 +5,9 @@ import (
 	"path"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/emulator"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/source/azureblob"
+	"github.com/kubri/kubri/internal/emulator"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/source/azureblob"
 )
 
 func TestAzureblob(t *testing.T) {

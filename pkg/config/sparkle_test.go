@@ -7,15 +7,16 @@ import (
 	"testing"
 
 	"github.com/MakeNowJust/heredoc/v2"
-	"github.com/abemedia/appcast/integrations/sparkle"
-	"github.com/abemedia/appcast/pkg/config"
-	"github.com/abemedia/appcast/pkg/crypto"
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/pkg/secret"
-	source "github.com/abemedia/appcast/source/file"
-	target "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/integrations/sparkle"
+	"github.com/kubri/kubri/pkg/config"
+	"github.com/kubri/kubri/pkg/crypto"
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/pkg/secret"
+	source "github.com/kubri/kubri/source/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestSparkle(t *testing.T) {
@@ -213,8 +214,8 @@ func TestSparkleDetectOS(t *testing.T) {
 		},
 	}
 
-	t.Setenv("APPCAST_PATH", t.TempDir())
-	path := filepath.Join(t.TempDir(), "appcast.yml")
+	t.Setenv("KUBRI_PATH", t.TempDir())
+	path := filepath.Join(t.TempDir(), "kubri.yml")
 	os.WriteFile(path, []byte(strings.ReplaceAll(heredoc.Doc(c), "\t", "  ")), os.ModePerm)
 
 	p, err := config.Load(path)

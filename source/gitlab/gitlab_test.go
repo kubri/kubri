@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/source/gitlab"
 	gl "github.com/xanzy/go-gitlab"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/source/gitlab"
 )
 
 func TestGitlab(t *testing.T) {

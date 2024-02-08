@@ -2,11 +2,12 @@ package sparkle
 
 import (
 	"dario.cat/mergo"
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/pkg/version"
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/target"
+
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/pkg/version"
+	"github.com/kubri/kubri/source"
+	"github.com/kubri/kubri/target"
 )
 
 type Config struct {

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/abemedia/appcast/integrations/sparkle"
+	"github.com/kubri/kubri/integrations/sparkle"
 )
 
 func TestOS_MarshalText(t *testing.T) {

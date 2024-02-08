@@ -9,7 +9,8 @@ import (
 	"github.com/ProtonMail/gopenpgp/v2/armor"
 	"github.com/ProtonMail/gopenpgp/v2/constants"
 	pgpcrypto "github.com/ProtonMail/gopenpgp/v2/crypto"
-	"github.com/abemedia/appcast/pkg/crypto"
+
+	"github.com/kubri/kubri/pkg/crypto"
 )
 
 type (

@@ -9,9 +9,10 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/abemedia/appcast/source"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/xanzy/go-gitlab"
+
+	"github.com/kubri/kubri/source"
 )
 
 type Config struct {

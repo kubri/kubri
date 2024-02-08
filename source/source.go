@@ -6,9 +6,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/abemedia/appcast/pkg/slices"
-	"github.com/abemedia/appcast/pkg/version"
 	"golang.org/x/mod/semver"
+
+	"github.com/kubri/kubri/pkg/slices"
+	"github.com/kubri/kubri/pkg/version"
 )
 
 type Release struct {

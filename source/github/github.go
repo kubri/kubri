@@ -10,9 +10,10 @@ import (
 	"os"
 	"path"
 
-	"github.com/abemedia/appcast/source"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
+
+	"github.com/kubri/kubri/source"
 )
 
 type Config struct {

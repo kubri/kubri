@@ -3,8 +3,9 @@ package slices_test
 import (
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/slices"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/pkg/slices"
 )
 
 func TestFilter(t *testing.T) {

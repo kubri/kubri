@@ -56,6 +56,8 @@ linters-settings:
         replacement: any
   gofumpt:
     extra-rules: true
+  goimports:
+    local-prefixes: github.com/kubri/kubri
   gomodguard:
     blocked:
       modules:

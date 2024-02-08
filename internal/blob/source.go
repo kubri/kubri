@@ -9,8 +9,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/abemedia/appcast/source"
 	"gocloud.dev/blob"
+
+	"github.com/kubri/kubri/source"
 )
 
 type blobSource struct {

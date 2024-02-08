@@ -7,10 +7,11 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/config"
 	"github.com/google/go-cmp/cmp"
 	"gopkg.in/yaml.v3"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/config"
 )
 
 func TestLoad(t *testing.T) {
@@ -21,38 +22,38 @@ func TestLoad(t *testing.T) {
 		mode   fs.FileMode
 		err    error
 	}{
-		{path: "appcast.yml"},
-		{path: "appcast.yaml"},
-		{path: ".appcast.yml"},
-		{path: ".appcast.yaml"},
-		{path: filepath.Join(".github", "appcast.yml")},
-		{path: filepath.Join(".github", "appcast.yaml")},
+		{path: "kubri.yml"},
+		{path: "kubri.yaml"},
+		{path: ".kubri.yml"},
+		{path: ".kubri.yaml"},
+		{path: filepath.Join(".github", "kubri.yml")},
+		{path: filepath.Join(".github", "kubri.yaml")},
 		{
 			path: "foo.yml",
 			err:  errors.New("no config file found"),
 		},
 		{
 			desc: "permission denied",
-			path: "appcast.yml",
-			err:  errors.New("open appcast.yml: permission denied"),
+			path: "kubri.yml",
+			err:  errors.New("open kubri.yml: permission denied"),
 			mode: 0o200,
 		},
 		{
 			desc:   "invalid yaml",
 			config: `*&%^`,
-			path:   "appcast.yml",
+			path:   "kubri.yml",
 			err:    errors.New("yaml: did not find expected alphabetic or numeric character"),
 		},
 		{
 			desc:   "non-existent field",
 			config: `foo: bar`,
-			path:   "appcast.yml",
+			path:   "kubri.yml",
 			err:    &yaml.TypeError{Errors: []string{"line 1: field foo not found in type config.config"}},
 		},
 		{
 			desc:   "failed validation",
 			config: `version: invalid`,
-			path:   "appcast.yml",
+			path:   "kubri.yml",
 			err: &config.Error{
 				Errors: []string{
 					"version must be a valid version constraint",

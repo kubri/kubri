@@ -3,10 +3,11 @@ package rsa_test
 import (
 	"testing"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/crypto/internal/cryptotest"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/crypto/internal/cryptotest"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
 )
 
 func TestRSA(t *testing.T) {

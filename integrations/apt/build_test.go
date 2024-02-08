@@ -13,13 +13,14 @@ import (
 	"testing/fstest"
 	"time"
 
-	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	source "github.com/abemedia/appcast/source/file"
-	"github.com/abemedia/appcast/target"
-	ftarget "github.com/abemedia/appcast/target/file"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	source "github.com/kubri/kubri/source/file"
+	"github.com/kubri/kubri/target"
+	ftarget "github.com/kubri/kubri/target/file"
 )
 
 func TestBuild(t *testing.T) {

@@ -3,9 +3,9 @@ package config
 import (
 	"fmt"
 
-	"github.com/abemedia/appcast/integrations/apt"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/pkg/secret"
+	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	"github.com/kubri/kubri/pkg/secret"
 )
 
 type aptConfig struct {

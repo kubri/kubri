@@ -4,8 +4,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/abemedia/appcast/source"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/source"
 )
 
 func TestByVersion(t *testing.T) {

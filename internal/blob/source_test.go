@@ -4,9 +4,10 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/blob"
-	"github.com/abemedia/appcast/internal/test"
 	_ "gocloud.dev/blob/memblob" // blob driver
+
+	"github.com/kubri/kubri/internal/blob"
+	"github.com/kubri/kubri/internal/test"
 )
 
 func TestSource(t *testing.T) {

@@ -9,10 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/local"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
+	"github.com/kubri/kubri/source"
+	"github.com/kubri/kubri/source/local"
 )
 
 func TestLocal(t *testing.T) {

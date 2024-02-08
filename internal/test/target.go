@@ -8,8 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/target"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/target"
 )
 
 type targetOptions struct {

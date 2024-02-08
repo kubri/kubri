@@ -3,9 +3,9 @@ package gcs_test
 import (
 	"testing"
 
-	"github.com/abemedia/appcast/internal/emulator"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/target/gcs"
+	"github.com/kubri/kubri/internal/emulator"
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/target/gcs"
 )
 
 func TestGCS(t *testing.T) {

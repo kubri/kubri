@@ -8,16 +8,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/abemedia/appcast/pkg/cmd"
-	"github.com/abemedia/appcast/pkg/crypto/dsa"
-	"github.com/abemedia/appcast/pkg/crypto/ed25519"
-	"github.com/abemedia/appcast/pkg/crypto/pgp"
-	"github.com/abemedia/appcast/pkg/crypto/rsa"
+	"github.com/kubri/kubri/pkg/cmd"
+	"github.com/kubri/kubri/pkg/crypto/dsa"
+	"github.com/kubri/kubri/pkg/crypto/ed25519"
+	"github.com/kubri/kubri/pkg/crypto/pgp"
+	"github.com/kubri/kubri/pkg/crypto/rsa"
 )
 
 func TestKeysPublicCmd(t *testing.T) {
 	dir := t.TempDir()
-	t.Setenv("APPCAST_PATH", dir)
+	t.Setenv("KUBRI_PATH", dir)
 
 	{
 		var stdout bytes.Buffer
@@ -111,7 +111,7 @@ func TestKeysPublicCmdErrors(t *testing.T) {
 		},
 	}
 
-	t.Setenv("APPCAST_PATH", t.TempDir())
+	t.Setenv("KUBRI_PATH", t.TempDir())
 
 	for _, test := range tests {
 		var stderr bytes.Buffer

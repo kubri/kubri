@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/target/github"
 	gh "github.com/google/go-github/github"
 	"golang.org/x/oauth2"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/target/github"
 )
 
 func TestGithub(t *testing.T) {

@@ -6,19 +6,20 @@ import (
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/config"
-	"github.com/abemedia/appcast/source"
-	"github.com/abemedia/appcast/source/azureblob"
-	"github.com/abemedia/appcast/source/file"
-	"github.com/abemedia/appcast/source/gcs"
-	"github.com/abemedia/appcast/source/github"
-	"github.com/abemedia/appcast/source/gitlab"
-	"github.com/abemedia/appcast/source/local"
-	"github.com/abemedia/appcast/source/s3"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/config"
+	"github.com/kubri/kubri/source"
+	"github.com/kubri/kubri/source/azureblob"
+	"github.com/kubri/kubri/source/file"
+	"github.com/kubri/kubri/source/gcs"
+	"github.com/kubri/kubri/source/github"
+	"github.com/kubri/kubri/source/gitlab"
+	"github.com/kubri/kubri/source/local"
+	"github.com/kubri/kubri/source/s3"
 )
 
 func TestSource(t *testing.T) {
@@ -302,7 +303,7 @@ func TestSource(t *testing.T) {
 				folder: .
 		`
 
-		path := filepath.Join(t.TempDir(), "appcast.yml")
+		path := filepath.Join(t.TempDir(), "kubri.yml")
 		os.WriteFile(path, test.JoinYAML(tc.config, baseConfig), os.ModePerm)
 
 		p, err := config.Load(path)

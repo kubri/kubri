@@ -4,9 +4,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/abemedia/appcast/internal/test"
-	"github.com/abemedia/appcast/pkg/config"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/kubri/kubri/internal/test"
+	"github.com/kubri/kubri/pkg/config"
 )
 
 func TestSchema(t *testing.T) {
