@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"io/fs"
 	"reflect"
 	"strings"
@@ -18,7 +17,7 @@ import (
 type Error struct{ Errors []string }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("invalid config:\n  %s", strings.Join(e.Errors, "\n  "))
+	return "invalid config:\n  " + strings.Join(e.Errors, "\n  ")
 }
 
 func Validate(c *config) error {
