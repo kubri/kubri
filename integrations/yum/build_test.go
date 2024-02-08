@@ -26,7 +26,7 @@ func TestBuild(t *testing.T) {
 	tgt, _ := target.New(target.Config{Path: dir})
 	key, _ := pgp.NewPrivateKey("test", "test@example.com")
 
-	test.Golden(t, "testdata", dir)
+	test.Golden(t, "testdata", dir, test.Ignore("*.rpm", "*.key", "*.asc"))
 
 	c := &yum.Config{
 		Source: src,

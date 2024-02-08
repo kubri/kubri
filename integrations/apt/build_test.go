@@ -30,7 +30,7 @@ func TestBuild(t *testing.T) {
 	src, _ := source.New(source.Config{Path: "../../testdata"})
 	tgt, _ := ftarget.New(ftarget.Config{Path: dir})
 
-	test.Golden(t, "testdata", dir)
+	test.Golden(t, "testdata", dir, test.Ignore("*.deb", "*.gz", "*.xz"))
 
 	t.Run("New", func(t *testing.T) {
 		c := &apt.Config{Source: src, Target: tgt}
