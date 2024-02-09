@@ -1,8 +1,6 @@
 package config
 
 import (
-	"errors"
-
 	"github.com/kubri/kubri/integrations/apk"
 	"github.com/kubri/kubri/pkg/crypto/rsa"
 	"github.com/kubri/kubri/pkg/secret"
@@ -22,7 +20,7 @@ func getApk(c *config) (*apk.Config, error) {
 			return nil, err
 		}
 		if c.Apk.KeyName == "" {
-			return nil, errors.New("missing key name")
+			return nil, &Error{Errors: []string{"apk.key-name is required when rsa_key is set"}}
 		}
 	}
 

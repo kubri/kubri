@@ -44,8 +44,6 @@ func (tc *targetConfig) UnmarshalYAML(node *yaml.Node) error {
 	}
 }
 
-var _ yaml.Unmarshaler = (*targetConfig)(nil)
-
 func (tc targetConfig) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		OneOf: []*jsonschema.Schema{
