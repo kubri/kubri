@@ -25,7 +25,7 @@ func buildCmd() *cobra.Command {
 		Use:     "build",
 		Short:   "Publish packages for common package managers and software update frameworks",
 		Aliases: []string{"b"},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			p, err := config.Load(configPath)
 			if err != nil {
 				return err

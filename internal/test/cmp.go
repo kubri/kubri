@@ -55,7 +55,7 @@ func CompareRSAPrivateKeys() cmp.Option {
 
 // ExportAll exports all unexported fields.
 func ExportAll() cmp.Option {
-	return cmp.Exporter(func(t reflect.Type) bool {
+	return cmp.Exporter(func(reflect.Type) bool {
 		return true
 	})
 }

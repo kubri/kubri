@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -169,7 +168,10 @@ func aptGolden() error {
 		return err
 	}
 
-	return filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+	return filepath.WalkDir(path, func(path string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
 		if filepath.Ext(path) != "" {
 			return os.Remove(path)
 		}
@@ -224,12 +226,12 @@ func apkGolden() error {
 		return err
 	}
 
-	return fs.WalkDir(os.DirFS(dir), ".", func(path string, d fs.DirEntry, err error) error {
+	return filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return err
 		}
-		if strings.HasSuffix(path, ".apk") {
-			os.Remove(filepath.Join(dir, path))
+		if filepath.Ext(path) == ".apk" {
+			return os.Remove(path)
 		}
 		return nil
 	})
