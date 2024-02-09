@@ -37,17 +37,13 @@ func New(c Config) (target.Target, error) {
 	client := github.NewClient(oauth2.NewClient(ctx, ts)).Repositories
 
 	// Ensure config is valid.
+	repo, _, err := client.Get(ctx, c.Owner, c.Repo)
+	if err != nil {
+		return nil, err
+	}
+
 	if c.Branch == "" {
-		repo, _, err := client.Get(ctx, c.Owner, c.Repo)
-		if err != nil {
-			return nil, err
-		}
 		c.Branch = *repo.DefaultBranch
-	} else {
-		_, _, err := client.GetBranch(ctx, c.Owner, c.Repo, c.Branch)
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	t := &githubTarget{
