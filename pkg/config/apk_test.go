@@ -1,7 +1,6 @@
 package config_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/kubri/kubri/integrations/apk"
@@ -92,7 +91,7 @@ func TestApk(t *testing.T) {
 				apk: {}
 			`,
 			hook: func() { secret.Put("rsa_key", keyBytes) },
-			err:  errors.New("missing key name"),
+			err:  &config.Error{Errors: []string{"apk.key-name is required when rsa_key is set"}},
 		},
 		{
 			desc: "invalid rsa key",
