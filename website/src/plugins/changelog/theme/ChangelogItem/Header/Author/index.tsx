@@ -5,18 +5,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
-import type {Props} from '@theme/BlogPostItem/Header/Author';
+import type { JSX } from 'react'
+import clsx from 'clsx'
+import Link from '@docusaurus/Link'
+import type { Props } from '@theme/BlogPostItem/Header/Author'
 
-import styles from './styles.module.css';
+import styles from './styles.module.css'
 
-export default function ChangelogAuthor({
-  author,
-  className,
-}: Props): JSX.Element {
-  const {name, url, imageURL} = author;
+export default function ChangelogAuthor({ author, className }: Props): JSX.Element {
+  const { name, url, imageURL } = author
   return (
     <div className={clsx('avatar margin-bottom--sm', className)}>
       {imageURL && (
@@ -29,11 +26,11 @@ export default function ChangelogAuthor({
               // Image returns 404 if the user's handle changes. We display a
               // fallback instead.
               e.currentTarget.src =
-                'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" fill="none" stroke="%2325c2a0" stroke-width="30" version="1.1"><circle cx="300" cy="230" r="115"/><path stroke-linecap="butt" d="M106.81863443903,481.4 a205,205 1 0,1 386.36273112194,0"/></svg>';
+                'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" fill="none" stroke="%2325c2a0" stroke-width="30" version="1.1"><circle cx="300" cy="230" r="115"/><path stroke-linecap="butt" d="M106.81863443903,481.4 a205,205 1 0,1 386.36273112194,0"/></svg>'
             }}
           />
         </Link>
       )}
     </div>
-  );
+  )
 }

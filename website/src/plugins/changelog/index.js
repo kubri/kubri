@@ -9,7 +9,6 @@ import path from 'path'
 import fs from 'fs-extra'
 import pluginContentBlog from '@docusaurus/plugin-content-blog'
 import { aliasedSitePath, docuHash, normalizeUrl } from '@docusaurus/utils'
-import { log } from 'console'
 
 /**
  * Multiple versions may be published on the same day, causing the order to be
@@ -109,15 +108,16 @@ export default async function ChangelogPlugin(context, options) {
         .filter(Boolean)
       await Promise.all(
         sections.map((section) =>
-          fs.outputFile(path.join(generateDir, `${section.title}.md`), section.content)
-        )
+          fs.outputFile(path.join(generateDir, `${section.title}.md`), section.content),
+        ),
       )
       const authorsPath = path.join(generateDir, 'authors.json')
       await fs.outputFile(authorsPath, JSON.stringify(authorsMap, null, 2))
       const content = await blogPlugin.loadContent()
       content.blogPosts.forEach((post, index) => {
         const pageIndex = Math.floor(index / options.postsPerPage)
-        post.metadata.listPageLink = normalizeUrl([
+        const { metadata } = post
+        metadata.listPageLink = normalizeUrl([
           context.baseUrl,
           options.routeBasePath,
           pageIndex === 0 ? '/' : `/page/${pageIndex + 1}`,

@@ -19,11 +19,12 @@ const config: Config = {
   onBrokenMarkdownLinks: 'warn',
 
   i18n: {
-    defaultLocale: defaultLocale,
+    defaultLocale,
     locales: [defaultLocale],
   },
 
   plugins: [
+    'docusaurus-plugin-sass',
     [
       './src/plugins/changelog/index.js',
       {
@@ -59,7 +60,7 @@ const config: Config = {
           editUrl: 'https://github.com/kubri/kubri/tree/master/website/',
         },
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: './src/css/custom.scss',
         },
       } satisfies Preset.Options,
     ],
