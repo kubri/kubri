@@ -53,6 +53,7 @@ function processSection(section) {
       authorsMap[author.alias] = author
     })
   }
+
   let hour = 20
   const date = title.match(/ \((?<date>.*)\)/)?.groups.date
   while (publishTimes.has(`${date}T${hour}:00`)) {
@@ -65,13 +66,8 @@ function processSection(section) {
     content: `---
 mdx:
  format: md
-date: ${`${date}T${hour}:00`}${
-      authors
-        ? `
-authors:
-${authors.map((author) => `  - '${author.alias}'`).join('\n')}`
-        : ''
-    }
+date: ${`${date}T${hour}:00`}
+${authors ? `authors:\n${authors.map((author) => `  - '${author.alias}'`).join('\n')}` : ''}
 ---
 
 # ${title.replace(/ \(.*\)/, '')}
