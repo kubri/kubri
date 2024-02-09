@@ -4,7 +4,7 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
+  padding: 8rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -22,14 +22,28 @@
   justify-content: center;
 }
 
-.features {
-  display: flex;
-  align-items: center;
-  padding: 2rem 0;
-  width: 100%;
+.section {
+  background-image: conic-gradient(
+    from 90deg at -10% 100%,
+    #bcc1cd 0deg,
+    #bcc1cd 90deg,
+    #fff 1turn
+  );
+  border-top-color: rgba(35, 39, 47, 0.1);
+  border-top-style: solid;
+  border-top-width: 1px;
+  font-size: 1.25rem;
+
+  h2 {
+    font-size: 2rem;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
 }
 
-.featureSvg {
-  height: 200px;
-  width: 200px;
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

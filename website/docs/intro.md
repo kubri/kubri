@@ -10,12 +10,8 @@ software update frameworks.
 ## Why we made it
 
 Kubri was created to solve the common problem of releasing your software for multiple different
-platforms.
-
-![y tho](./y_tho_meme.jpg)
-
-This is usually done with custom scripts, using various different tools which often even need to run
-on different operating systems, making the release process complex and disjointed.
+platforms. This is usually done with custom scripts, using various different tools which often even
+need to run on different operating systems, making the release process complex and disjointed.
 
 For example, to create a YUM repository you'd use the createrepo tool which only runs on Linux,
 while creating an App Installer file is commonly done in Visual Studio, which only runs on Windows.
@@ -53,6 +49,7 @@ target:
 # Use an empty object to enable the integration with default settings.
 apt: {}
 yum: {}
+apk: {}
 appinstaller: {}
 
 sparkle:
@@ -62,6 +59,12 @@ sparkle:
     - os: macos
       minimum-system-version: '10.13.0'
 ```
+
+## Why the name "Kubri"?
+
+The word "Kubri" derives from Arabic and translates to "bridge". We chose this name because it
+perfectly represents our mission to bridge the gap between software release and distribution,
+providing a seamless and efficient process.
 
 ## Need more?
 

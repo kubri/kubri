@@ -5,9 +5,6 @@ import Layout from '@theme/Layout'
 import Heading from '@theme/Heading'
 import { JSX } from 'react'
 
-import mountainSvg from '@site/static/img/undraw_docusaurus_mountain.svg'
-import treeSvg from '@site/static/img/undraw_docusaurus_tree.svg'
-import reactSvg from '@site/static/img/undraw_docusaurus_react.svg'
 import styles from './index.module.css'
 
 function HomepageHeader() {
@@ -29,72 +26,52 @@ function HomepageHeader() {
   )
 }
 
-interface FeatureItem {
-  title: string
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>
-  description: JSX.Element
-}
-
-const FeatureList: FeatureItem[] = [
+const FeatureList = [
   {
     title: 'Easy to Use',
-    Svg: mountainSvg,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and used to get your
-        website up and running quickly.
+        Write a simple YAML file to define your release process. Kubri will take care of the rest.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: treeSvg,
-    description: (
-      <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go ahead and move your
-        docs into the <code>docs</code> directory.
-      </>
-    ),
+    title: 'Works Everywhere',
+    description: <>Kubri has zero dependencies and works on Linux, Windows, and MacOS.</>,
   },
   {
-    title: 'Powered by React',
-    Svg: reactSvg,
+    title: 'Free and Open Source',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can be extended while
-        reusing the same header and footer.
+        Kubri is free to use and open source. It is licensed under the{' '}
+        <Link to="/license">MIT License</Link>.
       </>
     ),
   },
 ]
 
-function Feature({ title, Svg, description }: FeatureItem) {
-  return (
-    <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
-      </div>
-    </div>
-  )
-}
-
-function HomepageFeatures(): JSX.Element {
-  return (
-    <section className={styles.features}>
-      <div className="container">
-        <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
+const Integrations = [
+  {
+    title: 'APT',
+    description: 'Debian, Ubuntu etc.',
+  },
+  {
+    title: 'YUM / DNF / Zypper',
+    description: 'RHEL, Fedora, CentOS, OpenSUSE etc.',
+  },
+  {
+    title: 'APK',
+    description: 'Alpine Linux',
+  },
+  {
+    title: 'App Installer',
+    description: 'Windows',
+  },
+  {
+    title: 'Sparkle / WinSparkle',
+    description: 'MacOS, Windows',
+  },
+]
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext()
@@ -105,7 +82,72 @@ export default function Home(): JSX.Element {
     >
       <HomepageHeader />
       <main>
-        <HomepageFeatures />
+        <section className={styles.section}>
+          <div className="container padding-vert--xl">
+            <div className="row">
+              <div className={clsx('col col--6 margin-vert--md', styles.centered)}>
+                <span className={styles.lead}>
+                  Kubri takes the hassle out of releasing your software for multiple different
+                  platforms. It takes your releases from GitHub, GitLab or cloud storage systems and
+                  automatically creates repositories, releases, and artifacts for the platforms you
+                  care about.
+                </span>
+              </div>
+              <div className="col col--6">
+                <div className="card">
+                  <div className="card__header">
+                    <Heading as="h3">Supported Platforms</Heading>
+                  </div>
+                  <div className="card__body">
+                    <ul>
+                      {Integrations.map((integration, idx) => (
+                        <li key={idx}>
+                          <strong>{integration.title}</strong> ({integration.description})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className="container padding-vert--xl text--center">
+            <Heading as="h2" className="margin-bottom--lg">
+              How does it work?
+            </Heading>
+            <div>
+              <p>
+                Kubri simplifies the release process by allowing you to define your entire release
+                pipeline in a single YAML file. Whether your artifacts are stored on GitHub, GitLab,
+                or other platforms, Kubri automatically handles the download, repository generation,
+                package/metadata signing, and upload to your specified targets, allowing you to
+                effortlessly distribute your software to a wide array of platforms.
+              </p>
+              <p>
+                <Link to="/docs/intro#usage">Click here to see an example configuration.</Link>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className="container padding-vert--xl text--center">
+            <Heading as="h2" className="margin-bottom--lg">
+              Why Kubri?
+            </Heading>
+            <div className="row">
+              {FeatureList.map(({ title, description }, idx) => (
+                <div className="col" key={idx}>
+                  <Heading as="h3">{title}</Heading>
+                  <p>{description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
     </Layout>
   )
