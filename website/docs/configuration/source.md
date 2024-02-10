@@ -20,7 +20,7 @@ Automatically gets your GitHub releases to generate your repositories.
 
 | Name    | Description                                     |
 | ------- | ----------------------------------------------- |
-| `type`  | Must be `gitlab`.                               |
+| `type`  | Must be `github`.                               |
 | `owner` | Repository owner i.e. username or organisation. |
 | `repo`  | Repository name.                                |
 
@@ -64,7 +64,9 @@ source:
 
 ## File
 
-Automatically gets your GitLab releases to generate your repositories.
+Generate your repositories from local files.
+
+Expects files to be sorted into folders named after the version e.g. `./v1.0.0/my-app.dmg`
 
 ### Configuration
 
