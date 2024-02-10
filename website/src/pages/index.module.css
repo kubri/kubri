@@ -1,13 +1,5 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
-
 .heroBanner {
-  padding: 8rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+  padding: 6rem 0;
 }
 
 @media screen and (max-width: 996px) {
@@ -29,6 +21,16 @@
     #bcc1cd 90deg,
     #fff 1turn
   );
+
+  html[data-theme='dark'] & {
+    background-image: conic-gradient(
+      from -90deg at 110% 100%,
+      #2b303b 0deg,
+      #16181d 90deg,
+      #16181d 1turn
+    );
+  }
+
   border-top-color: rgba(35, 39, 47, 0.1);
   border-top-style: solid;
   border-top-width: 1px;

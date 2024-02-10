@@ -4,8 +4,7 @@
  * work well for content-centric websites.
  */
 
-$base: #387193;
-$base-lighter: lighten($base, 20%);
+$base: #149eca;
 
 :root {
   --ifm-color-primary: #{$base};
@@ -15,18 +14,4 @@ $base-lighter: lighten($base, 20%);
   --ifm-color-primary-light: #{lighten($base, 10%)};
   --ifm-color-primary-lighter: #{lighten($base, 20%)};
   --ifm-color-primary-lightest: #{lighten($base, 30%)};
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-}
-
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #{$base-lighter};
-  --ifm-color-primary-dark: #{darken($base-lighter, 10%)};
-  --ifm-color-primary-darker: #{darken($base-lighter, 20%)};
-  --ifm-color-primary-darkest: #{darken($base-lighter, 30%)};
-  --ifm-color-primary-light: #{lighten($base-lighter, 10%)};
-  --ifm-color-primary-lighter: #{lighten($base-lighter, 20%)};
-  --ifm-color-primary-lightest: #{lighten($base-lighter, 30%)};
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }

@@ -6,13 +6,15 @@ import Heading from '@theme/Heading'
 import { JSX } from 'react'
 
 import styles from './index.module.css'
+import Logo from '../../static/img/logo.svg'
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext()
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
+    <header className={clsx('hero hero--dark', styles.heroBanner)}>
+      <div className="container text--center">
+        <Logo width={200} />
+        <Heading as="h1" className="hero__title margin-vert--md">
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>

@@ -7,7 +7,7 @@ const defaultLocale = 'en'
 const config: Config = {
   title: 'Kubri',
   tagline: 'Sign and release software for common package managers and software update frameworks.',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   url: 'https://kubri.dev',
   baseUrl: '/',
@@ -68,7 +68,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    // image: 'img/docusaurus-social-card.jpg',
     navbar: {
       title: 'Kubri',
       logo: {
@@ -83,7 +83,7 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
-        { to: '/blog', label: 'Blog', position: 'left' },
+        // { to: '/blog', label: 'Blog', position: 'left' },
         {
           href: 'https://github.com/kubri/kubri',
           label: 'GitHub',
@@ -119,10 +119,10 @@ const config: Config = {
         {
           title: 'More',
           items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
+            // {
+            //   label: 'Blog',
+            //   to: '/blog',
+            // },
             {
               label: 'Changelog',
               to: '/changelog',
