@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/kubri/kubri/internal/test"
@@ -42,6 +43,9 @@ func TestFile(t *testing.T) {
 
 	t.Run("New", func(t *testing.T) {
 		t.Run("ResolvePathError", func(t *testing.T) {
+			if runtime.GOOS == "darwin" {
+				t.Skip("MacOS does not support this test")
+			}
 			wd, _ := os.Getwd()
 			defer os.Chdir(wd)
 
