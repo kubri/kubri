@@ -26,6 +26,7 @@ Path to the directory on your target.
 
 - Type: `string[]`
 - Default: `[gzip, xz]`
+- Allowed Values: `gzip`, `bzip2`, `xz`, `lzma`, `zstd`
 
 Compression algorithms to compress your package metadata with.
 

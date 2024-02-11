@@ -19,9 +19,24 @@ Disable Sparkle.
 ### `folder`
 
 - Type: `string`
-- Default: `'appcast'`
+- Default: `'sparkle'`
 
 Path to the directory on your target.
+
+### `filename`
+
+- Type: `string`
+- Default: `'appcast.xml'`
+
+Filename of your appcast feed.
+
+<!-- ### `upload-packages`
+
+- Type: `boolean`
+- Default: `false`
+
+Defines whether to upload packages to your target or reference them from your source. Set it to
+`true` if the source is private. -->
 
 ### `title`
 
