@@ -68,7 +68,7 @@ func Build(ctx context.Context, c *Config) error {
 		return nil
 	}
 
-	if err = repo.Write(c.RSAKey, c.KeyName); err != nil {
+	if err = repo.Write(c.RSAKey, c.KeyName+".rsa.pub"); err != nil {
 		return err
 	}
 
