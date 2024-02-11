@@ -1,0 +1,43 @@
+.heroBanner {
+  padding: 6rem 0;
+
+  @media screen and (max-width: 996px) {
+    padding: 2rem;
+  }
+}
+
+.section {
+  background-image: conic-gradient(
+    from 90deg at -10% 100%,
+    #bcc1cd 0deg,
+    #bcc1cd 90deg,
+    #fff 1turn
+  );
+  border-top-color: rgba(35, 39, 47, 0.1);
+  border-top-style: solid;
+  border-top-width: 1px;
+  font-size: 1.25rem;
+
+  h2 {
+    font-size: 2rem;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  html[data-theme='dark'] & {
+    background-image: conic-gradient(
+      from -90deg at 110% 100%,
+      #2b303b 0deg,
+      #16181d 90deg,
+      #16181d 1turn
+    );
+    border-color: rgba(246, 247, 249, 0.1);
+  }
+}
+
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

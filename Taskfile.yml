@@ -82,3 +82,10 @@ tasks:
       - ./go.(mod|sum)
     cmds:
       - go install -ldflags="-X 'main.version={{.GIT_COMMIT}}'"
+
+  docs:
+    desc: Run docs website
+    aliases: [d]
+    dir: website
+    cmds:
+      - yarn start
