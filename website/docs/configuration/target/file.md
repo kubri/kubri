@@ -4,19 +4,19 @@ sidebar_label: Local Filesystem
 
 # Local Filesystem Target
 
-Automatically gets your GitLab releases to generate your repositories.
+Stores your repositories in a local folder.
 
-### Configuration
+## Configuration
 
-| Name   | Description                                 |
-| ------ | ------------------------------------------- |
-| `type` | Must be `file`.                             |
-| `path` | Relative or absolute path to your releases. |
+| Name   | Description                                                                                |
+| ------ | ------------------------------------------------------------------------------------------ |
+| `type` | Must be `file`.                                                                            |
+| `path` | Relative or absolute path to your destination folder. Will be created if it doesn't exist. |
 
-### Example
+## Example
 
 ```yaml
 source:
   type: file
-  path: path/to/releases
+  path: path/to/destination
 ```

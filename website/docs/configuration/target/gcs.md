@@ -3,51 +3,31 @@ sidebar_position: 1
 sidebar_label: Google Cloud Storage
 ---
 
-# GCS Target
+# Google Cloud Storage Target
 
-Uploads your repositories to an Amazon S3 or S3-compatible bucket.
+Uploads your repositories to a Google Cloud Storage bucket.
 
 ## Environment variables
 
-| Name                    | Description                                                                                                                  |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `AWS_ACCESS_KEY_ID`     | The access key for your AWS account or S3-compatible service.                                                                |
-| `AWS_SECRET_ACCESS_KEY` | The secret key for your AWS account or S3-compatible service.                                                                |
-| `AWS_SESSION_TOKEN`     | The session key for your AWS account or S3-compatible service. This is only needed when you are using temporary credentials. |
+| Name                             | Description                                                         |
+| -------------------------------- | ------------------------------------------------------------------- |
+| `GOOGLE_APPLICATION_CREDENTIALS` | The location of a credential JSON file used to authenticate to GCS. |
 
 ## Configuration
 
-| Name          | Description                                                                           |
-| ------------- | ------------------------------------------------------------------------------------- |
-| `type`        | Must be `s3`.                                                                         |
-| `bucket`      | Storage bucket name.                                                                  |
-| `endpoint`    | The endpoint of your S3-compatible server. Not required if using Amazon S3.           |
-| `region`      | The bucket region.                                                                    |
-| `disable-ssl` | Disable SSL.                                                                          |
-| `folder`      | The folder to store your artifacts in. Defaults to the bucket root.                   |
-| `url`         | The public URL of your bucket. Defaults to `https://storage.googleapis.com/<bucket>`. |
+| Name     | Description                                                                           |
+| -------- | ------------------------------------------------------------------------------------- |
+| `type`   | Must be `gcs`.                                                                        |
+| `bucket` | Storage bucket name.                                                                  |
+| `folder` | The folder to store your artifacts in. Defaults to the bucket root.                   |
+| `url`    | The public URL of your bucket. Defaults to `https://storage.googleapis.com/{bucket}`. |
 
-## Examples
-
-### Amazon S3
+## Example
 
 ```yaml
 target:
-  type: s3
+  type: gcs
   bucket: my-bucket
-  region: us-east-1
   folder: my-folder
-  url: https://download.example.com
-```
-
-### Cloudflare R2
-
-```yaml
-target:
-  type: s3
-  bucket: my-bucket
-  region: auto
-  folder: my-folder
-  endpoint: https://<accountId>.r2.cloudflarestorage.com
-  url: https://download.example.com
+  url: https://downloads.example.com
 ```

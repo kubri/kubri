@@ -7,7 +7,7 @@ sidebar_label: Azure Blob Storage
 
 Uploads your repositories to an Azure Blob Storage bucket.
 
-### Environment variables
+## Environment variables
 
 | Name                      | Description                                                                                       |
 | ------------------------- | ------------------------------------------------------------------------------------------------- |
@@ -15,7 +15,7 @@ Uploads your repositories to an Azure Blob Storage bucket.
 | `AZURE_STORAGE_KEY`       | Storage account key. Must be used in conjunction with storage account name.                       |
 | `AZURE_STORAGE_SAS_TOKEN` | A Shared Access Signature (SAS). Must be used in conjunction with storage account name.           |
 
-### Configuration
+## Configuration
 
 | Name     | Description                                                         |
 | -------- | ------------------------------------------------------------------- |
@@ -24,7 +24,7 @@ Uploads your repositories to an Azure Blob Storage bucket.
 | `folder` | The folder to store your artifacts in. Defaults to the bucket root. |
 | `url`    | The public URL of your bucket.                                      |
 
-### Example
+## Example
 
 ```yaml
 target:
