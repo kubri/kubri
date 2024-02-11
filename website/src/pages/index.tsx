@@ -5,7 +5,7 @@ import Layout from '@theme/Layout'
 import Heading from '@theme/Heading'
 import { JSX } from 'react'
 
-import styles from './index.module.css'
+import styles from './index.module.scss'
 import Logo from '../../static/img/logo.svg'
 
 function HomepageHeader() {

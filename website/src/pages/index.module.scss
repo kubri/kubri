@@ -1,9 +1,7 @@
 .heroBanner {
   padding: 6rem 0;
-}
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
+  @media screen and (max-width: 996px) {
     padding: 2rem;
   }
 }
