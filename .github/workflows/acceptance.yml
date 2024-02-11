@@ -3,7 +3,7 @@ name: Acceptance Test
 on:
   pull_request:
     paths:
-      - 'integrations/*/*.go'
+      - integrations/*/*.go
 
 permissions:
   contents: read
@@ -23,7 +23,7 @@ jobs:
         id: packages
         uses: tj-actions/changed-files@v42
         with:
-          files: 'integrations/*/*.go'
+          files: integrations/*/*.go
           dir_names: true
           json: true
 

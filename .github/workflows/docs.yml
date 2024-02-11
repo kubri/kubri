@@ -1,9 +1,12 @@
 name: Docs
 
 on:
+  pull_request:
+    branches: [master]
   push:
-    # tags:
-    #   - v*
+    branches: [master]
+    tags: [v*]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,7 +14,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: 'pages'
+  group: pages
   cancel-in-progress: false
 
 defaults:
@@ -39,18 +42,24 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Run type check
+        run: yarn tsc
+
+      - name: Run ESLint
+        run: yarn lint
+
       - name: Build with Docusaurus
         run: yarn build
 
       - name: Upload artifact
-        # if: github.ref_type == 'tag'
+        if: github.ref_type == 'tag'
         uses: actions/upload-pages-artifact@v2
         with:
           path: website/build
 
   deploy:
     name: Deploy
-    # if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
