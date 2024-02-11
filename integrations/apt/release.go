@@ -41,6 +41,16 @@ func release(key *pgp.PrivateKey, algos CompressionAlgo, p []*Package) (string, 
 		}
 	}
 
+	if key != nil {
+		b, err := pgp.MarshalPublicKey(pgp.Public(key))
+		if err != nil {
+			return "", err
+		}
+		if err = os.WriteFile(filepath.Join(dir, "key.asc"), b, 0o600); err != nil {
+			return "", err
+		}
+	}
+
 	return dir, nil
 }
 
