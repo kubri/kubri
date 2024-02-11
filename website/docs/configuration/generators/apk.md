@@ -32,7 +32,7 @@ The name of the ed25519 key used to sign the metadata. Required if signing is en
 ## Example
 
 ```yaml
-apt:
+apk:
   folder: alpine
   key-name: alpine@example.com
 ```

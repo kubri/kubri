@@ -9,8 +9,63 @@ Releases are configured using a YAML file called `.kubri.yml`.
 A simple configuration consists of a source that your releases are fetched from, a target to publish
 your repositories to and one or more integrations, which are your repository generators.
 
+Click on the links below to learn more about each configuration.
+
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';
 
 <DocCardList />
+```
+
+## Full Example
+
+```yaml
+# source contains the configuration for the source of your releases.
+source:
+  type: github
+  owner: kubri
+  repo: kubri
+
+# target contains the configuration for the target of your releases.
+target:
+  type: s3
+  bucket: kubri-releases
+  region: us-west-1
+  url: https://download.example.com
+
+# apk contains the configuration for the Alpine Linux repository generator.
+apk:
+  folder: alpine
+  key-name: alpine@kubri.dev
+
+# apt contains the configuration for the Debian repository generator.
+apt:
+  folder: deb
+  compress: [gzip, xz]
+
+# yum contains the configuration for the YUM repository generator.
+yum:
+  folder: rpm
+
+# appinstaller contains the configuration for the AppInstaller generator.
+appinstaller:
+  folder: windows
+  upload-packages: true
+  on-launch:
+    hours-between-update-checks: 12
+    show-prompt: true
+    update-blocks-activation: true
+  automatic-background-task: true
+  force-update-from-any-version: true
+
+# sparkle contains the configuration for the Sparkle appcast feed generator.
+sparkle:
+  folder: appcast
+  title: My app feed title
+  description: My app feed description
+  params:
+    - os: windows
+      installer-arguments: /passive
+    - os: macos
+      minimum-system-version: '10.13.0'
 ```

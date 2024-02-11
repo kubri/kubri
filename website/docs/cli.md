@@ -2,7 +2,7 @@
 sidebar_position: 3
 ---
 
-# CLI
+# CLI Reference
 
 ## Options
 
