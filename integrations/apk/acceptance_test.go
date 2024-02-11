@@ -40,7 +40,7 @@ func TestAcceptance(t *testing.T) {
 
 			for i, test := range tests {
 				t.Run(test.name, func(t *testing.T) {
-					config := &apk.Config{Source: src, Target: tgt, Version: test.version, RSAKey: rsaKey, KeyName: "test@example.com.rsa.pub"}
+					config := &apk.Config{Source: src, Target: tgt, Version: test.version, RSAKey: rsaKey, KeyName: "test@example.com"}
 					if err := apk.Build(context.Background(), config); err != nil {
 						t.Fatal(err)
 					}
@@ -48,7 +48,7 @@ func TestAcceptance(t *testing.T) {
 					if i == 0 {
 						c.Exec(t, "echo '"+url+"' >> /etc/apk/repositories")
 						c.Exec(t, "apk add --no-cache wget")
-						c.Exec(t, "wget -q -O /etc/apk/keys/"+config.KeyName+" "+url+"/"+config.KeyName)
+						c.Exec(t, "wget -q -O /etc/apk/keys/"+config.KeyName+".rsa.pub "+url+"/"+config.KeyName+".rsa.pub")
 						c.Exec(t, "apk add --no-cache kubri-test")
 					} else {
 						c.Exec(t, "apk upgrade --no-cache kubri-test")

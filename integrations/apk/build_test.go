@@ -49,7 +49,7 @@ func TestBuild(t *testing.T) {
 			Source:  src,
 			Target:  tgt,
 			RSAKey:  rsaKey,
-			KeyName: "test.rsa.pub",
+			KeyName: "test@example.com",
 		}
 
 		err := apk.Build(context.Background(), c)
@@ -57,7 +57,7 @@ func TestBuild(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		pubBytes, _ := os.ReadFile(filepath.Join(dir, "test.rsa.pub"))
+		pubBytes, _ := os.ReadFile(filepath.Join(dir, "test@example.com.rsa.pub"))
 		pub, _ := rsa.UnmarshalPublicKey(pubBytes)
 		if !rsaKey.PublicKey.Equal(pub) {
 			t.Fatal("should have public key")
