@@ -28,7 +28,7 @@ const config: Config = {
     [
       './src/plugins/changelog/index.js',
       {
-        blogTitle: 'Kubri changelog',
+        blogTitle: 'Kubri Changelog',
         blogDescription: 'Keep yourself up-to-date about new features in every release',
         blogSidebarCount: 'ALL',
         blogSidebarTitle: 'Changelog',
