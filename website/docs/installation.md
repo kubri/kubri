@@ -49,6 +49,14 @@ sudo zypper --gpg-auto-import-keys refresh
 sudo zypper install kubri
 ```
 
+### APK
+
+```sh
+curl -fsSL -o /etc/apk/keys/alpine@kubri.dev.rsa.pub https://dl.kubri.dev/alpine/alpine@kubri.dev.rsa.pub
+echo 'https://dl.kubri.dev/alpine' >> /etc/apk/repositories
+apk add kubri
+```
+
 ## Binary
 
 Download the latest binary from https://github.com/kubri/kubri/releases and copy it to a folder in
