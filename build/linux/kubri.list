@@ -1,1 +1,1 @@
-deb [signed-by=/usr/share/keyrings/kubri.gpg] https://dl.kubri.dev/deb/ /
+deb [signed-by=/usr/share/keyrings/kubri.gpg] https://pkg.kubri.dev/deb/ /
