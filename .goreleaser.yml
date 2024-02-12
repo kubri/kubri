@@ -64,6 +64,7 @@ snapcrafts:
     grade: stable
     confinement: classic
     publish: true
+    disable: true # TODO: enable
 
 brews:
   - repository:
