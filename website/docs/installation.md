@@ -18,7 +18,7 @@ brew install kubri/tap/kubri
 
 ```sh
 curl -fsSL https://pkg.kubri.dev/deb/key.asc | gpg --dearmor | sudo tee /usr/share/keyrings/kubri.gpg
-echo 'deb [signed-by=/usr/share/keyrings/kubri.gpg] https://pkg.kubri.dev/deb/ /' | sudo tee /etc/apt/sources.list.d/kubri.list
+echo 'deb [signed-by=/usr/share/keyrings/kubri.gpg] https://pkg.kubri.dev/deb/ stable main' | sudo tee /etc/apt/sources.list.d/kubri.list
 sudo apt update
 sudo apt install kubri
 ```
