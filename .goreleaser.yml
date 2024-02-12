@@ -31,7 +31,7 @@ nfpms:
   - id: packages
     file_name_template: '{{ .ConventionalFileName }}'
     homepage: https://github.com/kubri/kubri
-    description: |-
+    description: >-
       Kubri signs and releases software for common package managers and
       software update frameworks.
     maintainer: Adam Bouqdib <adam@abemedia.co.uk>
@@ -58,7 +58,7 @@ nfpms:
 snapcrafts:
   - name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
     summary: Distribute auto-updating software with ease
-    description: |
+    description: >-
       Kubri signs and releases software for common package managers and
       software update frameworks.
     grade: stable
