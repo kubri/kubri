@@ -17,8 +17,8 @@ brew install kubri/tap/kubri
 ### APT
 
 ```sh
-curl -fsSL https://dl.kubri.dev/deb/key.asc | gpg --dearmor | sudo tee /usr/share/keyrings/kubri.gpg
-echo 'deb [signed-by=/usr/share/keyrings/kubri.gpg] https://dl.kubri.dev/deb/ /' | sudo tee /etc/apt/sources.list.d/kubri.list
+curl -fsSL https://pkg.kubri.dev/deb/key.asc | gpg --dearmor | sudo tee /usr/share/keyrings/kubri.gpg
+echo 'deb [signed-by=/usr/share/keyrings/kubri.gpg] https://pkg.kubri.dev/deb/ /' | sudo tee /etc/apt/sources.list.d/kubri.list
 sudo apt update
 sudo apt install kubri
 ```
@@ -28,11 +28,11 @@ sudo apt install kubri
 ```sh
 echo '[kubri]
 name=Kubri
-baseurl=https://dl.kubri.dev/rpm/
+baseurl=https://pkg.kubri.dev/rpm/
 enabled=1
 gpgcheck=0
 repo_gpgcheck=1
-gpgkey=https://dl.kubri.dev/rpm/repodata/repomd.xml.key' | sudo tee /etc/yum.repos.d/kubri.repo
+gpgkey=https://pkg.kubri.dev/rpm/repodata/repomd.xml.key' | sudo tee /etc/yum.repos.d/kubri.repo
 
 # yum
 sudo yum install kubri
@@ -44,7 +44,7 @@ sudo dnf install kubri
 ### Zypper
 
 ```sh
-sudo zypper addrepo "https://dl.kubri.dev/rpm/" kubri
+sudo zypper addrepo "https://pkg.kubri.dev/rpm/" kubri
 sudo zypper --gpg-auto-import-keys refresh
 sudo zypper install kubri
 ```
@@ -52,8 +52,8 @@ sudo zypper install kubri
 ### APK
 
 ```sh
-curl -fsSL -o /etc/apk/keys/alpine@kubri.dev.rsa.pub https://dl.kubri.dev/alpine/alpine@kubri.dev.rsa.pub
-echo 'https://dl.kubri.dev/alpine' >> /etc/apk/repositories
+curl -fsSL -o /etc/apk/keys/info@kubri.dev.rsa.pub https://pkg.kubri.dev/alpine/info@kubri.dev.rsa.pub
+echo 'https://pkg.kubri.dev/alpine' >> /etc/apk/repositories
 apk add kubri
 ```
 
