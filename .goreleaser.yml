@@ -80,9 +80,10 @@ brews:
     license: MIT
     test: system "#{bin}/kubri version"
     folder: Formula
+    homepage: https://kubri.dev/
     description: >-
       Kubri signs and releases software for common package managers and
       software update frameworks.
 
 changelog:
-  skip: true
+  disable: true
