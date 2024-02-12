@@ -3,6 +3,7 @@ name: Docs
 on:
   pull_request:
     branches: [master]
+    paths: [website/**]
   push:
     branches: [master]
     tags: [v*]
