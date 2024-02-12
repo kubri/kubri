@@ -74,7 +74,7 @@ snapcrafts:
     publish: true
 
 brews:
-  - tap:
+  - repository:
       owner: kubri
       name: homebrew-tap
     license: MIT
