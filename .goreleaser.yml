@@ -39,9 +39,13 @@ nfpms:
     vendor: Kubri
     section: utils
     formats:
+      - apk
       - deb
       - rpm
     contents:
+      - src: build/linux/kubri.gpg
+        dst: /usr/share/keyrings/kubri.gpg
+        packager: deb
       - src: build/linux/kubri.list
         dst: /etc/apt/sources.list.d/kubri.list
         packager: deb
