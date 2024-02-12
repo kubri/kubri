@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.5.0](https://github.com/kubri/kubri/compare/v0.4.0...v0.5.0) (2024-02-12)
+
+
+### Features
+
+* **apt:** upload gpg public key ([#336](https://github.com/kubri/kubri/issues/336)) ([6b30d3f](https://github.com/kubri/kubri/commit/6b30d3f53cd6756d9917f803461645e157f1aa55))
+* rename to kubri ([#315](https://github.com/kubri/kubri/issues/315)) ([adac6a4](https://github.com/kubri/kubri/commit/adac6a40c20307baa12a7ec33737540c2cb73094))
+* **target/github:** allow non-existent branch ([#312](https://github.com/kubri/kubri/issues/312)) ([7ecd098](https://github.com/kubri/kubri/commit/7ecd0987f9bb91a4bedce64e6e23eea5752e7a7e))
+
+
+### Bug Fixes
+
+* **apk:** key name missing .rsa.pub suffix ([#337](https://github.com/kubri/kubri/issues/337)) ([f33e1ff](https://github.com/kubri/kubri/commit/f33e1ffce29e293433af7fe948cdff4ab923e150))
+
 ## [0.4.0](https://github.com/kubri/kubri/compare/v0.3.0...v0.4.0) (2024-02-04)
 
 
