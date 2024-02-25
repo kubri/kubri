@@ -9,6 +9,7 @@ import (
 
 func Schema() []byte {
 	s := schema.Reflect(config{})
+	s.ID = "https://kubri.dev/schema.json"
 	b, _ := json.MarshalIndent(s, "", "  ") //nolint:errchkjson
 	return b
 }

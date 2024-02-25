@@ -52,6 +52,10 @@ jobs:
       - name: Build with Docusaurus
         run: yarn build
 
+      - name: Copy jsonschema
+        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+        run: cp -r ../pkg/config/testdata/jsonschema.json build/schema.json
+
       - name: Upload artifact
         if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
         uses: actions/upload-pages-artifact@v3
