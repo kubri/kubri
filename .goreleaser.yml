@@ -112,5 +112,50 @@ winget:
           name: winget-pkgs
           branch: master
 
+dockers:
+  - image_templates:
+      - kubri/kubri:v{{ .Version }}-amd64
+    dockerfile: build/docker/Dockerfile
+    goos: linux
+    goarch: amd64
+    use: buildx
+    build_flag_templates:
+      - --pull
+      - --label=org.opencontainers.image.name={{.ProjectName}}
+      - --label=org.opencontainers.image.description=Sign and release software
+      - --label=org.opencontainers.image.source={{.GitURL}}
+      - --label=org.opencontainers.image.url={{.GitURL}}
+      - --label=org.opencontainers.image.documentation=https://kubri.dev/
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.revision={{.FullCommit}}
+      - --label=org.opencontainers.image.version={{.Version}}
+      - --platform=linux/amd64
+  - image_templates:
+      - kubri/kubri:v{{ .Version }}-arm64
+    goos: linux
+    goarch: arm64
+    dockerfile: build/docker/Dockerfile
+    build_flag_templates:
+      - --pull
+      - --label=org.opencontainers.image.name={{.ProjectName}}
+      - --label=org.opencontainers.image.description=Sign and release software
+      - --label=org.opencontainers.image.source={{.GitURL}}
+      - --label=org.opencontainers.image.url={{.GitURL}}
+      - --label=org.opencontainers.image.documentation=https://kubri.dev/
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.revision={{.FullCommit}}
+      - --label=org.opencontainers.image.version={{.Version}}
+      - --platform=linux/arm64
+
+docker_manifests:
+  - name_template: kubri/kubri:v{{ .Version }}
+    image_templates:
+      - kubri/kubri:v{{ .Version }}-amd64
+      - kubri/kubri:v{{ .Version }}-arm64
+  - name_template: kubri/kubri:latest
+    image_templates:
+      - kubri/kubri:v{{ .Version }}-amd64
+      - kubri/kubri:v{{ .Version }}-arm64
+
 changelog:
   disable: true
