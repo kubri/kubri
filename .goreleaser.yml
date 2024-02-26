@@ -78,5 +78,39 @@ brews:
       Kubri signs and releases software for common package managers and
       software update frameworks.
 
+winget:
+  - name: kubri
+    publisher: Kubri
+    short_description: Distribute auto-updating software with ease
+    description: >-
+      Kubri signs and releases software for common package managers and
+      software update frameworks.
+    license: MIT
+    homepage: https://kubri.dev/
+    publisher_url: https://kubri.dev/
+    publisher_support_url: https://github.com/kubri/kubri/issues
+    release_notes_url: https://github.com/kubri/kubri/releases/tag/{{.Tag}}
+    tags:
+      - release
+      - update
+      - devops
+      - tool
+      - repository
+      - apt
+      - yum
+      - apk
+      - sparkle
+      - appinstaller
+    repository:
+      owner: kubri
+      name: winget-pkgs
+      branch: kubri-{{.Version}}
+      pull_request:
+        enabled: true
+        base:
+          owner: microsoft
+          name: winget-pkgs
+          branch: master
+
 changelog:
   disable: true
