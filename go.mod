@@ -42,7 +42,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.8.0
 	github.com/testcontainers/testcontainers-go v0.29.1
-	github.com/ulikunitz/xz v0.5.11
+	github.com/ulikunitz/xz v0.5.12
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	github.com/xanzy/go-gitlab v0.101.0
 	gitlab.alpinelinux.org/alpine/go v0.10.0
