@@ -44,7 +44,7 @@ require (
 	github.com/testcontainers/testcontainers-go v0.30.0
 	github.com/ulikunitz/xz v0.5.12
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	github.com/xanzy/go-gitlab v0.103.0
+	github.com/xanzy/go-gitlab v0.104.0
 	gitlab.alpinelinux.org/alpine/go v0.10.0
 	gocloud.dev v0.37.0
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225
