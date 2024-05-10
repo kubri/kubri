@@ -119,7 +119,7 @@ func (r *repo) Add(b []byte) error {
 		Format: Format{
 			License:     h.License(),
 			Vendor:      h.Vendor(),
-			Group:       h.Groups()[0],
+			Group:       h.Groups(),
 			BuildHost:   h.BuildHost(),
 			SourceRPM:   h.SourceRPM(),
 			HeaderRange: HeaderRange{Start: start, End: end},
