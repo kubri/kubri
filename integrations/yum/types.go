@@ -80,7 +80,7 @@ type Time struct {
 type Format struct {
 	License     string      `xml:"rpm:license,omitempty"`
 	Vendor      string      `xml:"rpm:vendor,omitempty"`
-	Group       string      `xml:"rpm:group,omitempty"`
+	Group       []string    `xml:"rpm:group,omitempty"`
 	BuildHost   string      `xml:"rpm:buildhost,omitempty"`
 	SourceRPM   string      `xml:"rpm:sourcerpm,omitempty"`
 	HeaderRange HeaderRange `xml:"rpm:header-range"`
@@ -98,7 +98,7 @@ func (f *Format) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
 	var data struct {
 		License     string      `xml:"license"`
 		Vendor      string      `xml:"vendor"`
-		Group       string      `xml:"group"`
+		Group       []string    `xml:"group"`
 		BuildHost   string      `xml:"buildhost"`
 		SourceRPM   string      `xml:"sourcerpm"`
 		HeaderRange HeaderRange `xml:"header-range"`
