@@ -2,8 +2,6 @@ run:
   timeout: 5m
   build-tags:
     - acceptance
-  skip-dirs:
-    - testdata
 
 linters:
   presets:
@@ -24,13 +22,13 @@ linters:
     - cyclop
     - deadcode # deprecated
     - depguard
+    - err113 # TODO: turn on and fix
     - errorlint # TODO: turn on and fix
     - exhaustive
     - exhaustivestruct # deprecated
     - exhaustruct
     - gci
     - godox
-    - goerr113 # TODO: turn on and fix
     - golint # deprecated
     - gomoddirectives # TODO: remove when go-rpm is updated.
     - interfacer # deprecated
@@ -91,6 +89,7 @@ linters-settings:
       - yaml
       - validate
       - jsonschema
+
 issues:
   fix: true
   exclude-rules:
