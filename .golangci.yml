@@ -20,29 +20,19 @@ linters:
     - unused
   disable:
     - cyclop
-    - deadcode # deprecated
     - depguard
     - err113 # TODO: turn on and fix
     - errorlint # TODO: turn on and fix
     - exhaustive
-    - exhaustivestruct # deprecated
     - exhaustruct
     - gci
     - godox
-    - golint # deprecated
     - gomoddirectives # TODO: remove when go-rpm is updated.
-    - interfacer # deprecated
-    - ireturn # false positive on returning generic
-    - maligned # deprecated
     - mnd
     - musttag
     - nonamedreturns
-    - nosnakecase # deprecated
     - nlreturn
     - paralleltest
-    - scopelint # deprecated
-    - structcheck # deprecated
-    - varcheck # deprecated
     - varnamelen
     - wrapcheck
     - wsl
@@ -76,6 +66,13 @@ linters-settings:
     enable-all: true
     disable:
       - fieldalignment
+  ireturn:
+    allow:
+      - error
+      - generic
+      - stdlib
+      - github.com/google/go-cmp/cmp.Option
+      - github.com/kubri/kubri/target.Target
   nolintlint:
     require-specific: true
   tagliatelle:
