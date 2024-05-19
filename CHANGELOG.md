@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/kubri/kubri/compare/v0.5.0...v0.5.1) (2024-05-19)
+
+
+### Bug Fixes
+
+* **rpm:** panic when package has no group ([#411](https://github.com/kubri/kubri/issues/411)) ([60ef176](https://github.com/kubri/kubri/commit/60ef176a29406812744179c4000fb106af9ca29c))
+
 ## [0.5.0](https://github.com/kubri/kubri/compare/v0.4.0...v0.5.0) (2024-02-12)
 
 
