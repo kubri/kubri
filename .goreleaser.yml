@@ -72,7 +72,7 @@ brews:
       name: homebrew-tap
     license: MIT
     test: system "#{bin}/kubri version"
-    folder: Formula
+    directory: Formula
     homepage: https://kubri.dev/
     description: >-
       Kubri signs and releases software for common package managers and
