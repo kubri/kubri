@@ -79,7 +79,7 @@ brews:
       software update frameworks.
 
 winget:
-  - name: kubri
+  - name: Kubri
     publisher: Kubri
     short_description: Distribute auto-updating software with ease
     description: >-
