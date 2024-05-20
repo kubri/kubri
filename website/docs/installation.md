@@ -57,6 +57,12 @@ echo 'https://pkg.kubri.dev/alpine' >> /etc/apk/repositories
 apk add kubri
 ```
 
+### Winget
+
+```sh
+winget install Kubri.Kubri
+```
+
 ## Docker
 
 Run Kubri from docker.
