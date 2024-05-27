@@ -45,9 +45,9 @@ require (
 	github.com/ulikunitz/xz v0.5.12
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	github.com/xanzy/go-gitlab v0.105.0
-	gitlab.alpinelinux.org/alpine/go v0.10.0
+	gitlab.alpinelinux.org/alpine/go v0.10.1
 	gocloud.dev v0.37.0
-	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225
+	golang.org/x/exp v0.0.0-20240314144324-c7f7c6466f7f
 	golang.org/x/mod v0.17.0
 	golang.org/x/oauth2 v0.20.0
 	golang.org/x/sync v0.7.0
