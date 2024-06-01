@@ -38,7 +38,7 @@ tasks:
     aliases: [b]
     sources:
       - ./**/*.go
-      - ./go.(mod|sum)
+      - ./go.{mod,sum}
     generates:
       - ./kubri
     cmds:
@@ -49,10 +49,10 @@ tasks:
     aliases: [l]
     sources:
       - './**/*.go'
-      - ./go.(mod|sum)
+      - ./go.{mod,sum}
       - .golangci.yml
     cmds:
-      - golangci-lint run
+      - golangci-lint run --fix
 
   test:
     desc: Run test suite
@@ -79,7 +79,7 @@ tasks:
     aliases: [i]
     sources:
       - './**/*.go'
-      - ./go.(mod|sum)
+      - ./go.{mod,sum}
     cmds:
       - go install -ldflags="-X 'main.version={{.GIT_COMMIT}}'"
 
