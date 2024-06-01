@@ -77,7 +77,7 @@ func (s *localSource) GetRelease(ctx context.Context, version string) (*source.R
 }
 
 func (s *localSource) UploadAsset(_ context.Context, _, name string, data []byte) error {
-	return os.WriteFile(filepath.Join(s.root, name), data, os.ModePerm)
+	return os.WriteFile(filepath.Join(s.root, name), data, os.ModePerm) //nolint:gosec
 }
 
 func (s *localSource) DownloadAsset(_ context.Context, _, name string) ([]byte, error) {
