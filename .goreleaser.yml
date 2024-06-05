@@ -1,3 +1,5 @@
+version: 2
+
 builds:
   - targets:
       - go_first_class
