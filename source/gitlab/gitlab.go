@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
 	"strconv"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -100,7 +99,7 @@ func (s *gitlabSource) UploadAsset(ctx context.Context, version, name string, da
 	}
 
 	u := s.client.BaseURL()
-	u.Path = path.Join(s.repo, file.URL)
+	u.Path = file.FullPath
 	url := u.String()
 
 	opt := &gitlab.CreateReleaseLinkOptions{Name: &name, URL: &url}
