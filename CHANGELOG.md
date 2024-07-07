@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/kubri/kubri/compare/v0.5.1...v0.5.2) (2024-07-07)
+
+
+### Bug Fixes
+
+* **source/gitlab:** upload asset uses wrong path ([#442](https://github.com/kubri/kubri/issues/442)) ([1b0ccec](https://github.com/kubri/kubri/commit/1b0ccec0ae423aa50744bc471267bccde70b1afd))
+
 ## [0.5.1](https://github.com/kubri/kubri/compare/v0.5.0...v0.5.1) (2024-05-19)
 
 
