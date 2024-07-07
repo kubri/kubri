@@ -13,6 +13,10 @@ replace github.com/invopop/jsonschema v0.12.0 => github.com/abemedia/jsonschema 
 // https://github.com/go-playground/validator/pull/1211
 replace github.com/go-playground/validator/v10 => github.com/abemedia/validator/v10 v10.0.0-20240110181639-80db7adbfa70
 
+// TODO: Remove when the following PR is merged:
+// https://github.com/xanzy/go-gitlab/pull/1968
+replace github.com/xanzy/go-gitlab v0.106.0 => github.com/abemedia/go-gitlab v0.0.0-20240707085002-5766f91a895c
+
 require (
 	bou.ke/monkey v1.0.2
 	dario.cat/mergo v1.0.0
