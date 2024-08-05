@@ -52,7 +52,7 @@ require (
 	gitlab.alpinelinux.org/alpine/go v0.10.1
 	gocloud.dev v0.38.0
 	golang.org/x/exp v0.0.0-20240314144324-c7f7c6466f7f
-	golang.org/x/mod v0.19.0
+	golang.org/x/mod v0.20.0
 	golang.org/x/oauth2 v0.21.0
 	golang.org/x/sync v0.8.0
 	gopkg.in/yaml.v3 v3.0.1
