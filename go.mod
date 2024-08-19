@@ -19,7 +19,7 @@ replace github.com/xanzy/go-gitlab v0.106.0 => github.com/abemedia/go-gitlab v0.
 
 require (
 	bou.ke/monkey v1.0.2
-	dario.cat/mergo v1.0.0
+	dario.cat/mergo v1.0.1
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/ProtonMail/go-crypto v1.0.0
