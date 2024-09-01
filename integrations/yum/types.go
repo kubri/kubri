@@ -7,7 +7,7 @@ import (
 
 type RepoMD struct {
 	XMLName  xml.Name `xml:"http://linux.duke.edu/metadata/repo repomd"`
-	Revision int      `xml:"revision,omitempty"`
+	Revision int64    `xml:"revision,omitempty"`
 	Data     []Data   `xml:"data"`
 }
 
@@ -16,7 +16,7 @@ type Data struct {
 	Checksum     Checksum `xml:"checksum"`
 	OpenChecksum Checksum `xml:"open-checksum"`
 	Location     Location `xml:"location"`
-	Timestamp    int      `xml:"timestamp"`
+	Timestamp    int64    `xml:"timestamp"`
 	Size         int      `xml:"size,omitempty"`
 	OpenSize     int      `xml:"open-size,omitempty"`
 }
@@ -73,8 +73,8 @@ type Package struct {
 }
 
 type Time struct {
-	File  int `xml:"file,attr"`
-	Build int `xml:"build,attr"`
+	File  int64 `xml:"file,attr"`
+	Build int64 `xml:"build,attr"`
 }
 
 type Format struct {
@@ -148,9 +148,9 @@ type Entry struct {
 }
 
 type Size struct {
-	Package   int `xml:"package,attr"`
-	Installed int `xml:"installed,attr"`
-	Archive   int `xml:"archive,attr"`
+	Package   int    `xml:"package,attr"`
+	Installed uint64 `xml:"installed,attr"`
+	Archive   uint64 `xml:"archive,attr"`
 }
 
 type FileLists struct {
