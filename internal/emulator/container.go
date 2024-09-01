@@ -71,7 +71,7 @@ func Build(t *testing.T, dockerfile string) Container {
 	}
 
 	return runContainer(t, testcontainers.ContainerRequest{
-		FromDockerfile:     testcontainers.FromDockerfile{ContextArchive: &buf},
+		FromDockerfile:     testcontainers.FromDockerfile{ContextArchive: bytes.NewReader(buf.Bytes())},
 		HostConfigModifier: func(hc *container.HostConfig) { hc.NetworkMode = "host" },
 	})
 }
