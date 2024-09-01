@@ -13,6 +13,8 @@ import (
 	"github.com/kubri/kubri/source"
 )
 
+// Source tests the given source.
+//
 //nolint:funlen
 func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) string) {
 	t.Helper()

@@ -82,7 +82,7 @@ func (r *repo) Add(b []byte) error {
 	}
 
 	id := h.String()
-	checksum := sha256.Sum256(b) // TODO: add checksum
+	checksum := sha256.Sum256(b)
 	start, end := h.HeaderRange()
 	files := h.Files()
 
