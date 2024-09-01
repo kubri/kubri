@@ -24,6 +24,8 @@ type Config struct {
 	KeyName    string
 }
 
+// Build creates or updates an APK repository.
+//
 //nolint:funlen
 func Build(ctx context.Context, c *Config) error {
 	repo, err := openRepo(ctx, c.Target)

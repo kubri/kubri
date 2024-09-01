@@ -39,6 +39,8 @@ func WithOpenSSLTest(arg ...string) Option {
 	return func(o *options) { o.opensslArgs = arg }
 }
 
+// Test runs the tests for the given crypto implementation.
+//
 //nolint:funlen,gocognit,maintidx
 func Test[PrivateKey, PublicKey any](t *testing.T, i Implementation[PrivateKey, PublicKey], opts ...Option) {
 	var opt options

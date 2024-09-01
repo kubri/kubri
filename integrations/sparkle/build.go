@@ -18,6 +18,7 @@ import (
 	"github.com/kubri/kubri/source"
 )
 
+// Build creates or updates a Sparkle RSS feed.
 func Build(ctx context.Context, c *Config) error {
 	items := read(ctx, c)
 

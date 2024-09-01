@@ -36,6 +36,8 @@ func WithIgnoreRemoveNotFound() TargetOption {
 	}
 }
 
+// Target tests the given target.
+//
 //nolint:funlen,gocognit
 func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ...TargetOption) {
 	t.Helper()
