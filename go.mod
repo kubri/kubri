@@ -3,7 +3,7 @@ module github.com/kubri/kubri
 go 1.23
 
 // TODO: Remove when v1.3.0 is released:
-replace github.com/cavaliergopher/rpm v1.2.0 => github.com/abemedia/rpm v0.0.0-20230903161415-49b78cf4b264
+replace github.com/cavaliergopher/rpm v1.2.0 => github.com/cavaliergopher/rpm v0.0.0-20231126213118-b2e876bef7ce
 
 // TODO: Remove when the following PR is merged:
 // https://github.com/invopop/jsonschema/pull/126
@@ -12,10 +12,6 @@ replace github.com/invopop/jsonschema v0.12.0 => github.com/abemedia/jsonschema 
 // TODO: Remove when the following PR is merged:
 // https://github.com/go-playground/validator/pull/1211
 replace github.com/go-playground/validator/v10 => github.com/abemedia/validator/v10 v10.0.0-20240110181639-80db7adbfa70
-
-// TODO: Remove when the following PR is merged:
-// https://github.com/xanzy/go-gitlab/pull/1968
-replace github.com/xanzy/go-gitlab v0.106.0 => github.com/abemedia/go-gitlab v0.0.0-20240707085002-5766f91a895c
 
 require (
 	bou.ke/monkey v1.0.2
@@ -48,7 +44,7 @@ require (
 	github.com/testcontainers/testcontainers-go v0.32.0
 	github.com/ulikunitz/xz v0.5.12
 	github.com/wk8/go-ordered-map/v2 v2.1.8
-	github.com/xanzy/go-gitlab v0.106.0
+	github.com/xanzy/go-gitlab v0.108.0
 	gitlab.alpinelinux.org/alpine/go v0.10.1
 	gocloud.dev v0.38.0
 	golang.org/x/exp v0.0.0-20240314144324-c7f7c6466f7f
