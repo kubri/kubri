@@ -145,7 +145,7 @@ func newSliceEncoder(typ reflect.Type) (encoder, error) {
 	}
 
 	return func(w io.Writer, v reflect.Value) error {
-		for i := 0; i < v.Len(); i++ {
+		for i := range v.Len() {
 			if i != 0 {
 				if _, err := w.Write(nl); err != nil {
 					return err
@@ -164,8 +164,7 @@ func newSliceEncoder(typ reflect.Type) (encoder, error) {
 func newStructEncoder(typ reflect.Type) (encoder, error) {
 	encoders := []func(buf *bytes.Buffer, w io.Writer, v reflect.Value) error{}
 
-	for i := 0; i < typ.NumField(); i++ {
-		i := i
+	for i := range typ.NumField() {
 		field := typ.Field(i)
 
 		n := getFieldName(field)
@@ -271,7 +270,7 @@ func newByteArrayEncoder(typ reflect.Type) (encoder, error) {
 	return func(w io.Writer, v reflect.Value) error {
 		var isNonZero bool
 		b := make([]byte, size)
-		for i := 0; i < size; i++ {
+		for i := range size {
 			if n := v.Index(i).Uint(); n > 0 {
 				b[i] = byte(n)
 				isNonZero = true
