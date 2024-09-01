@@ -106,12 +106,12 @@ func (r *repo) Add(b []byte) error {
 		URL:         h.URL(),
 		Time: Time{
 			File:  timeNow(),
-			Build: int(h.BuildTime().Unix()),
+			Build: h.BuildTime().Unix(),
 		},
 		Size: Size{
 			Package:   len(b),
-			Archive:   int(h.ArchiveSize()),
-			Installed: int(h.Size()),
+			Archive:   h.ArchiveSize(),
+			Installed: h.Size(),
 		},
 		Location: Location{
 			HREF: "Packages/" + id[0:1] + "/" + id + ".rpm",
@@ -329,4 +329,4 @@ func writeFile(path string, data []byte) error {
 }
 
 //nolint:gochecknoglobals
-var timeNow = func() int { return int(time.Now().Unix()) }
+var timeNow = func() int64 { return time.Now().Unix() }
