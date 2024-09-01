@@ -1,6 +1,6 @@
 module github.com/kubri/kubri
 
-go 1.21
+go 1.23
 
 // TODO: Remove when v1.3.0 is released:
 replace github.com/cavaliergopher/rpm v1.2.0 => github.com/abemedia/rpm v0.0.0-20230903161415-49b78cf4b264

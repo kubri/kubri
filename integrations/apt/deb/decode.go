@@ -163,8 +163,7 @@ func newSliceDecoder(typ reflect.Type) (decoder, error) {
 func newStructDecoder(typ reflect.Type) (decoder, error) {
 	decoders := map[string]decoder{}
 
-	for i := 0; i < typ.NumField(); i++ {
-		i := i
+	for i := range typ.NumField() {
 		field := typ.Field(i)
 
 		name := getFieldName(field)
