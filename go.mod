@@ -33,7 +33,7 @@ require (
 	github.com/go-xmlfmt/xmlfmt v1.1.2
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/goreleaser/nfpm/v2 v2.39.0
+	github.com/goreleaser/nfpm/v2 v2.40.0
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/invopop/jsonschema v0.12.0
 	github.com/joho/godotenv v1.5.1
@@ -71,7 +71,7 @@ require (
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
-	github.com/Masterminds/semver/v3 v3.2.1 // indirect
+	github.com/Masterminds/semver/v3 v3.3.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-mime v0.0.0-20230322103455-7d82a3887f2f // indirect
