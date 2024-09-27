@@ -16,7 +16,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "clsx": "^1.2.1",
+    "clsx": "^2.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.0.0"
   },
