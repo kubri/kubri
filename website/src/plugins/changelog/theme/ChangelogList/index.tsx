@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { JSX } from 'react'
+import type { JSX } from 'react'
 import clsx from 'clsx'
 import { PageMetadata, HtmlClassNameProvider, ThemeClassNames } from '@docusaurus/theme-common'
 import BlogLayout from '@theme/BlogLayout'
