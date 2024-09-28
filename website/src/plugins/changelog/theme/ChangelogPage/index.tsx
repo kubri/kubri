@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import type { ReactNode, JSX } from 'react'
+import type { JSX, ReactNode } from 'react'
 import clsx from 'clsx'
 import Translate from '@docusaurus/Translate'
 import Link from '@docusaurus/Link'
 import { HtmlClassNameProvider, ThemeClassNames } from '@docusaurus/theme-common'
-import { BlogPostProvider, useBlogPost } from '@docusaurus/theme-common/internal'
+import { BlogPostProvider, useBlogPost } from '@docusaurus/plugin-content-blog/client'
 import BlogPostPageMetadata from '@theme/BlogPostPage/Metadata'
 import BlogLayout from '@theme/BlogLayout'
 import ChangelogItem from '@theme/ChangelogItem'
