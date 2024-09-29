@@ -31,7 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "docusaurus-plugin-sass": "^0.2.5",
-    "eslint": "^8.2.0",
+    "eslint": "^8.57.1",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "17.1.0",
     "eslint-config-prettier": "^9.1.0",
