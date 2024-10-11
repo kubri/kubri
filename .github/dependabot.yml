@@ -13,7 +13,7 @@ updates:
   - package-ecosystem: npm
     directory: website
     schedule:
-      interval: daily
+      interval: monthly
     allow:
       - dependency-type: direct
       - dependency-name: caniuse-lite
