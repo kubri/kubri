@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	gh "github.com/google/go-github/github"
@@ -80,7 +79,7 @@ func TestTarget(t *testing.T) {
 				Errors: []string{
 					"target.bucket is a required field",
 					"target.folder must be a valid folder name",
-					"target.endpoint must be a valid URL or FQDN",
+					"target.endpoint must be a valid URL",
 					"target.url must be a valid URL",
 				},
 			},
@@ -195,9 +194,6 @@ func TestTarget(t *testing.T) {
 		test.ExportAll(),
 		test.IgnoreFunctions(),
 		test.CompareLoggers(),
-
-		// Ignore azblob policies as they are not comparable.
-		cmpopts.IgnoreFields(container.Client{}, "inner.internal.pl"),
 
 		// Ignore GitHub rate limit.
 		cmpopts.IgnoreTypes(gh.Rate{}),

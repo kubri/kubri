@@ -26,6 +26,7 @@ func runTest(t *testing.T, tests []testCase) {
 		test.ExportAll(),
 		test.ComparePGPKeys(),
 		test.CompareRSAPrivateKeys(),
+		test.IgnoreFunctions(),
 	}
 
 	for _, tc := range tests {

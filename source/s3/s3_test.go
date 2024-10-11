@@ -10,20 +10,19 @@ import (
 )
 
 func TestS3(t *testing.T) {
-	host := emulator.S3(t, "bucket")
+	endpoint := emulator.S3(t, "bucket")
 
 	s, err := s3.New(s3.Config{
-		Bucket:     "bucket",
-		Folder:     "folder",
-		Region:     "us-east-1",
-		Endpoint:   host,
-		DisableSSL: true,
+		Bucket:   "bucket",
+		Folder:   "folder",
+		Region:   "us-east-1",
+		Endpoint: endpoint,
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	test.Source(t, s, func(version, asset string) string {
-		return "http://" + host + "/bucket/folder/" + path.Join(version, asset)
+		return endpoint + "/bucket/folder/" + path.Join(version, asset)
 	})
 }

@@ -69,7 +69,7 @@ func S3(t *testing.T, bucket string) string {
 		Env:          map[string]string{"initialBuckets": bucket},
 		WaitingFor:   wait.ForHTTP("/").WithPort("9090").WithStatusCodeMatcher(nil),
 	})
-	host, err := c.PortEndpoint(context.Background(), "9090", "")
+	host, err := c.PortEndpoint(context.Background(), "9090", "http")
 	if err != nil {
 		t.Fatal(err)
 	}

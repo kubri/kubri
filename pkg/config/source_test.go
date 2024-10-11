@@ -5,9 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
 	"gopkg.in/yaml.v3"
 
 	"github.com/kubri/kubri/internal/test"
@@ -72,19 +70,17 @@ func TestSource(t *testing.T) {
 					type: s3
 					bucket: test
 					folder: test
-					endpoint: s3.example.com
+					endpoint: http://s3.example.com
 					region: auto
-					disable-ssl: true
 					url: http://example.com
 			`,
 			want: func() (*source.Source, error) {
 				return s3.New(s3.Config{
-					Bucket:     "test",
-					Folder:     "test",
-					Endpoint:   "s3.example.com",
-					Region:     "auto",
-					DisableSSL: true,
-					URL:        "http://example.com",
+					Bucket:   "test",
+					Folder:   "test",
+					Endpoint: "http://s3.example.com",
+					Region:   "auto",
+					URL:      "http://example.com",
 				})
 			},
 		},
@@ -101,7 +97,7 @@ func TestSource(t *testing.T) {
 				Errors: []string{
 					"source.bucket is a required field",
 					"source.folder must be a valid folder name",
-					"source.endpoint must be a valid URL or FQDN",
+					"source.endpoint must be a valid URL",
 					"source.url must be a valid URL",
 				},
 			},
@@ -280,9 +276,6 @@ func TestSource(t *testing.T) {
 		test.ExportAll(),
 		test.IgnoreFunctions(),
 		test.CompareLoggers(),
-
-		// Ignore azblob policies as they are not comparable.
-		cmpopts.IgnoreFields(container.Client{}, "inner.internal.pl"),
 	}
 
 	for _, tc := range tests {

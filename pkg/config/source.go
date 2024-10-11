@@ -79,12 +79,11 @@ type gcsSource struct {
 }
 
 type s3Source struct {
-	Bucket     string `yaml:"bucket"                validate:"required"`
-	Folder     string `yaml:"folder,omitempty"      validate:"omitempty,dirname"`
-	Endpoint   string `yaml:"endpoint,omitempty"    validate:"omitempty,fqdn|http_url"`
-	Region     string `yaml:"region,omitempty"`
-	DisableSSL bool   `yaml:"disable-ssl,omitempty"`
-	URL        string `yaml:"url,omitempty"         validate:"omitempty,http_url"`
+	Bucket   string `yaml:"bucket"             validate:"required"`
+	Folder   string `yaml:"folder,omitempty"   validate:"omitempty,dirname"`
+	Endpoint string `yaml:"endpoint,omitempty" validate:"omitempty,http_url"`
+	Region   string `yaml:"region,omitempty"`
+	URL      string `yaml:"url,omitempty"      validate:"omitempty,http_url"`
 }
 
 type fileSource struct {
