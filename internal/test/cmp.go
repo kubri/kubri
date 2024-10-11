@@ -63,7 +63,6 @@ func ExportAll() cmp.Option {
 // IgnoreFunctions ignores all functions.
 func IgnoreFunctions() cmp.Option {
 	return cmp.FilterPath(func(p cmp.Path) bool {
-		sf, ok := p.Index(-1).(cmp.StructField)
-		return ok && sf.Type().Kind() == reflect.Func
+		return p.Last().Type().Kind() == reflect.Func
 	}, cmp.Ignore())
 }

@@ -81,9 +81,6 @@
             "region": {
               "type": "string"
             },
-            "disable-ssl": {
-              "type": "boolean"
-            },
             "url": {
               "type": "string"
             }
@@ -241,9 +238,6 @@
             },
             "region": {
               "type": "string"
-            },
-            "disable-ssl": {
-              "type": "boolean"
             },
             "url": {
               "type": "string"

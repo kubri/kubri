@@ -10,12 +10,11 @@ import (
 )
 
 type Config struct {
-	Bucket     string
-	Folder     string
-	Endpoint   string
-	Region     string
-	DisableSSL bool
-	URL        string
+	Bucket   string
+	Folder   string
+	Endpoint string
+	Region   string
+	URL      string
 }
 
 func New(c Config) (target.Target, error) {
@@ -23,12 +22,9 @@ func New(c Config) (target.Target, error) {
 	if c.Region != "" {
 		q.Add("region", c.Region)
 	}
-	if c.DisableSSL {
-		q.Add("disableSSL", "true")
-	}
 	if c.Endpoint != "" {
 		q.Add("endpoint", c.Endpoint)
-		q.Add("s3ForcePathStyle", "true")
+		q.Add("hostname_immutable", "true")
 	}
 	return blob.NewTarget("s3://"+c.Bucket+"?"+q.Encode(), c.Folder, c.URL)
 }
