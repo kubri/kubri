@@ -40,7 +40,7 @@ func TestGitlab(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
-		_, err = client.Projects.DeleteProject(pid)
+		_, err = client.Projects.DeleteProject(pid, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
