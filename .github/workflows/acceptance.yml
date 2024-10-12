@@ -3,7 +3,7 @@ name: Acceptance Test
 on:
   pull_request:
     paths:
-      - integrations/*/*.go
+      - integrations/**
 
 permissions:
   contents: read
@@ -23,8 +23,9 @@ jobs:
         id: packages
         uses: tj-actions/changed-files@v45
         with:
-          files: integrations/*/*.go
+          files: integrations/**
           dir_names: true
+          dir_names_max_depth: 2
           json: true
 
       - name: Set output
@@ -48,4 +49,4 @@ jobs:
           go-version-file: go.mod
 
       - name: Run acceptance tests
-        run: go test -tags acceptance -run ^TestAcceptance$ ./${{ matrix.package }}
+        run: go test -v -tags acceptance -run ^TestAcceptance$ ./${{ matrix.package }}
