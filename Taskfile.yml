@@ -18,9 +18,9 @@ tasks:
     cmds:
       - task: init
       - task: mod
-      - task: build
       - task: lint
       - task: test
+      - task: build
 
   init:
     desc: Setup git hooks & dev dependencies

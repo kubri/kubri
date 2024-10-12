@@ -76,7 +76,6 @@ func S3(t *testing.T, bucket string) string {
 
 	t.Setenv("AWS_ACCESS_KEY_ID", "test")
 	t.Setenv("AWS_SECRET_ACCESS_KEY", "test")
-	t.Setenv("AWS_REGION", "us-east-1")
 
 	return host
 }

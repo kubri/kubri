@@ -1,4 +1,5 @@
 .task/
+.vscode/
 dist/
 
 *.out
