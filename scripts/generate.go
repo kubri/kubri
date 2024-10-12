@@ -57,6 +57,7 @@ var (
 					},
 				},
 				Deb: nfpm.Deb{Compression: "xz"},
+				RPM: nfpm.RPM{Group: "default"},
 			},
 		},
 	}
@@ -122,7 +123,7 @@ func buildPackages(packager string, config nfpm.Config) error {
 
 	config.Target = filepath.Join("testdata", config.Version, pkg.ConventionalFileName(info))
 
-	if err = os.MkdirAll(filepath.Dir(config.Target), 0o755); err != nil {
+	if err = os.MkdirAll(filepath.Dir(config.Target), 0o750); err != nil {
 		return err
 	}
 

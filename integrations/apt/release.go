@@ -113,7 +113,7 @@ func releaseArch(algos CompressionAlgo, p []*Package, suite, arch, root string) 
 	}
 
 	dir := filepath.Join(root, "main", "binary-"+arch)
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(dir, 0o750); err != nil {
 		return err
 	}
 	if err := writeFile(filepath.Join(dir, "Release"), r); err != nil {

@@ -1,3 +1,4 @@
+// Package github provides a source implementation for GitHub releases.
 package github
 
 import (
@@ -16,17 +17,13 @@ import (
 	"github.com/kubri/kubri/source"
 )
 
+// Config represents the configuration for a GitHub source.
 type Config struct {
 	Owner string
 	Repo  string
 }
 
-type githubSource struct {
-	client *github.Client
-	owner  string
-	repo   string
-}
-
+// New returns a new GitHub source.
 func New(c Config) (*source.Source, error) {
 	var client *http.Client
 	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
@@ -41,6 +38,12 @@ func New(c Config) (*source.Source, error) {
 	}
 
 	return source.New(s), nil
+}
+
+type githubSource struct {
+	client *github.Client
+	owner  string
+	repo   string
 }
 
 func (s *githubSource) ListReleases(ctx context.Context) ([]*source.Release, error) {
