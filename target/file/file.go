@@ -1,3 +1,4 @@
+// Package file provides a target implementation for the local filesystem.
 package file
 
 import (
@@ -10,22 +11,19 @@ import (
 	"github.com/kubri/kubri/target"
 )
 
+// Config represents the configuration for a file target.
 type Config struct {
 	Path string
 	URL  string
 }
 
-type fileTarget struct {
-	path string
-	url  string
-}
-
+// New returns a new file target.
 func New(c Config) (target.Target, error) {
 	path, err := filepath.Abs(c.Path)
 	if err != nil {
 		return nil, err
 	}
-	if err = os.MkdirAll(path, 0o755); err != nil {
+	if err = os.MkdirAll(path, 0o750); err != nil {
 		return nil, err
 	}
 	if c.URL == "" {
@@ -34,9 +32,14 @@ func New(c Config) (target.Target, error) {
 	return &fileTarget{path, c.URL}, nil
 }
 
+type fileTarget struct {
+	path string
+	url  string
+}
+
 func (t *fileTarget) NewWriter(_ context.Context, filename string) (io.WriteCloser, error) {
 	path := filepath.Join(t.path, filename)
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o750); err != nil {
 		return nil, err
 	}
 	return os.Create(path)

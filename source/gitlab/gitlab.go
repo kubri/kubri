@@ -1,3 +1,4 @@
+// Package gitlab provides a source implementation for GitLab releases.
 package gitlab
 
 import (
@@ -14,17 +15,14 @@ import (
 	"github.com/kubri/kubri/source"
 )
 
+// Config represents the configuration for a GitLab source.
 type Config struct {
 	Owner string
 	Repo  string
 	URL   string
 }
 
-type gitlabSource struct {
-	client *gitlab.Client
-	repo   string
-}
-
+// New returns a new GitLab source.
 func New(c Config) (*source.Source, error) {
 	var opt []gitlab.ClientOptionFunc
 	if c.URL != "" {
@@ -42,6 +40,11 @@ func New(c Config) (*source.Source, error) {
 	}
 
 	return source.New(s), nil
+}
+
+type gitlabSource struct {
+	client *gitlab.Client
+	repo   string
 }
 
 func (s *gitlabSource) ListReleases(ctx context.Context) ([]*source.Release, error) {

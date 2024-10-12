@@ -89,6 +89,13 @@ linters-settings:
 
 issues:
   fix: true
+  include:
+    - EXC0004
+    - EXC0005
+    - EXC0009
+    # - EXC0012 # TODO: enable & fix.
+    - EXC0013
+    - EXC0014
   exclude-rules:
     - path: (.+)_test.go
       linters:

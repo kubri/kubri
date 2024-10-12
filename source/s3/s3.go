@@ -1,3 +1,4 @@
+// Package s3 provides a source implementation for Amazon S3.
 package s3
 
 import (
@@ -9,6 +10,7 @@ import (
 	"github.com/kubri/kubri/source"
 )
 
+// Config represents the configuration for an Amazon S3 source.
 type Config struct {
 	Bucket   string
 	Folder   string
@@ -17,6 +19,7 @@ type Config struct {
 	URL      string
 }
 
+// New returns a new Amazon S3 source.
 func New(c Config) (*source.Source, error) {
 	q := url.Values{}
 	if c.Region != "" {

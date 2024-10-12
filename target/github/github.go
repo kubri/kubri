@@ -1,3 +1,4 @@
+// Package github provides a target implementation for GitHub.
 package github
 
 import (
@@ -16,6 +17,7 @@ import (
 	"github.com/kubri/kubri/target"
 )
 
+// Config represents the configuration for a GitHub target.
 type Config struct {
 	Owner  string
 	Repo   string
@@ -23,14 +25,7 @@ type Config struct {
 	Folder string
 }
 
-type githubTarget struct {
-	client *github.RepositoriesService
-	owner  string
-	repo   string
-	branch string
-	path   string
-}
-
+// New returns a new GitHub target.
 func New(c Config) (target.Target, error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")})
@@ -55,6 +50,14 @@ func New(c Config) (target.Target, error) {
 	}
 
 	return t, nil
+}
+
+type githubTarget struct {
+	client *github.RepositoriesService
+	owner  string
+	repo   string
+	branch string
+	path   string
 }
 
 func (t *githubTarget) NewWriter(ctx context.Context, filename string) (io.WriteCloser, error) {

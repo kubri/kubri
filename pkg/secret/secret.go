@@ -80,6 +80,6 @@ func dir() string {
 	}
 	dir, _ := os.UserConfigDir()
 	dir = filepath.Join(dir, "kubri")
-	_ = os.MkdirAll(dir, os.ModePerm)
+	_ = os.MkdirAll(dir, 0o750)
 	return dir
 }

@@ -54,7 +54,7 @@ func Golden(t *testing.T, golden, result string, filter ...PathFilter) {
 				}
 			}
 
-			if err = os.MkdirAll(filepath.Join(golden, filepath.Dir(path)), 0o755); err != nil {
+			if err = os.MkdirAll(filepath.Join(golden, filepath.Dir(path)), 0o750); err != nil {
 				return err
 			}
 			if err = os.Rename(filepath.Join(result, path), filepath.Join(golden, path)); err != nil {
