@@ -9,7 +9,7 @@ target:
   type: s3
   bucket: kubri-packages
   region: auto
-  endpoint: 44d8880eefdff4523e34b12529c6e1ed.r2.cloudflarestorage.com
+  endpoint: https://44d8880eefdff4523e34b12529c6e1ed.r2.cloudflarestorage.com
   url: https://pkg.kubri.dev/
 
 apk:
