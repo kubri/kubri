@@ -9,13 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"bou.ke/monkey"
 	"github.com/goreleaser/nfpm/v2"
 	"github.com/goreleaser/nfpm/v2/files"
 
 	_ "github.com/goreleaser/nfpm/v2/apk"  // apk packager
 	_ "github.com/goreleaser/nfpm/v2/arch" // archlinux packager
 	_ "github.com/goreleaser/nfpm/v2/deb"  // deb packager
+	_ "github.com/goreleaser/nfpm/v2/ipk"  // ipk packager
 	_ "github.com/goreleaser/nfpm/v2/rpm"  // rpm packager
 
 	"github.com/kubri/kubri/integrations/apk"
@@ -27,13 +27,13 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	date     = time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC)
 	versions = []string{"v1.0.0", "v1.1.0-beta", "v1.1.0", "v2.0.0"}
 	archs    = []string{"amd64", "386"}
 	formats  = []string{"deb", "rpm", "apk"}
 
 	config = nfpm.Config{
 		Info: nfpm.Info{
+			MTime:       time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC),
 			Name:        "kubri-test",
 			Platform:    "linux",
 			Section:     "utils",
@@ -64,8 +64,6 @@ var (
 )
 
 func main() {
-	monkey.Patch(time.Now, func() time.Time { return date })
-
 	c := config
 	for _, version := range versions {
 		c.Version = version

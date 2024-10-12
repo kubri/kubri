@@ -10,10 +10,10 @@ Provides: kubri-test-alt
 Priority: optional
 Section: utils
 Filename: pool/main/k/kubri-test/kubri-test_2.0.0_amd64.deb
-Size: 860
-MD5sum: 834df16115678291d278e9db5752e342
-SHA1: ee01b24680d78b31d424baddd33a33eb13723fda
-SHA256: e9dbba7e062b4ee952b117d10fc27921be3f77acbc23813b934ed648ec380d15
+Size: 858
+MD5sum: 2f76675f080a07bdd5f7196de40fb951
+SHA1: 032f54ca4fc971b981208c52abde41d123e9c1cf
+SHA256: 09707143ad333db2e624dae6bbde2eba5fb533d8df1597fb5450e318833f8079
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.
@@ -33,9 +33,9 @@ Priority: optional
 Section: utils
 Filename: pool/main/k/kubri-test/kubri-test_1.1.0_amd64.deb
 Size: 862
-MD5sum: 423953e20f61a810ea68205c0368e081
-SHA1: d1a47d9345f00181a0b33c312843359db9ee9eeb
-SHA256: 9cb861fde6a451aee02d1995314b7061e4bfb78e6de1b27f8fd61f0a3d21a5c4
+MD5sum: 8e66d4280ebc479a4e9e76d82e921636
+SHA1: 0d1f64c5dd825e51ca2b8e42f04341e11f1c9ce9
+SHA256: 6b824e762e1a7a9a1d254b7ee5d0ebc1183e3fd9bdc0d366d6ac20cff0ec49e2
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.
@@ -54,10 +54,10 @@ Provides: kubri-test-alt
 Priority: optional
 Section: utils
 Filename: pool/main/k/kubri-test/kubri-test_1.0.0_amd64.deb
-Size: 860
-MD5sum: e5bfe61b6832cb0eb06efe95e51a2c9d
-SHA1: aa44bbb7c97f10a64e9377609181762396ab1f2a
-SHA256: 680eb40d881b5921bdff07e5d1f7b513afcf66e3697e5ab5af88e1b24cf711fb
+Size: 858
+MD5sum: c53565f421d826def50d2a030ae2a51d
+SHA1: d40c6761e4bba62d346046eddab4b4fe515f5ab0
+SHA256: 09980d5e166c420c9bf630c3de6e5ca63294b8c512d0e531e8349163c4d8a7df
 Homepage: http://example.com
 Description: This is a test.
  It does nothing.

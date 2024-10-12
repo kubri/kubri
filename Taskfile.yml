@@ -66,6 +66,7 @@ tasks:
     env:
       UPDATE_GOLDEN: '1'
     cmds:
+      - go run ./scripts/generate.go
       - gotestsum -- -cover ./...
 
   acceptance:
