@@ -34,6 +34,7 @@ require (
 	github.com/goreleaser/nfpm/v2 v2.40.0
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/invopop/jsonschema v0.12.0
+	github.com/jlaffaye/ftp v0.2.0
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.17.11
 	github.com/pierrec/lz4 v2.6.1+incompatible
@@ -129,7 +130,9 @@ require (
 	github.com/googleapis/gax-go/v2 v2.13.0 // indirect
 	github.com/goreleaser/chglog v0.6.1 // indirect
 	github.com/goreleaser/fileglob v1.3.0 // indirect
+	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

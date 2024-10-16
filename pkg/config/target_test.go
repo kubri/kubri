@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"net"
 	"os"
 	"path/filepath"
 	"testing"
@@ -15,6 +16,7 @@ import (
 	"github.com/kubri/kubri/target"
 	"github.com/kubri/kubri/target/azureblob"
 	"github.com/kubri/kubri/target/file"
+	"github.com/kubri/kubri/target/ftp"
 	"github.com/kubri/kubri/target/gcs"
 	"github.com/kubri/kubri/target/github"
 	"github.com/kubri/kubri/target/s3"
@@ -173,12 +175,42 @@ func TestTarget(t *testing.T) {
 			},
 		},
 		{
+			desc: "ftp",
+			config: `
+				target:
+					type: ftp
+					address: test.rebex.net:21
+					folder: test
+					url: http://dl.example.com
+			`,
+			want: func() (target.Target, error) {
+				return ftp.New(ftp.Config{Address: "test.rebex.net:21", Folder: "test", URL: "http://dl.example.com"})
+			},
+		},
+		{
+			desc: "ftp invalid",
+			config: `
+				target:
+					type: ftp
+					address: nope
+					folder: '*'
+					url: invalid
+			`,
+			err: &config.Error{
+				Errors: []string{
+					"target.address must be a valid hostname and port",
+					"target.folder must be a valid folder name",
+					"target.url must be a valid URL",
+				},
+			},
+		},
+		{
 			desc: "invalid type",
 			config: `
 				target:
 					type: nope
 			`,
-			err: &config.Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github]"}},
+			err: &config.Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github ftp]"}},
 		},
 		{
 			desc: "unmarshal error",
@@ -197,6 +229,9 @@ func TestTarget(t *testing.T) {
 
 		// Ignore GitHub rate limit.
 		cmpopts.IgnoreTypes(gh.Rate{}),
+
+		// Ignore FTP connection.
+		cmpopts.IgnoreTypes(net.TCPConn{}),
 	}
 
 	for _, tc := range tests {
@@ -204,7 +239,8 @@ func TestTarget(t *testing.T) {
 		if tc.want != nil {
 			w, err := tc.want()
 			if err != nil {
-				t.Fatal(err)
+				t.Errorf("%s: %s", tc.desc, err)
+				continue
 			}
 			want = w
 		}
