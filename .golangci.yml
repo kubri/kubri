@@ -33,6 +33,7 @@ linters:
     - nonamedreturns
     - nlreturn
     - paralleltest
+    - recvcheck
     - varnamelen
     - wrapcheck
     - wsl
