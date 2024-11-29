@@ -28,7 +28,7 @@ require (
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.16.0
-	github.com/go-xmlfmt/xmlfmt v1.1.2
+	github.com/go-xmlfmt/xmlfmt v1.1.3
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/goreleaser/nfpm/v2 v2.41.1
