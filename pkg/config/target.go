@@ -7,6 +7,7 @@ import (
 	"github.com/kubri/kubri/target"
 	"github.com/kubri/kubri/target/azureblob"
 	"github.com/kubri/kubri/target/file"
+	"github.com/kubri/kubri/target/ftp"
 	"github.com/kubri/kubri/target/gcs"
 	"github.com/kubri/kubri/target/github"
 	"github.com/kubri/kubri/target/s3"
@@ -18,6 +19,7 @@ type targetConfig struct {
 	*s3Target
 	*fileTarget
 	*githubTarget
+	*ftpTarget
 }
 
 func (tc *targetConfig) UnmarshalYAML(node *yaml.Node) error {
@@ -39,6 +41,8 @@ func (tc *targetConfig) UnmarshalYAML(node *yaml.Node) error {
 		return node.Decode(&tc.fileTarget)
 	case "github":
 		return node.Decode(&tc.githubTarget)
+	case "ftp":
+		return node.Decode(&tc.ftpTarget)
 	default:
 		return nil
 	}
@@ -52,6 +56,7 @@ func (tc targetConfig) JSONSchema() *jsonschema.Schema {
 			withType(tc.s3Target, "s3"),
 			withType(tc.fileTarget, "file"),
 			withType(tc.githubTarget, "github"),
+			withType(tc.ftpTarget, "ftp"),
 		},
 	}
 }
@@ -88,6 +93,12 @@ type githubTarget struct {
 	Folder string `yaml:"folder,omitempty" validate:"omitempty,dirname"`
 }
 
+type ftpTarget struct {
+	Address string `yaml:"address"          validate:"required,hostname_port"`
+	Folder  string `yaml:"folder,omitempty" validate:"omitempty,dirname"`
+	URL     string `yaml:"url"              validate:"required,http_url"`
+}
+
 func getTarget(c *targetConfig) (target.Target, error) {
 	switch {
 	case c.azureblobTarget != nil:
@@ -100,7 +111,9 @@ func getTarget(c *targetConfig) (target.Target, error) {
 		return file.New(file.Config(*c.fileTarget))
 	case c.githubTarget != nil:
 		return github.New(github.Config(*c.githubTarget))
+	case c.ftpTarget != nil:
+		return ftp.New(ftp.Config(*c.ftpTarget))
 	default:
-		return nil, &Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github]"}}
+		return nil, &Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github ftp]"}}
 	}
 }
