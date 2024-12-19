@@ -293,6 +293,29 @@
             "owner",
             "repo"
           ]
+        },
+        {
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "ftp"
+            },
+            "address": {
+              "type": "string"
+            },
+            "folder": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "required": [
+            "address",
+            "url"
+          ]
         }
       ]
     },
