@@ -84,8 +84,8 @@ func registerTranslations(v *validator.Validate, trans ut.Translator) error {
 			message: "{0} must be a valid URL",
 		},
 		{
-			name:    "fqdn|http_url",
-			message: "{0} must be a valid URL or FQDN",
+			name:    "hostname_port",
+			message: "{0} must be a valid hostname and port",
 		},
 	}
 
