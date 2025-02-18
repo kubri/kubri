@@ -112,7 +112,7 @@ func newMarshalerEncoder(typ reflect.Type) (encoder, error) {
 		if ptr && v.IsNil() {
 			return nil
 		}
-		b, err := v.Interface().(encoding.TextMarshaler).MarshalText()
+		b, err := v.Interface().(encoding.TextMarshaler).MarshalText() //nolint:forcetypeassert
 		if err != nil {
 			return err
 		}
