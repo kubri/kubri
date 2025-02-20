@@ -21,7 +21,7 @@ require (
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 	github.com/cavaliergopher/rpm v1.2.0
 	github.com/dlclark/regexp2 v1.11.5
-	github.com/docker/docker v27.5.1+incompatible
+	github.com/docker/docker v28.0.0+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/dsnet/compress v0.0.1
 	github.com/fullstorydev/emulators/storage v1.0.0
