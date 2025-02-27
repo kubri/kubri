@@ -1,7 +1,6 @@
 package test
 
 import (
-	"context"
 	"errors"
 	"io"
 	"io/fs"
@@ -47,13 +46,12 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 		o(opts)
 	}
 
-	ctx := context.Background()
 	data := []byte("test")
 
 	t.Run("NewWriter_Create", func(t *testing.T) {
 		t.Helper()
 
-		w, err := tgt.NewWriter(ctx, "path/to/file")
+		w, err := tgt.NewWriter(t.Context(), "path/to/file")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -72,7 +70,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 	t.Run("NewWriter_Update", func(t *testing.T) {
 		t.Helper()
 
-		w, err := tgt.NewWriter(ctx, "path/to/file")
+		w, err := tgt.NewWriter(t.Context(), "path/to/file")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -91,7 +89,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 	t.Run("NewReader", func(t *testing.T) {
 		t.Helper()
 
-		r, err := tgt.NewReader(ctx, "path/to/file")
+		r, err := tgt.NewReader(t.Context(), "path/to/file")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -109,7 +107,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 			t.Fatal(diff)
 		}
 
-		_, err = tgt.NewReader(ctx, "does/not/exist")
+		_, err = tgt.NewReader(t.Context(), "does/not/exist")
 		if !errors.Is(err, fs.ErrNotExist) {
 			t.Fatalf("Should return %q - got %q", fs.ErrNotExist, err)
 		}
@@ -120,7 +118,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 
 		sub := tgt.Sub("path/to")
 
-		r, err := sub.NewReader(ctx, "file")
+		r, err := sub.NewReader(t.Context(), "file")
 		if err != nil {
 			t.Fatal(err)
 		} else {
@@ -131,7 +129,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 	t.Run("URL", func(t *testing.T) {
 		t.Helper()
 
-		url, err := tgt.URL(ctx, "path/to/file")
+		url, err := tgt.URL(t.Context(), "path/to/file")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -144,14 +142,14 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 	t.Run("Remove", func(t *testing.T) {
 		t.Helper()
 
-		err := tgt.Remove(ctx, "path/to/file")
+		err := tgt.Remove(t.Context(), "path/to/file")
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		time.Sleep(opts.delay)
 
-		r, err := tgt.NewReader(ctx, "path/to/file")
+		r, err := tgt.NewReader(t.Context(), "path/to/file")
 		if err == nil {
 			r.Close()
 		}
@@ -160,7 +158,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 		}
 
 		if !opts.ignoreRemoveNotFound {
-			err = tgt.Remove(ctx, "does/not/exist")
+			err = tgt.Remove(t.Context(), "does/not/exist")
 			if !errors.Is(err, fs.ErrNotExist) {
 				t.Fatalf("Remove should return %q - got %q", fs.ErrNotExist, err)
 			}

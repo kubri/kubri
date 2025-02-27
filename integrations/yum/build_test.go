@@ -1,7 +1,6 @@
 package yum_test
 
 import (
-	"context"
 	"io"
 	"io/fs"
 	"os"
@@ -95,13 +94,13 @@ func testBuild(t *testing.T, c *yum.Config, want map[string][]byte, now time.Tim
 
 	yum.SetTime(now)
 
-	err := yum.Build(context.Background(), c)
+	err := yum.Build(t.Context(), c)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for name, data := range want {
-		r, err := c.Target.NewReader(context.Background(), name)
+		r, err := c.Target.NewReader(t.Context(), name)
 		if err != nil {
 			t.Fatal(name, err)
 		}

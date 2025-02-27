@@ -26,7 +26,7 @@ func (c *Container) Exec(t *testing.T, script string) string {
 		}
 	})
 
-	code, _, err := c.Container.Exec(context.Background(), []string{"sh", "-c", script}, opt)
+	code, _, err := c.Container.Exec(t.Context(), []string{"sh", "-c", script}, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,8 +78,7 @@ func Build(t *testing.T, dockerfile string) Container {
 
 func runContainer(t *testing.T, cr testcontainers.ContainerRequest) Container {
 	t.Helper()
-	ctx := context.Background()
-	c, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+	c, err := testcontainers.GenericContainer(t.Context(), testcontainers.GenericContainerRequest{
 		ContainerRequest: cr,
 		Started:          true,
 		Logger:           nopLogger{},
@@ -87,7 +86,7 @@ func runContainer(t *testing.T, cr testcontainers.ContainerRequest) Container {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = c.Terminate(ctx) })
+	t.Cleanup(func() { _ = c.Terminate(context.Background()) }) //nolint:usetesting
 	return Container{c}
 }
 

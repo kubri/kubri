@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/exp/slices"
 )
 
 func keysCmd() *cobra.Command {

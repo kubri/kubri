@@ -3,7 +3,6 @@
 package yum_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
@@ -55,7 +54,7 @@ func TestAcceptance(t *testing.T) {
 			for i, test := range tests {
 				t.Run(test.name, func(t *testing.T) {
 					config := &yum.Config{Source: src, Target: tgt, Version: test.version, PGPKey: pgpKey}
-					if err := yum.Build(context.Background(), config); err != nil {
+					if err := yum.Build(t.Context(), config); err != nil {
 						t.Fatal(err)
 					}
 

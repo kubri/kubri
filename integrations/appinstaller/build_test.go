@@ -1,7 +1,6 @@
 package appinstaller_test
 
 import (
-	"context"
 	"io"
 	"testing"
 
@@ -102,12 +101,12 @@ func TestBuild(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		err := appinstaller.Build(context.Background(), test.config)
+		err := appinstaller.Build(t.Context(), test.config)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		r, err := test.config.Target.NewReader(context.Background(), test.name)
+		r, err := test.config.Target.NewReader(t.Context(), test.name)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -124,7 +123,7 @@ func TestBuild(t *testing.T) {
 
 		if test.config.UploadPackages {
 			for _, ext := range []string{".msixbundle", ".msix"} {
-				if _, err = tgt.NewReader(context.Background(), "test"+ext); err != nil {
+				if _, err = tgt.NewReader(t.Context(), "test"+ext); err != nil {
 					t.Fatal(err)
 				}
 			}

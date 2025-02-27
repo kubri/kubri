@@ -1,7 +1,6 @@
 package file_test
 
 import (
-	"context"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -46,11 +45,9 @@ func TestFile(t *testing.T) {
 			if runtime.GOOS == "darwin" {
 				t.Skip("MacOS does not support this test")
 			}
-			wd, _ := os.Getwd()
-			defer os.Chdir(wd)
 
 			dir := t.TempDir()
-			os.Chdir(dir)
+			t.Chdir(dir)
 			os.Remove(dir)
 
 			_, err := file.New(file.Config{})
@@ -79,7 +76,7 @@ func TestFile(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, err = tgt.NewWriter(context.Background(), filepath.Join(dir, "test", "test"))
+		_, err = tgt.NewWriter(t.Context(), filepath.Join(dir, "test", "test"))
 		if err == nil {
 			t.Fatal("should error")
 		}

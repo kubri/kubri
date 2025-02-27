@@ -2,7 +2,6 @@ package local_test
 
 import (
 	"bytes"
-	"context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -101,7 +100,6 @@ func TestLocal(t *testing.T) {
 	}
 
 	data := []byte("test\n")
-	ctx := context.Background()
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -121,7 +119,7 @@ func TestLocal(t *testing.T) {
 			opt := cmpopts.EquateApproxTime(100 * time.Millisecond)
 
 			t.Run("ListReleases", func(t *testing.T) {
-				got, err := s.ListReleases(ctx, nil)
+				got, err := s.ListReleases(t.Context(), nil)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -132,7 +130,7 @@ func TestLocal(t *testing.T) {
 			})
 
 			t.Run("GetRelease", func(t *testing.T) {
-				got, err := s.GetRelease(ctx, test.want[0].Version)
+				got, err := s.GetRelease(t.Context(), test.want[0].Version)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -143,7 +141,7 @@ func TestLocal(t *testing.T) {
 			})
 
 			t.Run("UploadAsset", func(t *testing.T) {
-				err := s.UploadAsset(ctx, test.want[0].Version, "test.txt", data)
+				err := s.UploadAsset(t.Context(), test.want[0].Version, "test.txt", data)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -164,7 +162,7 @@ func TestLocal(t *testing.T) {
 			})
 
 			t.Run("DownloadAsset", func(t *testing.T) {
-				b, err := s.DownloadAsset(ctx, test.want[0].Version, test.want[0].Assets[0].Name)
+				b, err := s.DownloadAsset(t.Context(), test.want[0].Version, test.want[0].Assets[0].Name)
 				if err != nil {
 					t.Fatal(err)
 				}
