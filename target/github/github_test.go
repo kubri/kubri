@@ -21,10 +21,9 @@ func TestGithub(t *testing.T) {
 		t.Skip("Missing environment variable: GITHUB_TOKEN")
 	}
 
-	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-	client := gh.NewClient(oauth2.NewClient(ctx, ts))
-	user, _, err := client.Users.Get(ctx, "")
+	client := gh.NewClient(oauth2.NewClient(t.Context(), ts))
+	user, _, err := client.Users.Get(t.Context(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -42,12 +41,12 @@ func TestGithub(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			repo := fmt.Sprintf("test_%d", time.Now().UnixNano())
 
-			r, _, err := client.Repositories.Create(ctx, "", &gh.Repository{Name: &repo})
+			r, _, err := client.Repositories.Create(t.Context(), "", &gh.Repository{Name: &repo})
 			if err != nil {
 				t.Fatal(err)
 			}
 			t.Cleanup(func() {
-				_, err := client.Repositories.Delete(ctx, owner, repo)
+				_, err := client.Repositories.Delete(context.Background(), owner, repo) //nolint:usetesting
 				if err != nil {
 					t.Fatal(err)
 				}

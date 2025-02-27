@@ -69,9 +69,6 @@ func TestLoad(t *testing.T) {
 		test.CompareErrorMessages(),
 	}
 
-	wd, _ := os.Getwd()
-	defer os.Chdir(wd)
-
 	for _, tc := range tests {
 		if tc.desc == "" {
 			tc.desc = tc.path
@@ -89,7 +86,7 @@ func TestLoad(t *testing.T) {
 			tc.mode = os.ModePerm
 		}
 
-		os.Chdir(t.TempDir())
+		t.Chdir(t.TempDir())
 		os.MkdirAll(filepath.Dir(tc.path), os.ModePerm)
 		os.WriteFile(tc.path, test.YAML(tc.config), tc.mode)
 

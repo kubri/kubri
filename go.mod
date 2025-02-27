@@ -1,6 +1,6 @@
 module github.com/kubri/kubri
 
-go 1.23
+go 1.24
 
 // TODO: Remove when v1.3.0 is released:
 replace github.com/cavaliergopher/rpm v1.2.0 => github.com/cavaliergopher/rpm v0.0.0-20231126213118-b2e876bef7ce
@@ -45,7 +45,6 @@ require (
 	gitlab.alpinelinux.org/alpine/go v0.10.1
 	gitlab.com/gitlab-org/api/client-go v0.123.0
 	gocloud.dev v0.40.0
-	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	golang.org/x/mod v0.23.0
 	golang.org/x/oauth2 v0.26.0
 	golang.org/x/sync v0.11.0
@@ -193,6 +192,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect

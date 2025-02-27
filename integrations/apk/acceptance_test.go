@@ -3,7 +3,6 @@
 package apk_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/kubri/kubri/integrations/apk"
@@ -41,7 +40,7 @@ func TestAcceptance(t *testing.T) {
 			for i, test := range tests {
 				t.Run(test.name, func(t *testing.T) {
 					config := &apk.Config{Source: src, Target: tgt, Version: test.version, RSAKey: rsaKey, KeyName: "test@example.com"}
-					if err := apk.Build(context.Background(), config); err != nil {
+					if err := apk.Build(t.Context(), config); err != nil {
 						t.Fatal(err)
 					}
 

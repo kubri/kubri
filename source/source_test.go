@@ -1,7 +1,6 @@
 package source_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -34,8 +33,6 @@ func TestSource(t *testing.T) {
 		{Version: "v1.0.0"},
 	})
 
-	ctx := context.Background()
-
 	t.Run("ListReleases", func(t *testing.T) {
 		tests := []struct {
 			msg  string
@@ -49,7 +46,7 @@ func TestSource(t *testing.T) {
 		}
 
 		for _, test := range tests {
-			got, _ := s.ListReleases(ctx, test.opt)
+			got, _ := s.ListReleases(t.Context(), test.opt)
 			if diff := cmp.Diff(test.want, got); diff != "" {
 				t.Errorf("%s\n%s", test.msg, diff)
 			}
@@ -57,21 +54,21 @@ func TestSource(t *testing.T) {
 	})
 
 	t.Run("GetRelease", func(t *testing.T) {
-		got, _ := s.GetRelease(ctx, want[0].Version)
+		got, _ := s.GetRelease(t.Context(), want[0].Version)
 		if diff := cmp.Diff(want[0], got); diff != "" {
 			t.Error(diff)
 		}
 	})
 
 	t.Run("UploadAsset", func(t *testing.T) {
-		err := s.UploadAsset(ctx, want[0].Version, "test", []byte("test"))
+		err := s.UploadAsset(t.Context(), want[0].Version, "test", []byte("test"))
 		if err != nil {
 			t.Error(err)
 		}
 	})
 
 	t.Run("DownloadAsset", func(t *testing.T) {
-		got, err := s.DownloadAsset(ctx, want[0].Version, "test")
+		got, err := s.DownloadAsset(t.Context(), want[0].Version, "test")
 		if err != nil {
 			t.Error(err)
 		}

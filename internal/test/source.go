@@ -2,7 +2,6 @@ package test
 
 import (
 	"bytes"
-	"context"
 	"strings"
 	"testing"
 	"time"
@@ -20,12 +19,11 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 	t.Helper()
 
 	data := []byte("test\n")
-	ctx := context.Background()
 	want := SourceWant()
 
 	for _, release := range want {
 		for _, asset := range release.Assets {
-			_ = s.UploadAsset(ctx, release.Version, asset.Name, data)
+			_ = s.UploadAsset(t.Context(), release.Version, asset.Name, data)
 			asset.URL = makeURL(release.Version, asset.Name)
 		}
 	}
@@ -48,7 +46,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 	t.Run("ListReleases", func(t *testing.T) {
 		t.Helper()
 
-		got, err := s.ListReleases(ctx, &source.ListOptions{Prerelease: true})
+		got, err := s.ListReleases(t.Context(), &source.ListOptions{Prerelease: true})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -60,7 +58,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 	t.Run("GetRelease", func(t *testing.T) {
 		t.Helper()
 
-		got, err := s.GetRelease(ctx, want[0].Version)
+		got, err := s.GetRelease(t.Context(), want[0].Version)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -68,7 +66,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 			t.Error(diff)
 		}
 
-		_, err = s.GetRelease(ctx, "v0.0.0")
+		_, err = s.GetRelease(t.Context(), "v0.0.0")
 		if err == nil {
 			t.Error("should return error")
 		}
@@ -77,7 +75,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 	t.Run("UploadAsset", func(t *testing.T) {
 		t.Helper()
 
-		err := s.UploadAsset(ctx, want[0].Version, "test.txt", data)
+		err := s.UploadAsset(t.Context(), want[0].Version, "test.txt", data)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -86,7 +84,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 	t.Run("DownloadAsset", func(t *testing.T) {
 		t.Helper()
 
-		b, err := s.DownloadAsset(ctx, want[0].Version, "test.txt")
+		b, err := s.DownloadAsset(t.Context(), want[0].Version, "test.txt")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -94,12 +92,12 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 			t.Error("should be equal")
 		}
 
-		_, err = s.DownloadAsset(ctx, "v0.0.0", "test.txt")
+		_, err = s.DownloadAsset(t.Context(), "v0.0.0", "test.txt")
 		if err == nil {
 			t.Error("should return error")
 		}
 
-		_, err = s.DownloadAsset(ctx, want[0].Version, "fail.txt")
+		_, err = s.DownloadAsset(t.Context(), want[0].Version, "fail.txt")
 		if err == nil {
 			t.Error("should return error")
 		}

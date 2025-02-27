@@ -1,7 +1,6 @@
 package emulator
 
 import (
-	"context"
 	"testing"
 
 	"github.com/docker/go-connections/nat"
@@ -20,7 +19,7 @@ func AzureBlob(t *testing.T, bucket string) string {
 		Cmd:          []string{"azurite-blob", "--blobHost", "0.0.0.0"},
 		WaitingFor:   wait.ForListeningPort(nat.Port("10000")),
 	})
-	host, err := c.PortEndpoint(context.Background(), "10000", "")
+	host, err := c.PortEndpoint(t.Context(), "10000", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -36,7 +35,7 @@ func AzureBlob(t *testing.T, bucket string) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err = client.Create(context.Background(), nil); err != nil {
+	if _, err = client.Create(t.Context(), nil); err != nil {
 		t.Fatal(err)
 	}
 
@@ -69,7 +68,7 @@ func S3(t *testing.T, bucket string) string {
 		Env:          map[string]string{"initialBuckets": bucket},
 		WaitingFor:   wait.ForHTTP("/").WithPort("9090").WithStatusCodeMatcher(nil),
 	})
-	host, err := c.PortEndpoint(context.Background(), "9090", "http")
+	host, err := c.PortEndpoint(t.Context(), "9090", "http")
 	if err != nil {
 		t.Fatal(err)
 	}

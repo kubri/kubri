@@ -1,7 +1,6 @@
 package sparkle_test
 
 import (
-	"context"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/xml"
@@ -20,7 +19,6 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	ctx := context.Background()
 	data := []byte("test")
 	ts := time.Now().UTC()
 	src := testsource.New([]*source.Release{
@@ -36,19 +34,19 @@ func TestBuild(t *testing.T) {
 - Something else`,
 		},
 	})
-	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.0.0", "test_32-bit.exe", data)
-	src.UploadAsset(ctx, "v1.0.0", "test_64-bit.msi", data)
-	src.UploadAsset(ctx, "v1.1.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.1.0", "test_32-bit.exe", data)
-	src.UploadAsset(ctx, "v1.1.0", "test_64-bit.msi", data)
+	src.UploadAsset(t.Context(), "v1.0.0", "test.dmg", data)
+	src.UploadAsset(t.Context(), "v1.0.0", "test_32-bit.exe", data)
+	src.UploadAsset(t.Context(), "v1.0.0", "test_64-bit.msi", data)
+	src.UploadAsset(t.Context(), "v1.1.0", "test.dmg", data)
+	src.UploadAsset(t.Context(), "v1.1.0", "test_32-bit.exe", data)
+	src.UploadAsset(t.Context(), "v1.1.0", "test_64-bit.msi", data)
 
 	tgt, err := target.New(target.Config{Path: t.TempDir(), URL: "https://example.com"})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	w, err := tgt.NewWriter(ctx, "appcast.xml")
+	w, err := tgt.NewWriter(t.Context(), "appcast.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -213,12 +211,11 @@ func TestBuild(t *testing.T) {
 func testBuild(t *testing.T, c *sparkle.Config, want string) {
 	t.Helper()
 
-	ctx := context.Background()
-	if err := sparkle.Build(ctx, c); err != nil {
+	if err := sparkle.Build(t.Context(), c); err != nil {
 		t.Fatal(err)
 	}
 
-	r, err := c.Target.NewReader(ctx, "appcast.xml")
+	r, err := c.Target.NewReader(t.Context(), "appcast.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -235,12 +232,11 @@ func testBuild(t *testing.T, c *sparkle.Config, want string) {
 }
 
 func TestBuildSign(t *testing.T) {
-	ctx := context.Background()
 	data := []byte("test")
 	ts := time.Now().UTC()
 	src := testsource.New([]*source.Release{{Version: "v1.0.0", Date: ts}})
-	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.0.0", "test.msi", data)
+	src.UploadAsset(t.Context(), "v1.0.0", "test.dmg", data)
+	src.UploadAsset(t.Context(), "v1.0.0", "test.msi", data)
 
 	tgt, err := target.New(target.Config{Path: t.TempDir(), URL: "https://example.com"})
 	if err != nil {
@@ -314,11 +310,11 @@ func TestBuildSign(t *testing.T) {
 		}},
 	}
 
-	if err = sparkle.Build(ctx, c); err != nil {
+	if err = sparkle.Build(t.Context(), c); err != nil {
 		t.Fatal(err)
 	}
 
-	r, err := tgt.NewReader(ctx, "appcast.xml")
+	r, err := tgt.NewReader(t.Context(), "appcast.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -360,12 +356,11 @@ func TestBuildSign(t *testing.T) {
 }
 
 func TestBuildUpload(t *testing.T) {
-	ctx := context.Background()
 	data := []byte("test")
 	ts := time.Now().UTC()
 	src := testsource.New([]*source.Release{{Version: "v1.0.0", Date: ts}})
-	src.UploadAsset(ctx, "v1.0.0", "test.dmg", data)
-	src.UploadAsset(ctx, "v1.0.0", "test.msi", data)
+	src.UploadAsset(t.Context(), "v1.0.0", "test.dmg", data)
+	src.UploadAsset(t.Context(), "v1.0.0", "test.msi", data)
 
 	for _, upload := range []bool{true, false} {
 		tgt, err := target.New(target.Config{Path: t.TempDir()})
@@ -384,17 +379,17 @@ func TestBuildUpload(t *testing.T) {
 			UploadPackages: upload,
 		}
 
-		if err := sparkle.Build(ctx, c); err != nil {
+		if err := sparkle.Build(t.Context(), c); err != nil {
 			t.Fatal(err)
 		}
 
-		r, err := src.GetRelease(ctx, "v1.0.0")
+		r, err := src.GetRelease(t.Context(), "v1.0.0")
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		for _, asset := range r.Assets {
-			rd, err := tgt.NewReader(ctx, r.Version+"/"+asset.Name)
+			rd, err := tgt.NewReader(t.Context(), r.Version+"/"+asset.Name)
 			if err == nil {
 				rd.Close()
 			}

@@ -1,7 +1,6 @@
 package apt_test
 
 import (
-	"context"
 	"io"
 	"io/fs"
 	"maps"
@@ -90,7 +89,7 @@ func TestBuild(t *testing.T) {
 			Compress: apt.BZIP2 | apt.ZSTD,
 		}
 
-		err := apt.Build(context.Background(), c)
+		err := apt.Build(t.Context(), c)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -148,7 +147,7 @@ func readTestData(t *testing.T, compress ...string) map[string]string {
 func testBuild(t *testing.T, c *apt.Config, want map[string]string, now time.Time) { //nolint:thelper
 	apt.SetTime(now)
 
-	err := apt.Build(context.Background(), c)
+	err := apt.Build(t.Context(), c)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,7 +170,7 @@ func testBuild(t *testing.T, c *apt.Config, want map[string]string, now time.Tim
 func readFile(t *testing.T, tgt target.Target, name string) []byte {
 	t.Helper()
 
-	r, err := tgt.NewReader(context.Background(), name)
+	r, err := tgt.NewReader(t.Context(), name)
 	if err != nil {
 		t.Fatal(name, err)
 	}

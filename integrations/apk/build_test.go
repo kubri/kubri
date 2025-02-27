@@ -1,7 +1,6 @@
 package apk_test
 
 import (
-	"context"
 	"io"
 	"io/fs"
 	"os"
@@ -52,7 +51,7 @@ func TestBuild(t *testing.T) {
 			KeyName: "test@example.com",
 		}
 
-		err := apk.Build(context.Background(), c)
+		err := apk.Build(t.Context(), c)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -99,13 +98,13 @@ func readTestData(t *testing.T) map[string][]byte {
 func testBuild(t *testing.T, c *apk.Config, want map[string][]byte) {
 	t.Helper()
 
-	err := apk.Build(context.Background(), c)
+	err := apk.Build(t.Context(), c)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for name, data := range want {
-		r, err := c.Target.NewReader(context.Background(), name)
+		r, err := c.Target.NewReader(t.Context(), name)
 		if err != nil {
 			t.Fatal(name, err)
 		}
