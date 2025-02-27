@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	gl "github.com/xanzy/go-gitlab"
+	gl "gitlab.com/gitlab-org/api/client-go"
 
 	"github.com/kubri/kubri/internal/test"
 	"github.com/kubri/kubri/source/gitlab"

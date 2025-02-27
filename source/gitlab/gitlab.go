@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/go-retryablehttp"
-	"github.com/xanzy/go-gitlab"
+	gitlab "gitlab.com/gitlab-org/api/client-go"
 
 	"github.com/kubri/kubri/source"
 )
@@ -96,7 +96,12 @@ func (s *gitlabSource) parseRelease(ctx context.Context, release *gitlab.Release
 }
 
 func (s *gitlabSource) UploadAsset(ctx context.Context, version, name string, data []byte) error {
-	file, _, err := s.client.Projects.UploadFile(s.repo, bytes.NewReader(data), name, gitlab.WithContext(ctx))
+	file, _, err := s.client.ProjectMarkdownUploads.UploadProjectMarkdown(
+		s.repo,
+		bytes.NewReader(data),
+		name,
+		gitlab.WithContext(ctx),
+	)
 	if err != nil {
 		return err
 	}
