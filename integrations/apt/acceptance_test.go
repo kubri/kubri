@@ -3,7 +3,6 @@
 package apt_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/kubri/kubri/integrations/apt"
@@ -47,14 +46,14 @@ func TestAcceptance(t *testing.T) {
 				ENTRYPOINT ["tail", "-f", "/dev/null"]
 			`)
 
-			c.CopyToContainer(context.Background(), key, "kubri-test.asc", 0o644)
+			c.CopyToContainer(t.Context(), key, "kubri-test.asc", 0o644)
 			c.Exec(t, "gpg --dearmor --yes --output /usr/share/keyrings/kubri-test.gpg < kubri-test.asc")
 			c.Exec(t, "echo 'deb [signed-by=/usr/share/keyrings/kubri-test.gpg] "+url+" stable main' > /etc/apt/sources.list.d/kubri-test.list")
 
 			for i, test := range tests {
 				t.Run(test.name, func(t *testing.T) {
 					config := &apt.Config{Source: src, Target: tgt, Version: test.version, PGPKey: pgpKey}
-					if err := apt.Build(context.Background(), config); err != nil {
+					if err := apt.Build(t.Context(), config); err != nil {
 						t.Fatal(err)
 					}
 

@@ -304,7 +304,7 @@ Int: 1
 
 	var v []record
 
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		deb.Unmarshal(in, &v)
 	}
 }

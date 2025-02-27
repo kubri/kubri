@@ -3,7 +3,6 @@ package emulator
 import (
 	"archive/tar"
 	"bytes"
-	"context"
 	"strings"
 	"testing"
 	"unicode"
@@ -26,7 +25,7 @@ func (c *Container) Exec(t *testing.T, script string) string {
 		}
 	})
 
-	code, _, err := c.Container.Exec(context.Background(), []string{"sh", "-c", script}, opt)
+	code, _, err := c.Container.Exec(t.Context(), []string{"sh", "-c", script}, opt)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +77,7 @@ func Build(t *testing.T, dockerfile string) Container {
 
 func runContainer(t *testing.T, cr testcontainers.ContainerRequest) Container {
 	t.Helper()
-	ctx := context.Background()
+	ctx := t.Context()
 	c, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: cr,
 		Started:          true,

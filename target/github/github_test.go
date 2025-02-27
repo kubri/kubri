@@ -1,7 +1,6 @@
 package github_test
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path"
@@ -21,7 +20,7 @@ func TestGithub(t *testing.T) {
 		t.Skip("Missing environment variable: GITHUB_TOKEN")
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 	client := gh.NewClient(oauth2.NewClient(ctx, ts))
 	user, _, err := client.Users.Get(ctx, "")

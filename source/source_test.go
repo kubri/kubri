@@ -1,7 +1,6 @@
 package source_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -34,7 +33,7 @@ func TestSource(t *testing.T) {
 		{Version: "v1.0.0"},
 	})
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	t.Run("ListReleases", func(t *testing.T) {
 		tests := []struct {

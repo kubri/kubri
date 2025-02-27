@@ -2,7 +2,6 @@ package test
 
 import (
 	"bytes"
-	"context"
 	"strings"
 	"testing"
 	"time"
@@ -20,7 +19,7 @@ func Source(t *testing.T, s *source.Source, makeURL func(version, asset string) 
 	t.Helper()
 
 	data := []byte("test\n")
-	ctx := context.Background()
+	ctx := t.Context()
 	want := SourceWant()
 
 	for _, release := range want {

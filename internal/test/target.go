@@ -1,7 +1,6 @@
 package test
 
 import (
-	"context"
 	"errors"
 	"io"
 	"io/fs"
@@ -47,7 +46,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 		o(opts)
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	data := []byte("test")
 
 	t.Run("NewWriter_Create", func(t *testing.T) {

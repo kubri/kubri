@@ -2,7 +2,6 @@ package local_test
 
 import (
 	"bytes"
-	"context"
 	"os"
 	"path/filepath"
 	"strings"
@@ -101,7 +100,7 @@ func TestLocal(t *testing.T) {
 	}
 
 	data := []byte("test\n")
-	ctx := context.Background()
+	ctx := t.Context()
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

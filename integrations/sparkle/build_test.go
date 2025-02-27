@@ -1,7 +1,6 @@
 package sparkle_test
 
 import (
-	"context"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/xml"
@@ -20,7 +19,7 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	data := []byte("test")
 	ts := time.Now().UTC()
 	src := testsource.New([]*source.Release{
@@ -213,7 +212,7 @@ func TestBuild(t *testing.T) {
 func testBuild(t *testing.T, c *sparkle.Config, want string) {
 	t.Helper()
 
-	ctx := context.Background()
+	ctx := t.Context()
 	if err := sparkle.Build(ctx, c); err != nil {
 		t.Fatal(err)
 	}
@@ -235,7 +234,7 @@ func testBuild(t *testing.T, c *sparkle.Config, want string) {
 }
 
 func TestBuildSign(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	data := []byte("test")
 	ts := time.Now().UTC()
 	src := testsource.New([]*source.Release{{Version: "v1.0.0", Date: ts}})
@@ -360,7 +359,7 @@ func TestBuildSign(t *testing.T) {
 }
 
 func TestBuildUpload(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	data := []byte("test")
 	ts := time.Now().UTC()
 	src := testsource.New([]*source.Release{{Version: "v1.0.0", Date: ts}})

@@ -79,7 +79,7 @@ func TestBuild(t *testing.T) {
 			path: ` + t.TempDir()
 
 	for _, tc := range tests {
-		os.Chdir(t.TempDir())
+		t.Chdir(t.TempDir())
 		os.WriteFile(tc.path, test.JoinYAML(tc.config, baseConfig), os.ModePerm)
 
 		var out bytes.Buffer
