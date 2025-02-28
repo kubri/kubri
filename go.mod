@@ -16,7 +16,7 @@ replace github.com/go-playground/validator/v10 => github.com/abemedia/validator/
 require (
 	dario.cat/mergo v1.0.1
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
-	github.com/ProtonMail/go-crypto v1.1.5
+	github.com/ProtonMail/go-crypto v1.1.6
 	github.com/ProtonMail/gopenpgp/v2 v2.8.2
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 	github.com/cavaliergopher/rpm v1.2.0
@@ -31,7 +31,7 @@ require (
 	github.com/go-xmlfmt/xmlfmt v1.1.3
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/goreleaser/nfpm/v2 v2.41.2
+	github.com/goreleaser/nfpm/v2 v2.41.3
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/invopop/jsonschema v0.13.0
 	github.com/joho/godotenv v1.5.1
