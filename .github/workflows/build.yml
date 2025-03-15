@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   test:
-    uses: kubri/kubri/.github/workflows/test.yml@master
+    uses: .github/workflows/test.yml
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
