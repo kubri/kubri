@@ -34,10 +34,10 @@ Create private keys for signing update packages. If keys already exist, this is 
 | `--email` |       |         | Email for PGP key. |
 | `--name`  |       |         | Name for PGP key.  |
 
-### `kubri keys import (dsa|ed25519|pgp) <path>`
+### `kubri keys import (dsa|ed25519|pgp|rsa) <path>`
 
 Import private keys for signing update packages. If keys already exist, this is a no-op.
 
-### `kubri keys public (dsa|ed25519|pgp)`
+### `kubri keys public (dsa|ed25519|pgp|rsa)`
 
 Output public key.
