@@ -43,7 +43,7 @@ require (
 	github.com/ulikunitz/xz v0.5.12
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	gitlab.alpinelinux.org/alpine/go v0.10.1
-	gitlab.com/gitlab-org/api/client-go v0.124.0
+	gitlab.com/gitlab-org/api/client-go v0.125.0
 	gocloud.dev v0.40.0
 	golang.org/x/mod v0.24.0
 	golang.org/x/oauth2 v0.28.0
@@ -196,7 +196,7 @@ require (
 	golang.org/x/net v0.36.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
-	golang.org/x/time v0.9.0 // indirect
+	golang.org/x/time v0.10.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240716161551-93cc26a95ae9 // indirect
 	google.golang.org/api v0.219.0 // indirect
 	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
