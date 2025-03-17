@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/kubri/kubri/compare/v0.5.2...v0.6.0) (2025-03-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **s3:** require full URL for endpoint option, remove disable-ssl option ([#514](https://github.com/kubri/kubri/issues/514))
+
+### Features
+
+* **s3:** require full URL for endpoint option, remove disable-ssl option ([#514](https://github.com/kubri/kubri/issues/514)) ([9fbe359](https://github.com/kubri/kubri/commit/9fbe359e7d9c1931021ba1dd51cbe519146be24e))
+* **sparkle:** support windows-arm64 ([#610](https://github.com/kubri/kubri/issues/610)) ([81bebc9](https://github.com/kubri/kubri/commit/81bebc9caa1aa37bc369b373379b3c0e11d76274))
+
 ## [0.5.2](https://github.com/kubri/kubri/compare/v0.5.1...v0.5.2) (2024-07-07)
 
 
