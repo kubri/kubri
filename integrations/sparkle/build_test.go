@@ -37,9 +37,11 @@ func TestBuild(t *testing.T) {
 	src.UploadAsset(t.Context(), "v1.0.0", "test.dmg", data)
 	src.UploadAsset(t.Context(), "v1.0.0", "test_32-bit.exe", data)
 	src.UploadAsset(t.Context(), "v1.0.0", "test_64-bit.msi", data)
+	src.UploadAsset(t.Context(), "v1.0.0", "test_ARM64.msi", data)
 	src.UploadAsset(t.Context(), "v1.1.0", "test.dmg", data)
 	src.UploadAsset(t.Context(), "v1.1.0", "test_32-bit.exe", data)
 	src.UploadAsset(t.Context(), "v1.1.0", "test_64-bit.msi", data)
+	src.UploadAsset(t.Context(), "v1.1.0", "test_ARM64.msi", data)
 
 	tgt, err := target.New(target.Config{Path: t.TempDir(), URL: "https://example.com"})
 	if err != nil {
@@ -76,6 +78,15 @@ func TestBuild(t *testing.T) {
 				<sparkle:criticalUpdate />
 			</sparkle:tags>
 			<enclosure url="https://example.com/v1.0.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
+		</item>
+		<item>
+			<title>v1.0.0</title>
+			<pubDate>Mon, 02 Jan 2006 15:04:05 +0000</pubDate>
+			<sparkle:version>1.0.0</sparkle:version>
+			<sparkle:tags>
+				<sparkle:criticalUpdate />
+			</sparkle:tags>
+			<enclosure url="https://example.com/v1.0.0/test_ARM64.msi" sparkle:os="windows-arm64" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
 		</item>
 	</channel>
 </rss>`))
@@ -175,6 +186,22 @@ func TestBuild(t *testing.T) {
 			<enclosure url="https://example.com/v1.1.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.1.0" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
 		</item>
 		<item>
+			<title>v1.1.0</title>
+			<pubDate>` + pubDate + `</pubDate>
+			<description><![CDATA[
+				<h2>New Features</h2>
+				<ul>
+					<li>Something</li>
+					<li>Something else</li>
+				</ul>
+			]]></description>
+			<sparkle:version>1.1.0</sparkle:version>
+			<sparkle:criticalUpdate sparkle:version="1.0.0" />
+			<sparkle:minimumAutoupdateVersion>1.0.0</sparkle:minimumAutoupdateVersion>
+			<sparkle:ignoreSkippedUpgradesBelowVersion>1.0.0</sparkle:ignoreSkippedUpgradesBelowVersion>
+			<enclosure url="https://example.com/v1.1.0/test_ARM64.msi" sparkle:os="windows-arm64" sparkle:version="1.1.0" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
+		</item>
+		<item>
 			<title>v1.0.0</title>
 			<pubDate>Mon, 02 Jan 2006 15:04:05 +0000</pubDate>
 			<sparkle:version>1.0.0</sparkle:version>
@@ -197,6 +224,15 @@ func TestBuild(t *testing.T) {
 				<sparkle:criticalUpdate />
 			</sparkle:tags>
 			<enclosure url="https://example.com/v1.0.0/test_64-bit.msi" sparkle:os="windows-x64" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
+		</item>
+		<item>
+			<title>v1.0.0</title>
+			<pubDate>Mon, 02 Jan 2006 15:04:05 +0000</pubDate>
+			<sparkle:version>1.0.0</sparkle:version>
+			<sparkle:tags>
+				<sparkle:criticalUpdate />
+			</sparkle:tags>
+			<enclosure url="https://example.com/v1.0.0/test_ARM64.msi" sparkle:os="windows-arm64" sparkle:version="1.0.0" sparkle:dsaSignature="test" sparkle:installerArguments="/passive" length="4" type="application/x-msi" />
 		</item>
 	</channel>
 </rss>`

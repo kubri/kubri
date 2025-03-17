@@ -15,10 +15,11 @@ func TestOS_MarshalText(t *testing.T) {
 	}{
 		{sparkle.MacOS, "macos", nil},
 		{sparkle.Windows, "windows", nil},
-		{sparkle.Windows64, "windows-x64", nil},
 		{sparkle.Windows32, "windows-x86", nil},
+		{sparkle.Windows64, "windows-x64", nil},
+		{sparkle.WindowsARM64, "windows-arm64", nil},
 		{sparkle.Unknown, "", nil},
-		{99, "", sparkle.ErrUnknownOS},
+		{255, "", sparkle.ErrUnknownOS},
 	}
 
 	for _, test := range tests {
@@ -39,8 +40,9 @@ func TestOS_UnmarshalText(t *testing.T) {
 	}{
 		{"macos", sparkle.MacOS, nil},
 		{"windows", sparkle.Windows, nil},
-		{"windows-x64", sparkle.Windows64, nil},
 		{"windows-x86", sparkle.Windows32, nil},
+		{"windows-x64", sparkle.Windows64, nil},
+		{"windows-arm64", sparkle.WindowsARM64, nil},
 		{"", sparkle.Unknown, nil},
 		{"foo", sparkle.Unknown, sparkle.ErrUnknownOS},
 	}
@@ -65,8 +67,10 @@ func TestIsOS(t *testing.T) {
 		{sparkle.MacOS, sparkle.Windows, false},
 		{sparkle.Windows32, sparkle.Windows, true},
 		{sparkle.Windows64, sparkle.Windows, true},
+		{sparkle.WindowsARM64, sparkle.Windows, true},
 		{sparkle.Unknown, sparkle.MacOS, false},
 		{sparkle.MacOS, sparkle.Unknown, true},
+		{255, sparkle.Windows, false},
 	}
 
 	for _, test := range tests {
@@ -86,14 +90,18 @@ func TestDetectOS(t *testing.T) {
 		{"test.pkg", sparkle.MacOS},
 		{"test.exe", sparkle.Windows},
 		{"test.msi", sparkle.Windows},
+		{"test_i386_amd64.msi", sparkle.Windows}, // Ambiguous
 		{"test_32bit.exe", sparkle.Windows32},
 		{"test_x86.msi", sparkle.Windows32},
 		{"test_i386.msi", sparkle.Windows32},
+		{"test_i686.msi", sparkle.Windows32},
 		{"test_ia32.msi", sparkle.Windows32},
 		{"test_64-bit.exe", sparkle.Windows64},
 		{"test_x86_64.msi", sparkle.Windows64},
 		{"test_x64.msi", sparkle.Windows64},
 		{"test_amd64.msi", sparkle.Windows64},
+		{"test_arm64.msi", sparkle.WindowsARM64},
+		{"test_aarch64.msi", sparkle.WindowsARM64},
 	}
 
 	for _, test := range tests {

@@ -52,7 +52,7 @@ Description of your appcast feed.
 
 ### `detect-os`
 
-- Type: `map['macos'|'windows'|'windows-x64'|'windows-x86']string`
+- Type: `map['macos'|'windows'|'windows-arm64'|'windows-x64'|'windows-x86']string`
 
 A map of globs to override detecting what file is what OS. Set this if your update packages are
 `.zip` files or you use non-standard naming to differentiate between Windows 64-bit and 32-bit
@@ -62,9 +62,10 @@ installers.
 
 - Files with the extensions `.dmg` and `.pkg` are picked up as `macos`.
 - Files with the extensions `.exe` and `.msi` are picked up as `windows`.
+  - Files matching `arm64|aarch64|a64` are picked up as `windows-arm64`.
   - Files matching `amd64|x64|x86[\W_]?64|64[\W_]?bit` are picked up as `windows-x64`.
-  - Files matching `386|x86(?![\W_]?64)|ia32|32[\W_]?bit` are picked up as `windows-x86`.
-  - Files matching both regular expressions are picked up as `windows`.
+  - Files matching `386|686|x86(?![\W_]?64)|ia32|32[\W_]?bit` are picked up as `windows-x86`.
+  - Files matching multiple regular expressions are picked up as `windows`.
 
 :::
 
@@ -75,6 +76,7 @@ sparkle:
   detect-os:
     macos: '*_MacOS.zip'
     windows: '*_Windows.zip'
+    windows_arm64: '*_Windows_arm64.zip'
     windows_x64: '*_Windows_x64.zip'
     windows_x86: '*_Windows_x86.zip'
 ```
@@ -95,15 +97,15 @@ sparkle:
 
 ### `params[*].os`
 
-- Type: `'macos'|'windows'|'windows-x64'|'windows-x86'`
+- Type: `'macos'|'windows'|'windows-arm64'|'windows-x64'|'windows-x86'`
 
-Apply these parameters only if the OS matches. Must be either `macos`, `windows`, `windows-x64` or
-`windows-x86`.
+Apply these parameters only if the OS matches. Must be either `macos`, `windows`, `windows-arm64`,
+`windows-x64` or `windows-x86`.
 
 :::info
 
-Setting `os` to `windows` will also apply the parameters to `windows-x64` and `windows-x86`
-releases.
+Setting `os` to `windows` will also apply the parameters to `windows-arm64`, `windows-x64` and
+`windows-x86` releases.
 
 :::
 
