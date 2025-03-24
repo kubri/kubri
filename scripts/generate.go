@@ -132,7 +132,7 @@ func buildPackages(packager string, config nfpm.Config) error {
 	defer f.Close()
 
 	if err := pkg.Package(info, f); err != nil {
-		os.Remove(config.Target)
+		_ = os.Remove(config.Target)
 		return err
 	}
 

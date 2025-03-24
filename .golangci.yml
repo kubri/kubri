@@ -1,23 +1,14 @@
+version: '2'
+
 run:
-  timeout: 5m
   build-tags:
     - acceptance
 
+issues:
+  fix: true
+
 linters:
-  presets:
-    - bugs
-    - comment
-    - complexity
-    - error
-    - format
-    - import
-    - metalinter
-    - module
-    - performance
-    # - sql
-    - style
-    - test
-    - unused
+  default: all
   disable:
     - cyclop
     - depguard
@@ -25,96 +16,92 @@ linters:
     - errorlint # TODO: turn on and fix
     - exhaustive
     - exhaustruct
-    - gci
     - godox
     - gomoddirectives # TODO: remove when go-rpm is updated.
     - mnd
     - musttag
-    - nonamedreturns
     - nlreturn
+    - nonamedreturns
     - paralleltest
     - recvcheck
     - varnamelen
     - wrapcheck
     - wsl
+  settings:
+    gomodguard:
+      blocked:
+        modules:
+          - encoding/json:
+              recommendations: [github.com/goccy/go-json]
+          - github.com/pkg/errors:
+              recommendations: [errors]
+    gosec:
+      excludes:
+        - G204
+        - G401
+        - G501
+        - G505
+    govet:
+      disable:
+        - fieldalignment
+      enable-all: true
+    ireturn:
+      allow:
+        - error
+        - generic
+        - stdlib
+        - github.com/google/go-cmp/cmp.Option
+        - github.com/kubri/kubri/target.Target
+    nolintlint:
+      require-specific: true
+    tagalign:
+      order:
+        - yaml
+        - validate
+        - jsonschema
+    tagliatelle:
+      case:
+        rules:
+          deb: header
+          yaml: kebab
+        use-field-name: true
+  exclusions:
+    generated: lax
+    presets:
+      - common-false-positives
+      - std-error-handling
+    rules:
+      - linters:
+          - contextcheck
+          - cyclop
+          - errcheck
+          - funlen
+          - gocognit
+          - goconst
+          - gosec
+          - lll
+          - maintidx
+        path: (.+)_test.go
+      - linters: [govet]
+        text: 'shadow: declaration of "err" shadows declaration'
+      - linters: [staticcheck]
+        text: 'SA1019: "crypto/dsa" has been deprecated'
+      - linters: [lll]
+        source: ^\s*//
+      - linters: [revive]
+        text: '^(exported|package-comments): .*$'
 
-linters-settings:
-  gofmt:
-    rewrite-rules:
-      - pattern: interface{}
-        replacement: any
-  gofumpt:
-    extra-rules: true
-  goimports:
-    local-prefixes: github.com/kubri/kubri
-  gomodguard:
-    blocked:
-      modules:
-        - encoding/json:
-            recommendations:
-              - github.com/goccy/go-json
-        - github.com/pkg/errors:
-            recommendations:
-              - errors
-  gosec:
-    excludes:
-      - G107
-      - G204
-      - G401
-      - G501
-      - G505
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-  ireturn:
-    allow:
-      - error
-      - generic
-      - stdlib
-      - github.com/google/go-cmp/cmp.Option
-      - github.com/kubri/kubri/target.Target
-  nolintlint:
-    require-specific: true
-  tagliatelle:
-    case:
-      use-field-name: true
-      rules:
-        yaml: kebab
-        deb: header
-  tagalign:
-    order:
-      - yaml
-      - validate
-      - jsonschema
-
-issues:
-  fix: true
-  include:
-    - EXC0004
-    - EXC0005
-    - EXC0009
-    # - EXC0012 # TODO: enable & fix.
-    - EXC0013
-    - EXC0014
-  exclude-rules:
-    - path: (.+)_test.go
-      linters:
-        - contextcheck
-        - cyclop
-        - errcheck
-        - funlen
-        - gocognit
-        - goconst
-        - gosec
-        - lll
-        - maintidx
-    - linters:
-        - govet
-      text: 'shadow: declaration of "err" shadows declaration'
-    - linters:
-        - staticcheck
-      text: 'SA1019: "crypto/dsa" has been deprecated'
-    - linters:
-        - lll
-      source: '^\s*//'
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gofmt:
+      rewrite-rules:
+        - pattern: interface{}
+          replacement: any
+    gofumpt:
+      extra-rules: true
+    goimports:
+      local-prefixes: [github.com/kubri/kubri]
