@@ -27,7 +27,7 @@ func keysCmd() *cobra.Command {
 		},
 	}
 
-	cmd.AddCommand(keysCreateCmd(), keysPublicCmd(), keysImportCmd())
+	cmd.AddCommand(keysCreateCmd(), keysPublicCmd(), keysImportCmd(), keysExportCmd())
 
 	return cmd
 }
