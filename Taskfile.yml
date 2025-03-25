@@ -40,9 +40,9 @@ tasks:
       - ./**/*.go
       - ./go.{mod,sum}
     generates:
-      - ./kubri
+      - ./dist/kubri
     cmds:
-      - go build
+      - go build -o ./dist/kubri -ldflags="-X 'main.version={{.GIT_COMMIT}}'"
 
   lint:
     desc: Run golangci-lint
