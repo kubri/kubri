@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/kubri/kubri/pkg/crypto"
 	"github.com/kubri/kubri/pkg/crypto/dsa"
 	"github.com/kubri/kubri/pkg/crypto/ed25519"
 	"github.com/kubri/kubri/pkg/crypto/pgp"
@@ -33,6 +34,14 @@ func keysImportCmd() *cobra.Command {
 				_, err = dsa.UnmarshalPrivateKey(b)
 			case "ed25519":
 				_, err = ed25519.UnmarshalPrivateKey(b)
+				if err == crypto.ErrInvalidKey {
+					var edKey ed25519.PrivateKey
+					edKey, err = ed25519.UnmarshalPrivateKeyPEM(b)
+					if err != nil {
+						return err
+					}
+					b, err = ed25519.MarshalPrivateKey(edKey)
+				}
 			case "pgp":
 				_, err = pgp.UnmarshalPrivateKey(b)
 			case "rsa":

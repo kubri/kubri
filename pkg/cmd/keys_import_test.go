@@ -27,6 +27,10 @@ func TestKeysImportCmd(t *testing.T) {
 	ed25519Path := filepath.Join(t.TempDir(), "test")
 	os.WriteFile(ed25519Path, ed25519Bytes, os.ModePerm)
 
+	ed25519PEMBytes, _ := ed25519.MarshalPrivateKeyPEM(ed25519Key)
+	ed25519PEMPath := filepath.Join(t.TempDir(), "test")
+	os.WriteFile(ed25519PEMPath, ed25519PEMBytes, os.ModePerm)
+
 	pgpKey, _ := pgp.NewPrivateKey("test", "test@example.com")
 	pgpBytes, _ := pgp.MarshalPrivateKey(pgpKey)
 	pgpPath := filepath.Join(t.TempDir(), "test")
@@ -37,25 +41,55 @@ func TestKeysImportCmd(t *testing.T) {
 	rsaPath := filepath.Join(t.TempDir(), "test")
 	os.WriteFile(rsaPath, rsaBytes, os.ModePerm)
 
-	tests := [][]string{
-		{"keys", "import", "dsa", dsaPath},
-		{"keys", "import", "ed25519", ed25519Path},
-		{"keys", "import", "pgp", pgpPath},
-		{"keys", "import", "rsa", rsaPath},
-		{"keys", "import", "dsa", dsaPath, "--force"},
-		{"keys", "import", "ed25519", ed25519Path, "--force"},
-		{"keys", "import", "pgp", pgpPath, "--force"},
-		{"keys", "import", "rsa", rsaPath, "--force"},
+	tests := []struct {
+		args []string
+		want []byte
+	}{
+		{
+			args: []string{"keys", "import", "dsa", dsaPath},
+			want: dsaBytes,
+		},
+		{
+			args: []string{"keys", "import", "ed25519", ed25519Path},
+			want: ed25519Bytes,
+		},
+		{
+			args: []string{"keys", "import", "pgp", pgpPath},
+			want: pgpBytes,
+		},
+		{
+			args: []string{"keys", "import", "rsa", rsaPath},
+			want: rsaBytes,
+		},
+		{
+			args: []string{"keys", "import", "dsa", dsaPath, "--force"},
+			want: dsaBytes,
+		},
+		{
+			args: []string{"keys", "import", "ed25519", ed25519Path, "--force"},
+			want: ed25519Bytes,
+		},
+		{
+			args: []string{"keys", "import", "ed25519", ed25519PEMPath, "--force"},
+			want: ed25519Bytes,
+		},
+		{
+			args: []string{"keys", "import", "pgp", pgpPath, "--force"},
+			want: pgpBytes,
+		},
+		{
+			args: []string{"keys", "import", "rsa", rsaPath, "--force"},
+			want: rsaBytes,
+		},
 	}
 
 	t.Setenv("KUBRI_PATH", t.TempDir())
 
 	for _, test := range tests {
-		want, _ := os.ReadFile(test[3])
-		err := cmd.Execute("", cmd.WithArgs(test...), cmd.WithStdout(io.Discard))
+		err := cmd.Execute("", cmd.WithArgs(test.args...), cmd.WithStdout(io.Discard))
 		if err != nil {
 			t.Errorf("%s: %s", test, err)
-		} else if b, _ := secret.Get(test[2] + "_key"); !bytes.Equal(want, b) {
+		} else if b, _ := secret.Get(test.args[2] + "_key"); !bytes.Equal(test.want, b) {
 			t.Errorf("%s should be equal", test)
 		}
 	}

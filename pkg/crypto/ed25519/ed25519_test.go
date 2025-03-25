@@ -41,9 +41,9 @@ func TestEd25519(t *testing.T) {
 		cmd := exec.Command("openssl", "pkeyutl", "-verify", "-pubin", "-inkey", "public.der", "-rawin", "-in", "data.txt", "-sigfile", "data.txt.sig")
 		cmd.Dir = dir
 		out, err := cmd.CombinedOutput()
-		if err != nil {
-			t.Fatal(err, string(out))
-		}
 		t.Log(string(out))
+		if err != nil {
+			t.Fatal(err)
+		}
 	})
 }
