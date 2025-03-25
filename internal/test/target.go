@@ -122,7 +122,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 		if err != nil {
 			t.Fatal(err)
 		} else {
-			r.Close()
+			_ = r.Close()
 		}
 	})
 
@@ -151,7 +151,7 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 
 		r, err := tgt.NewReader(t.Context(), "path/to/file")
 		if err == nil {
-			r.Close()
+			_ = r.Close()
 		}
 		if !errors.Is(err, fs.ErrNotExist) {
 			t.Fatalf("Read should return %q - got %q", fs.ErrNotExist, err)
