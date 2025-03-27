@@ -1,3 +1,4 @@
+.kubri/
 .task/
 .vscode/
 dist/
@@ -5,4 +6,3 @@ dist/
 *.out
 .DS_Store
 .env
-/kubri
