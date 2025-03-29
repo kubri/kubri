@@ -24,6 +24,7 @@ linters:
     - nonamedreturns
     - paralleltest
     - recvcheck
+    - tparallel
     - varnamelen
     - wrapcheck
     - wsl

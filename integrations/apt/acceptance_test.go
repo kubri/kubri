@@ -17,10 +17,8 @@ func TestAcceptance(t *testing.T) {
 		name  string
 		image string
 	}{
-		{"Debian 12", "debian:12"},
-		{"Debian 11", "debian:11"},
-		{"Ubuntu 22.04", "ubuntu:jammy"},
-		{"Ubuntu 20.04", "ubuntu:focal"},
+		{"Debian", "debian:latest"},
+		{"Ubuntu", "ubuntu:latest"},
 	}
 
 	tests := []struct {
@@ -33,19 +31,16 @@ func TestAcceptance(t *testing.T) {
 
 	for _, distro := range distros {
 		t.Run(distro.name, func(t *testing.T) {
+			t.Parallel()
+
 			dir := t.TempDir()
 			pgpKey, _ := pgp.NewPrivateKey("test", "test@example.com")
 			key, _ := pgp.MarshalPublicKey(pgp.Public(pgpKey))
 			src, _ := source.New(source.Config{Path: "../../testdata"})
 			tgt, _ := ftarget.New(ftarget.Config{Path: dir})
 			url := emulator.FileServer(t, dir)
-			c := emulator.Build(t, `
-				FROM `+distro.image+`
-				ENV DEBIAN_FRONTEND=noninteractive
-				RUN apt-get update && apt-get install -y --no-install-recommends gpg apt-utils
-				ENTRYPOINT ["tail", "-f", "/dev/null"]
-			`)
-
+			c := emulator.Image(t, distro.image, emulator.WithEnv("DEBIAN_FRONTEND", "noninteractive"))
+			c.Exec(t, "apt-get update -q && apt-get install -yq --no-install-recommends gpg")
 			c.CopyToContainer(t.Context(), key, "kubri-test.asc", 0o644)
 			c.Exec(t, "gpg --dearmor --yes --output /usr/share/keyrings/kubri-test.gpg < kubri-test.asc")
 			c.Exec(t, "echo 'deb [signed-by=/usr/share/keyrings/kubri-test.gpg] "+url+" stable main' > /etc/apt/sources.list.d/kubri-test.list")

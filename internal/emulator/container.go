@@ -41,16 +41,16 @@ func (c *Container) Exec(t *testing.T, script string) string {
 	return strings.TrimRightFunc(s, unicode.IsSpace)
 }
 
-func Image(t *testing.T, name string) Container {
+func Image(t *testing.T, name string, opt ...Option) Container {
 	t.Helper()
 	return runContainer(t, testcontainers.ContainerRequest{
 		Image:              name,
 		HostConfigModifier: func(hc *container.HostConfig) { hc.NetworkMode = "host" },
 		Entrypoint:         []string{"tail", "-f", "/dev/null"},
-	})
+	}, opt...)
 }
 
-func Build(t *testing.T, dockerfile string) Container {
+func Build(t *testing.T, dockerfile string, opt ...Option) Container {
 	t.Helper()
 
 	var buf bytes.Buffer
@@ -73,11 +73,14 @@ func Build(t *testing.T, dockerfile string) Container {
 	return runContainer(t, testcontainers.ContainerRequest{
 		FromDockerfile:     testcontainers.FromDockerfile{ContextArchive: bytes.NewReader(buf.Bytes())},
 		HostConfigModifier: func(hc *container.HostConfig) { hc.NetworkMode = "host" },
-	})
+	}, opt...)
 }
 
-func runContainer(t *testing.T, cr testcontainers.ContainerRequest) Container {
+func runContainer(t *testing.T, cr testcontainers.ContainerRequest, opt ...Option) Container {
 	t.Helper()
+	for _, o := range opt {
+		o(&cr)
+	}
 	c, err := testcontainers.GenericContainer(t.Context(), testcontainers.GenericContainerRequest{
 		ContainerRequest: cr,
 		Started:          true,

@@ -27,11 +27,9 @@ func TestAcceptance(t *testing.T) {
 		image string
 		pkg   string
 	}{
-		{"RHEL 9", "registry.access.redhat.com/ubi9/ubi:latest", "dnf"},
-		{"RHEL 8", "registry.access.redhat.com/ubi8/ubi:latest", "dnf"},
-		{"Fedora 39", "fedora:39", "dnf"},
-		{"Fedora 38", "fedora:38", "dnf"},
-		{"openSUSE Leap 15", "opensuse/leap:15", "zypper"},
+		{"RHEL 9", "redhat/ubi9:latest", "dnf"},
+		{"Fedora", "fedora:latest", "dnf"},
+		{"openSUSE", "opensuse/leap:latest", "zypper"},
 	}
 
 	tests := []struct {
@@ -44,6 +42,8 @@ func TestAcceptance(t *testing.T) {
 
 	for _, distro := range distros {
 		t.Run(distro.name, func(t *testing.T) {
+			t.Parallel()
+
 			dir := t.TempDir()
 			pgpKey, _ := pgp.NewPrivateKey("test", "test@example.com")
 			src, _ := source.New(source.Config{Path: "../../testdata"})

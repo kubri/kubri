@@ -17,7 +17,7 @@ func TestAcceptance(t *testing.T) {
 		name  string
 		image string
 	}{
-		{"Alpine 3", "alpine:3"},
+		{"Alpine", "alpine:latest"},
 	}
 
 	tests := []struct {

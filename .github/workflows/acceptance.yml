@@ -48,7 +48,7 @@ jobs:
           fi
 
   test:
-    name: Test ${{ matrix.package }}
+    name: ${{ matrix.package }}
     if: needs.packages.outputs.packages != '[]'
     needs: packages
     runs-on: ubuntu-latest
@@ -65,7 +65,14 @@ jobs:
           go-version-file: go.mod
 
       - name: Run acceptance tests
-        run: go test -v -tags acceptance -run ^TestAcceptance$ ./${{ matrix.package }}
+        run: |
+          go test -v -tags acceptance -run ^TestAcceptance$ -coverprofile coverage.out -coverpkg=./... ./${{ matrix.package }}
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: ${{ matrix.package }}
 
   acceptance:
     name: Acceptance Test
