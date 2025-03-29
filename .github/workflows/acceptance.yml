@@ -2,8 +2,7 @@ name: Acceptance Test
 
 on:
   pull_request:
-    paths:
-      - integrations/**
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,13 +13,24 @@ concurrency:
 
 jobs:
   packages:
-    name: Changed packages
+    name: Select packages
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      packages: ${{ steps.set-matrix.outputs.packages }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if go.mod or go.sum changed
+        id: deps
+        if: github.event_name != 'workflow_dispatch'
+        uses: tj-actions/changed-files@v46
+        with:
+          files: go.{mod,sum}
+
       - name: Find packages with changes
         id: packages
+        if: steps.deps.outputs.any_changed != 'true'
         uses: tj-actions/changed-files@v46
         with:
           files: integrations/**
@@ -31,14 +41,20 @@ jobs:
       - name: Set output
         id: set-matrix
         run: |
-          echo "matrix={\"package\":${{ steps.packages.outputs.all_changed_and_modified_files }}}" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ steps.deps.outputs.any_changed }}" == "true" ]]; then
+            echo "packages=$(find integrations -mindepth 1 -maxdepth 2 -type d | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          else
+            echo "packages=${{ steps.packages.outputs.all_changed_and_modified_files }}" >> $GITHUB_OUTPUT
+          fi
 
-  acceptance:
-    name: ${{ matrix.package }}
+  test:
+    name: Test ${{ matrix.package }}
+    if: needs.packages.outputs.packages != '[]'
     needs: packages
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.packages.outputs.matrix) }}
+      matrix:
+        package: ${{ fromJSON(needs.packages.outputs.packages) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,3 +66,10 @@ jobs:
 
       - name: Run acceptance tests
         run: go test -v -tags acceptance -run ^TestAcceptance$ ./${{ matrix.package }}
+
+  acceptance:
+    name: Acceptance Test
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - run: exit 0
