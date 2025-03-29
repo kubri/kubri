@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/kubri/kubri/compare/v0.6.0...v0.7.0) (2025-03-29)
+
+
+### Features
+
+* **keys:** export keys, allow ed25519 PEM import ([#622](https://github.com/kubri/kubri/issues/622)) ([fcc610f](https://github.com/kubri/kubri/commit/fcc610f8f8a3cdccf9d2bf3ab9211cb62d37b90c))
+
 ## [0.6.0](https://github.com/kubri/kubri/compare/v0.5.2...v0.6.0) (2025-03-17)
 
 
