@@ -46,6 +46,9 @@ const Integrations = [
     description: 'Alpine Linux',
   },
   {
+    title: 'Arch Linux',
+  },
+  {
     title: 'App Installer',
     description: 'Windows',
   },
@@ -98,7 +101,8 @@ export default function Home(): JSX.Element {
                     <ul>
                       {Integrations.map((integration, idx) => (
                         <li key={idx}>
-                          <strong>{integration.title}</strong> ({integration.description})
+                          <strong>{integration.title}</strong>{' '}
+                          {integration.description && <>({integration.description})</>}
                         </li>
                       ))}
                     </ul>

@@ -52,6 +52,9 @@ yum: {}
 apk: {}
 appinstaller: {}
 
+arch:
+  repo-name: my-repo
+
 sparkle:
   title: My app feed title
   description: My app feed description
