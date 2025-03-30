@@ -33,6 +33,7 @@ func Validate(c *config) error {
 	_ = v.RegisterValidation("dirname", isDirname)
 	_ = v.RegisterValidation("version", isVersion)
 	_ = v.RegisterValidation("version_constraint", isConstraint)
+	_ = v.RegisterValidation("slug", isSlug)
 
 	uni := ut.New(locales.New())
 	trans, _ := uni.GetTranslator("en")
@@ -87,6 +88,10 @@ func registerTranslations(v *validator.Validate, trans ut.Translator) error {
 			name:    "fqdn|http_url",
 			message: "{0} must be a valid URL or FQDN",
 		},
+		{
+			name:    "slug",
+			message: "{0} must only contain letters, numbers, dashes and underscores",
+		},
 	}
 
 	for _, t := range translations {
@@ -128,4 +133,18 @@ func isVersion(fl validator.FieldLevel) bool {
 func isConstraint(fl validator.FieldLevel) bool {
 	_, err := version.NewConstraint(fl.Field().String())
 	return err == nil
+}
+
+func isSlug(fl validator.FieldLevel) bool {
+	for _, c := range fl.Field().String() {
+		switch {
+		case 'a' <= c && c <= 'z':
+		case 'A' <= c && c <= 'Z':
+		case '0' <= c && c <= '9':
+		case c == '-', c == '_':
+		default:
+			return false
+		}
+	}
+	return true
 }

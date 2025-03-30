@@ -16,28 +16,34 @@ import (
 )
 
 func TestPGP(t *testing.T) {
-	cryptotest.Test(t,
-		cryptotest.Implementation[*pgp.PrivateKey, *pgp.PublicKey]{
-			NewPrivateKey: func() (*pgp.PrivateKey, error) {
-				return pgp.NewPrivateKey("test", "test@example.com")
-			},
-			MarshalPrivateKey:   pgp.MarshalPrivateKey,
-			UnmarshalPrivateKey: pgp.UnmarshalPrivateKey,
-			Public:              pgp.Public,
-			MarshalPublicKey:    pgp.MarshalPublicKey,
-			UnmarshalPublicKey:  pgp.UnmarshalPublicKey,
-			Sign:                pgp.Sign,
-			Verify:              pgp.Verify,
-		},
-		cryptotest.WithCmpOptions(test.ComparePGPKeys()),
-	)
+	impl := cryptotest.Implementation[*pgp.PrivateKey, *pgp.PublicKey]{
+		NewPrivateKey:       func() (*pgp.PrivateKey, error) { return pgp.NewPrivateKey("test", "test@example.com") },
+		MarshalPrivateKey:   pgp.MarshalPrivateKey,
+		UnmarshalPrivateKey: pgp.UnmarshalPrivateKey,
+		Public:              pgp.Public,
+		MarshalPublicKey:    pgp.MarshalPublicKey,
+		UnmarshalPublicKey:  pgp.UnmarshalPublicKey,
+		Sign:                pgp.Sign,
+		Verify:              pgp.Verify,
+	}
+
+	t.Run("Binary", func(t *testing.T) {
+		cryptotest.Test(t, impl, cryptotest.WithCmpOptions(test.ComparePGPKeys()))
+	})
+
+	t.Run("Text", func(t *testing.T) {
+		impl.Sign = pgp.SignText
+		impl.Verify = pgp.VerifyText
+		cryptotest.Test(t, impl, cryptotest.WithCmpOptions(test.ComparePGPKeys()))
+	})
 
 	priv, _ := pgp.NewPrivateKey("test", "test@example.com")
 	pub := pgp.Public(priv)
 	pubBytes, _ := pgp.MarshalPublicKey(pub)
 	data := []byte("foo\nbar\nbaz")
 	sig, _ := pgp.Sign(priv, data)
-	signed, _ := pgp.SignText(priv, data)
+	sigAsc, _ := pgp.Sign(priv, data)
+	signed, _ := pgp.ClearSign(priv, data)
 
 	t.Run("NewPrivateKey", func(t *testing.T) {
 		tests := []struct {
@@ -52,7 +58,7 @@ func TestPGP(t *testing.T) {
 			},
 			{
 				desc:  "email only",
-				email: "test",
+				email: "test@example.com",
 			},
 			{
 				desc: "missing name & email",
@@ -68,7 +74,7 @@ func TestPGP(t *testing.T) {
 		}
 	})
 
-	t.Run("SignText", func(t *testing.T) {
+	t.Run("ClearSign", func(t *testing.T) {
 		tests := []struct {
 			name string
 			key  *pgp.PrivateKey
@@ -88,7 +94,7 @@ func TestPGP(t *testing.T) {
 		}
 
 		for _, test := range tests {
-			got, err := pgp.SignText(test.key, data)
+			got, err := pgp.ClearSign(test.key, data)
 			if !errors.Is(err, test.err) {
 				t.Errorf("%s should return error %q got %q", test.name, test.err, err)
 			} else if test.err == nil {
@@ -97,7 +103,7 @@ func TestPGP(t *testing.T) {
 					t.Errorf("%s failed to split message: %s", test.name, err)
 				} else if diff := cmp.Diff(string(test.data), string(gotData)); diff != "" {
 					t.Error(test.name, diff)
-				} else if test.err == nil && !pgp.Verify(pub, gotData, gotSig) {
+				} else if test.err == nil && !pgp.VerifyText(pub, gotData, gotSig) {
 					t.Error(test.name, "should pass verification")
 				}
 			}
@@ -143,7 +149,7 @@ func TestPGP(t *testing.T) {
 				t.Errorf("%s should return error %q got %q", test.name, test.err, err)
 			} else if diff := cmp.Diff(string(test.want), string(gotData)); diff != "" {
 				t.Error(test.name, diff)
-			} else if test.err == nil && !pgp.Verify(pub, gotData, gotSig) {
+			} else if test.err == nil && !pgp.VerifyText(pub, gotData, gotSig) {
 				t.Error(test.name, "should pass verification")
 			}
 		}
@@ -193,13 +199,15 @@ func TestPGP(t *testing.T) {
 		dir := t.TempDir()
 		os.WriteFile(filepath.Join(dir, "key.asc"), pubBytes, 0o600)
 		os.WriteFile(filepath.Join(dir, "data"), data, 0o600)
-		os.WriteFile(filepath.Join(dir, "data.asc"), sig, 0o600)
+		os.WriteFile(filepath.Join(dir, "data.sig"), sig, 0o600)
+		os.WriteFile(filepath.Join(dir, "data.asc"), sigAsc, 0o600)
 		os.WriteFile(filepath.Join(dir, "signed"), signed, 0o600)
 
 		baseArgs := []string{"--no-default-keyring", "--keyring", "keyring.gpg"}
 		arguments := [][]string{
 			{"--import", "key.asc"},  // Create keybox & import key.
-			{"--verify", "data.asc"}, // Verify detached signature.
+			{"--verify", "data.sig"}, // Verify detached signature.
+			{"--verify", "data.asc"}, // Verify armored signature.
 			{"--verify", "signed"},   // Verify signed message.
 		}
 
