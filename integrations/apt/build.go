@@ -6,7 +6,6 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"fmt"
-	"io/fs"
 	"os"
 	"path"
 	"strings"
@@ -58,24 +57,7 @@ func Build(ctx context.Context, c *Config) error {
 	}
 	defer os.RemoveAll(dir)
 
-	files := os.DirFS(dir)
-	return fs.WalkDir(files, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
-			return err
-		}
-		b, err := fs.ReadFile(files, path)
-		if err != nil {
-			return err
-		}
-		w, err := c.Target.NewWriter(ctx, path)
-		if err != nil {
-			return err
-		}
-		if _, err = w.Write(b); err != nil {
-			return err
-		}
-		return w.Close()
-	})
+	return target.CopyFS(ctx, c.Target, os.DirFS(dir))
 }
 
 func read(ctx context.Context, c *Config) []*Package {

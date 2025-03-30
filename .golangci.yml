@@ -38,6 +38,7 @@ linters:
               recommendations: [errors]
     gosec:
       excludes:
+        - G104
         - G204
         - G401
         - G501

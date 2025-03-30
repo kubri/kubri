@@ -2,7 +2,6 @@ package apk
 
 import (
 	"context"
-	"io/fs"
 	"os"
 	"path"
 	"strings"
@@ -25,8 +24,6 @@ type Config struct {
 }
 
 // Build creates or updates an APK repository.
-//
-//nolint:funlen
 func Build(ctx context.Context, c *Config) error {
 	repo, err := openRepo(ctx, c.Target)
 	if err != nil {
@@ -74,24 +71,7 @@ func Build(ctx context.Context, c *Config) error {
 		return err
 	}
 
-	files := os.DirFS(repo.dir)
-	err = fs.WalkDir(files, ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
-			return err
-		}
-		b, err := fs.ReadFile(files, path)
-		if err != nil {
-			return err
-		}
-		w, err := c.Target.NewWriter(ctx, path)
-		if err != nil {
-			return err
-		}
-		if _, err = w.Write(b); err != nil {
-			return err
-		}
-		return w.Close()
-	})
+	err = target.CopyFS(ctx, c.Target, os.DirFS(repo.dir))
 	if err != nil {
 		return err
 	}
