@@ -17,8 +17,8 @@ Disable YUM.
 
 ### `folder`
 
-- Type: `boolean`
-- Default: `false`
+- Type: `string`
+- Default: `'yum'`
 
 Path to the directory on your target.
 

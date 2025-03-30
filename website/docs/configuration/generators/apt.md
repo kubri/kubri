@@ -18,15 +18,15 @@ Disable APT.
 ### `folder`
 
 - Type: `string`
-- Default: `apt`
+- Default: `'apt'`
 
 Path to the directory on your target.
 
 ### `compress`
 
 - Type: `string[]`
-- Default: `[gzip, xz]`
-- Allowed Values: `gzip`, `bzip2`, `xz`, `lzma`, `zstd`
+- Default: `['gzip', 'xz']`
+- Allowed Values: `'gzip'`, `'bzip2'`, `'xz'`, `'lzma'`, `'zstd'`
 
 Compression algorithms to compress your package metadata with.
 

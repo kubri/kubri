@@ -18,14 +18,13 @@ Disable Alpine Linux.
 ### `folder`
 
 - Type: `string`
-- Default: `apt`
+- Default: `'apk'`
 
 Path to the directory on your target.
 
 ### `key-name`
 
 - Type: `string`
-- Default: ``
 
 The name of the ed25519 key used to sign the metadata. Required if signing is enabled.
 
