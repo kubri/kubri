@@ -338,6 +338,10 @@ func TestBuildSign(t *testing.T) {
 							sig, _ := dsa.Sign(dsaKey, sum[:])
 							return base64.StdEncoding.EncodeToString(sig)
 						}(),
+						EDSignature: func() string {
+							sig, _ := ed25519.Sign(edKey, data)
+							return base64.StdEncoding.EncodeToString(sig)
+						}(),
 						Length: 4,
 						Type:   "application/x-msi",
 					},
