@@ -1,6 +1,8 @@
 package config
 
 import (
+	"cmp"
+
 	"github.com/kubri/kubri/integrations/yum"
 	"github.com/kubri/kubri/pkg/crypto/pgp"
 	"github.com/kubri/kubri/pkg/secret"
@@ -22,7 +24,7 @@ func getYum(c *config) (*yum.Config, error) {
 
 	return &yum.Config{
 		Source:     c.source,
-		Target:     c.target.Sub(fallback(c.Yum.Folder, "yum")),
+		Target:     c.target.Sub(cmp.Or(c.Yum.Folder, "yum")),
 		Version:    c.Version,
 		Prerelease: c.Prerelease,
 		PGPKey:     pgpKey,
