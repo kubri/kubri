@@ -3,6 +3,7 @@ package testsource
 
 import (
 	"context"
+	"slices"
 
 	"github.com/kubri/kubri/source"
 )
@@ -26,7 +27,7 @@ func (s *testSource) GetRelease(_ context.Context, version string) (*source.Rele
 }
 
 func (s *testSource) ListReleases(context.Context) ([]*source.Release, error) {
-	return append([]*source.Release(nil), s.data...), nil
+	return slices.Clone(s.data), nil
 }
 
 func (s *testSource) DownloadAsset(ctx context.Context, version, name string) ([]byte, error) {

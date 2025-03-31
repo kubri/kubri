@@ -22,8 +22,6 @@ type Config struct {
 }
 
 // Build creates or updates a YUM repository.
-//
-//nolint:gocognit
 func Build(ctx context.Context, c *Config) error {
 	repo, err := openRepo(ctx, c.Target)
 	if err != nil {
