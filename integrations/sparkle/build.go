@@ -125,7 +125,7 @@ func getReleaseItems(ctx context.Context, c *Config, release *source.Release) ([
 		}
 
 		var b []byte
-		if (os == MacOS && c.Ed25519Key != nil) || c.DSAKey != nil || c.UploadPackages {
+		if c.Ed25519Key != nil || c.DSAKey != nil || c.UploadPackages {
 			b, err = c.Source.DownloadAsset(ctx, release.Version, asset.Name)
 			if err != nil {
 				return nil, err
@@ -175,13 +175,14 @@ func getReleaseItems(ctx context.Context, c *Config, release *source.Release) ([
 
 //nolint:nonamedreturns
 func signAsset(c *Config, os OS, b []byte) (edSig, dsaSig string, err error) {
-	if os == MacOS && c.Ed25519Key != nil {
+	if c.Ed25519Key != nil {
 		sig, err := ed25519.Sign(c.Ed25519Key, b)
 		if err != nil {
 			return "", "", err
 		}
 		edSig = base64.StdEncoding.EncodeToString(sig)
-	} else if c.DSAKey != nil {
+	}
+	if isOS(os, Windows) && c.DSAKey != nil {
 		sum := sha1.Sum(b)
 		sig, err := dsa.Sign(c.DSAKey, sum[:])
 		if err != nil {
