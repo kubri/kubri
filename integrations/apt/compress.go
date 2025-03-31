@@ -57,32 +57,36 @@ func compressionExtensions(algo CompressionAlgo) []string {
 func compress(ext string) func(io.Writer) (io.WriteCloser, error) {
 	switch ext {
 	case ".gz":
-		return func(r io.Writer) (io.WriteCloser, error) {
-			return gzip.NewWriter(r), nil
+		return func(w io.Writer) (io.WriteCloser, error) {
+			return gzip.NewWriterLevel(w, gzip.BestCompression)
 		}
 	case ".bz2":
-		return func(r io.Writer) (io.WriteCloser, error) {
-			return bzip2.NewWriter(r, nil)
+		return func(w io.Writer) (io.WriteCloser, error) {
+			return bzip2.NewWriter(w, &bzip2.WriterConfig{Level: bzip2.BestCompression})
 		}
 	case ".xz":
-		return func(r io.Writer) (io.WriteCloser, error) {
-			return xz.NewWriter(r)
+		return func(w io.Writer) (io.WriteCloser, error) {
+			return xz.NewWriter(w)
 		}
 	case ".lzma":
-		return func(r io.Writer) (io.WriteCloser, error) {
-			return lzma.NewWriter(r)
+		return func(w io.Writer) (io.WriteCloser, error) {
+			return lzma.NewWriter(w)
 		}
 	case ".lz4":
-		return func(r io.Writer) (io.WriteCloser, error) {
-			return lz4.NewWriter(r), nil
+		return func(w io.Writer) (io.WriteCloser, error) {
+			return lz4.NewWriter(w), nil
 		}
 	case ".zst":
-		return func(r io.Writer) (io.WriteCloser, error) {
-			return zstd.NewWriter(r)
+		return func(w io.Writer) (io.WriteCloser, error) {
+			return zstd.NewWriter(w,
+				zstd.WithEncoderLevel(zstd.SpeedBestCompression),
+				zstd.WithZeroFrames(true),
+				zstd.WithEncoderCRC(false),
+			)
 		}
 	default:
-		return func(r io.Writer) (io.WriteCloser, error) {
-			return writeCloser{r}, nil
+		return func(w io.Writer) (io.WriteCloser, error) {
+			return writeCloser{w}, nil
 		}
 	}
 }
