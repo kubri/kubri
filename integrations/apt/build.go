@@ -78,7 +78,7 @@ func read(ctx context.Context, c *Config) []*Package {
 	}
 
 	var pkgs []*Package
-	for _, arch := range strings.Split(r.Architectures, " ") {
+	for arch := range strings.SplitSeq(r.Architectures, " ") {
 		path := fmt.Sprintf("dists/%s/main/binary-%s/Packages", dist, arch)
 		rd, err = c.Target.NewReader(ctx, path)
 		if err != nil {

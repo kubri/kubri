@@ -235,7 +235,7 @@ func BenchmarkMarshal(b *testing.B) {
 		},
 	}
 
-	for range b.N {
+	for b.Loop() {
 		deb.Marshal(v)
 	}
 }
