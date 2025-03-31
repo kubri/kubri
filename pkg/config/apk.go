@@ -1,6 +1,8 @@
 package config
 
 import (
+	"cmp"
+
 	"github.com/kubri/kubri/integrations/apk"
 	"github.com/kubri/kubri/pkg/crypto/rsa"
 	"github.com/kubri/kubri/pkg/secret"
@@ -26,7 +28,7 @@ func getApk(c *config) (*apk.Config, error) {
 
 	return &apk.Config{
 		Source:     c.source,
-		Target:     c.target.Sub(fallback(c.Apk.Folder, "apk")),
+		Target:     c.target.Sub(cmp.Or(c.Apk.Folder, "apk")),
 		Version:    c.Version,
 		Prerelease: c.Prerelease,
 		RSAKey:     rsaKey,

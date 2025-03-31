@@ -1,6 +1,7 @@
 package config
 
 import (
+	"cmp"
 	"fmt"
 
 	"github.com/kubri/kubri/integrations/apt"
@@ -47,7 +48,7 @@ func getApt(c *config) (*apt.Config, error) {
 
 	return &apt.Config{
 		Source:     c.source,
-		Target:     c.target.Sub(fallback(c.Apt.Folder, "apt")),
+		Target:     c.target.Sub(cmp.Or(c.Apt.Folder, "apt")),
 		Version:    c.Version,
 		Prerelease: c.Prerelease,
 		PGPKey:     pgpKey,

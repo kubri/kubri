@@ -123,11 +123,3 @@ type config struct {
 	source *source.Source
 	target target.Target
 }
-
-func fallback[T comparable](a, b T) T {
-	var zero T
-	if a != zero {
-		return a
-	}
-	return b
-}

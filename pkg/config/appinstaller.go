@@ -1,6 +1,10 @@
 package config
 
-import "github.com/kubri/kubri/integrations/appinstaller"
+import (
+	"cmp"
+
+	"github.com/kubri/kubri/integrations/appinstaller"
+)
 
 type appinstallerConfig struct {
 	Disabled bool   `yaml:"disabled,omitempty"`
@@ -21,7 +25,7 @@ func getAppinstaller(c *config) *appinstaller.Config {
 		ForceUpdateFromAnyVersion: c.Appinstaller.ForceUpdateFromAnyVersion,
 
 		Source:         c.source,
-		Target:         c.target.Sub(fallback(c.Appinstaller.Folder, "appinstaller")),
+		Target:         c.target.Sub(cmp.Or(c.Appinstaller.Folder, "appinstaller")),
 		Version:        c.Version,
 		Prerelease:     c.Prerelease,
 		UploadPackages: c.UploadPackages,

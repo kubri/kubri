@@ -1,6 +1,7 @@
 package config
 
 import (
+	"cmp"
 	"path"
 
 	"github.com/kubri/kubri/integrations/sparkle"
@@ -69,16 +70,16 @@ func getSparkle(c *config) (*sparkle.Config, error) {
 	}
 
 	return &sparkle.Config{
-		Title:       fallback(c.Sparkle.Title, c.Title),
-		Description: fallback(c.Sparkle.Description, c.Description),
-		FileName:    fallback(c.Sparkle.Filename, "appcast.xml"),
+		Title:       cmp.Or(c.Sparkle.Title, c.Title),
+		Description: cmp.Or(c.Sparkle.Description, c.Description),
+		FileName:    cmp.Or(c.Sparkle.Filename, "appcast.xml"),
 		DSAKey:      dsaKey,
 		Ed25519Key:  edKey,
 		Settings:    params,
 		DetectOS:    detectOS,
 
 		Source:         c.source,
-		Target:         c.target.Sub(fallback(c.Sparkle.Folder, "sparkle")),
+		Target:         c.target.Sub(cmp.Or(c.Sparkle.Folder, "sparkle")),
 		Version:        c.Version,
 		Prerelease:     c.Prerelease,
 		UploadPackages: c.UploadPackages,
