@@ -33,7 +33,7 @@ func openRepo(ctx context.Context, t target.Target) (*repo, error) {
 	}
 
 	// See https://wiki.alpinelinux.org/wiki/Architecture
-	archs := []string{"x86", "x86_64", "armhf", "armv7", "aarch64", "ppc64le", "s390x"}
+	archs := []string{"x86", "x86_64", "armhf", "armv7", "aarch64", "ppc64le", "s390x", "riscv64", "loongarch64"}
 
 	for _, arch := range archs {
 		r, err := t.NewReader(ctx, arch+"/APKINDEX.tar.gz")
