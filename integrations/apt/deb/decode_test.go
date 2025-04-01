@@ -270,6 +270,18 @@ func TestDecodeErrors(t *testing.T) {
 			},
 			err: "unmarshal error",
 		},
+		{
+			msg:    "reader error on first line",
+			reader: io.MultiReader(strings.NewReader("String:\n test\n"), iotest.ErrReader(errors.New("reader error"))),
+			value:  &record{},
+			err:    "reader error",
+		},
+		{
+			msg:    "reader error on second line",
+			reader: io.MultiReader(strings.NewReader("String:\n foo\n bar"), iotest.ErrReader(errors.New("reader error"))),
+			value:  &record{},
+			err:    "reader error",
+		},
 	}
 
 	opts := test.CompareErrorMessages()
