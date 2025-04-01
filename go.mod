@@ -2,9 +2,6 @@ module github.com/kubri/kubri
 
 go 1.24
 
-// TODO: Remove when v1.3.0 is released:
-replace github.com/cavaliergopher/rpm v1.2.0 => github.com/cavaliergopher/rpm v0.0.0-20231126213118-b2e876bef7ce
-
 // TODO: Remove when the following PR is merged:
 // https://github.com/invopop/jsonschema/pull/126
 replace github.com/invopop/jsonschema v0.12.0 => github.com/abemedia/jsonschema v0.0.0-20240108235924-6da915f1869e
@@ -19,7 +16,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.6
 	github.com/ProtonMail/gopenpgp/v2 v2.8.3
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
-	github.com/cavaliergopher/rpm v1.2.0
+	github.com/cavaliergopher/rpm v1.3.0
 	github.com/dlclark/regexp2 v1.11.5
 	github.com/docker/docker v28.0.4+incompatible
 	github.com/docker/go-connections v0.5.0
