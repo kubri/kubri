@@ -65,9 +65,13 @@ tasks:
     aliases: [g]
     env:
       UPDATE_GOLDEN: '1'
+    vars:
+      PACKAGES:
+        sh: |
+          find . -name '*_test.go' -not -path './website/*' -exec grep -l 'test.Golden' {} \; | xargs -n1 dirname | sort -u | tr '\n' ' '
     cmds:
       - go run ./scripts/generate.go
-      - gotestsum -- -cover ./...
+      - gotestsum -- {{.PACKAGES}}
 
   acceptance:
     desc: Run acceptance tests

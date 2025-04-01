@@ -18,13 +18,13 @@ import (
 )
 
 func TestBuild(t *testing.T) {
+	dir := t.TempDir() + "/rpm"
+	test.Golden(t, "testdata", dir, test.Ignore("*.apk"))
+
 	want := readTestData(t)
 
-	dir := t.TempDir() + "/rpm"
 	src, _ := source.New(source.Config{Path: "../../testdata"})
 	tgt, _ := target.New(target.Config{Path: dir})
-
-	test.Golden(t, "testdata", dir, test.Ignore("*.apk"))
 
 	c := &apk.Config{
 		Source: src,
