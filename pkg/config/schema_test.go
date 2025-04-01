@@ -18,7 +18,5 @@ func TestSchema(t *testing.T) {
 		t.Error(diff)
 	}
 
-	if test.Update {
-		os.WriteFile("testdata/jsonschema.json", got, 0o644)
-	}
+	test.GoldenFile(t, "testdata/jsonschema.json", got)
 }

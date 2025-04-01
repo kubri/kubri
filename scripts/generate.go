@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -17,12 +15,6 @@ import (
 	_ "github.com/goreleaser/nfpm/v2/deb"  // deb packager
 	_ "github.com/goreleaser/nfpm/v2/ipk"  // ipk packager
 	_ "github.com/goreleaser/nfpm/v2/rpm"  // rpm packager
-
-	"github.com/kubri/kubri/integrations/apk"
-	"github.com/kubri/kubri/integrations/apt"
-	"github.com/kubri/kubri/integrations/yum"
-	source "github.com/kubri/kubri/source/file"
-	target "github.com/kubri/kubri/target/file"
 )
 
 //nolint:gochecknoglobals
@@ -76,12 +68,6 @@ func main() {
 				}
 			}
 		}
-	}
-
-	err := errors.Join(apkGolden(), aptGolden(), yumGolden())
-	if err != nil {
-		fmt.Printf("failed to generate golden: %s\n", err) //nolint:forbidigo
-		os.Exit(1)
 	}
 }
 
@@ -138,100 +124,4 @@ func buildPackages(packager string, config nfpm.Config) error {
 
 	fmt.Printf("created package: %s\n", config.Target) //nolint:forbidigo
 	return f.Close()
-}
-
-func aptGolden() error {
-	path := filepath.Join("integrations", "apt", "testdata")
-
-	if err := os.RemoveAll(path); err != nil {
-		return err
-	}
-
-	src, err := source.New(source.Config{Path: "testdata"})
-	if err != nil {
-		return err
-	}
-
-	tgt, err := target.New(target.Config{Path: path})
-	if err != nil {
-		return err
-	}
-
-	err = apt.Build(context.Background(), &apt.Config{Source: src, Target: tgt})
-	if err != nil {
-		return err
-	}
-
-	err = os.RemoveAll(filepath.Join(path, "pool"))
-	if err != nil {
-		return err
-	}
-
-	return filepath.WalkDir(path, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
-			return err
-		}
-		if filepath.Ext(path) != "" {
-			return os.Remove(path)
-		}
-		return nil
-	})
-}
-
-func yumGolden() error {
-	path := filepath.Join("integrations", "yum", "testdata")
-
-	if err := os.RemoveAll(path); err != nil {
-		return err
-	}
-
-	src, err := source.New(source.Config{Path: "testdata"})
-	if err != nil {
-		return err
-	}
-
-	tgt, err := target.New(target.Config{Path: path})
-	if err != nil {
-		return err
-	}
-
-	err = yum.Build(context.Background(), &yum.Config{Source: src, Target: tgt})
-	if err != nil {
-		return err
-	}
-
-	return os.RemoveAll(filepath.Join(path, "Packages"))
-}
-
-func apkGolden() error {
-	dir := filepath.Join("integrations", "apk", "testdata")
-
-	if err := os.RemoveAll(dir); err != nil {
-		return err
-	}
-
-	src, err := source.New(source.Config{Path: "testdata"})
-	if err != nil {
-		return err
-	}
-
-	tgt, err := target.New(target.Config{Path: dir})
-	if err != nil {
-		return err
-	}
-
-	err = apk.Build(context.Background(), &apk.Config{Source: src, Target: tgt})
-	if err != nil {
-		return err
-	}
-
-	return filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
-			return err
-		}
-		if filepath.Ext(path) == ".apk" {
-			return os.Remove(path)
-		}
-		return nil
-	})
 }

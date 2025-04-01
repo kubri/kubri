@@ -23,14 +23,14 @@ import (
 )
 
 func TestBuild(t *testing.T) {
+	dir := t.TempDir() + "/apt"
+	test.Golden(t, "testdata", dir, test.Ignore("*.deb", "*.gz", "*.xz"))
+
 	want := readTestData(t, ".gz", ".xz")
 	now := time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC)
 
-	dir := t.TempDir() + "/apt"
 	src, _ := source.New(source.Config{Path: "../../testdata"})
 	tgt, _ := ftarget.New(ftarget.Config{Path: dir})
-
-	test.Golden(t, "testdata", dir, test.Ignore("*.deb", "*.gz", "*.xz"))
 
 	t.Run("New", func(t *testing.T) {
 		c := &apt.Config{Source: src, Target: tgt}

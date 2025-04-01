@@ -8,8 +8,8 @@ import (
 	"testing"
 )
 
-// Update indicates whether golden files should be updated.
-var Update, _ = strconv.ParseBool(os.Getenv("UPDATE_GOLDEN")) //nolint:gochecknoglobals
+// update indicates whether golden files should be updated.
+var update, _ = strconv.ParseBool(os.Getenv("UPDATE_GOLDEN")) //nolint:gochecknoglobals
 
 type PathFilter func(path string) bool
 
@@ -33,8 +33,13 @@ func Ignore(globs ...string) PathFilter {
 func Golden(t *testing.T, golden, result string, filter ...PathFilter) {
 	t.Helper()
 
-	if !Update {
+	if !update {
 		return
+	}
+
+	// Create testdata directory if it doesn't exist.
+	if err := os.MkdirAll(golden, 0o750); err != nil {
+		t.Fatal("failed to create testdata directory:", err)
 	}
 
 	t.Cleanup(func() {
@@ -66,4 +71,17 @@ func Golden(t *testing.T, golden, result string, filter ...PathFilter) {
 			t.Fatal("failed to update golden files:", err)
 		}
 	})
+}
+
+func GoldenFile(t *testing.T, file string, data []byte) {
+	t.Helper()
+
+	if !update {
+		return
+	}
+
+	err := os.WriteFile(file, data, 0o600)
+	if err != nil {
+		t.Fatal("failed to write golden file:", err)
+	}
 }
