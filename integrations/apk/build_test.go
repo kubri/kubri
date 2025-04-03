@@ -1,14 +1,15 @@
 package apk_test
 
 import (
+	"bytes"
 	"io"
-	"io/fs"
 	"os"
-	"path/filepath"
 	"testing"
+	"testing/fstest"
+
+	"gitlab.alpinelinux.org/alpine/go/repository"
 
 	"github.com/google/go-cmp/cmp"
-	"gitlab.alpinelinux.org/alpine/go/repository"
 
 	"github.com/kubri/kubri/integrations/apk"
 	"github.com/kubri/kubri/internal/test"
@@ -18,105 +19,57 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	dir := t.TempDir() + "/rpm"
-	test.Golden(t, "testdata", dir, test.Ignore("*.apk"))
+	dir := t.TempDir()
+	test.Golden(t, "testdata", dir)
 
-	want := readTestData(t)
-
-	src, _ := source.New(source.Config{Path: "../../testdata"})
-	tgt, _ := target.New(target.Config{Path: dir})
-
-	c := &apk.Config{
-		Source: src,
-		Target: tgt,
-	}
-
-	t.Run("New", func(t *testing.T) {
-		testBuild(t, c, want)
-	})
-
-	t.Run("NoChange", func(t *testing.T) {
-		testBuild(t, c, want)
-	})
+	test.Build(t, apk.Build, nil, dir)
 
 	t.Run("RSA", func(t *testing.T) {
-		rsaKey, _ := rsa.NewPrivateKey()
 		dir := t.TempDir()
-		tgt, _ := target.New(target.Config{Path: dir})
 
-		c := &apk.Config{
-			Source:  src,
-			Target:  tgt,
-			RSAKey:  rsaKey,
-			KeyName: "test@example.com",
+		c := &apk.Config{KeyName: "test@example.com"}
+		c.Source, _ = source.New(source.Config{Path: "../../testdata"})
+		c.Target, _ = target.New(target.Config{Path: dir})
+		c.RSAKey, _ = rsa.NewPrivateKey()
+
+		if err := apk.Build(t.Context(), c); err != nil {
+			t.Fatal(err)
 		}
 
-		err := apk.Build(t.Context(), c)
+		want := test.ReadFS(os.DirFS("testdata"))
+		got := test.ReadFS(os.DirFS(dir))
+
+		opt := cmp.Options{
+			test.IgnoreFSMeta(),
+			test.IgnoreKeys("test@example.com.rsa.pub", "*/APKINDEX.tar.gz"),
+		}
+		if diff := cmp.Diff(want, got, opt); diff != "" {
+			t.Fatal(diff)
+		}
+
+		err := fstest.TestFS(got, "test@example.com.rsa.pub", "x86_64/APKINDEX.tar.gz", "x86/APKINDEX.tar.gz")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		pubBytes, _ := os.ReadFile(filepath.Join(dir, "test@example.com.rsa.pub"))
-		pub, _ := rsa.UnmarshalPublicKey(pubBytes)
-		if !rsaKey.PublicKey.Equal(pub) {
-			t.Fatal("should have public key")
+		pub, _ := rsa.UnmarshalPublicKey(got["test@example.com.rsa.pub"].Data)
+		if diff := cmp.Diff(pub, rsa.Public(c.RSAKey)); diff != "" {
+			t.Fatal(diff)
 		}
 
-		indexFile, _ := os.Open(filepath.Join(dir, "x86_64", "APKINDEX.tar.gz"))
-		apkindex, _ := repository.IndexFromArchive(indexFile)
-		unsigedIndex, _ := repository.ArchiveFromIndex(apkindex)
-		indexBytes, _ := io.ReadAll(unsigedIndex)
-		if !rsa.Verify(pub, indexBytes, apkindex.Signature) {
-			t.Fatal("should pass RSA verification")
+		for _, arch := range []string{"x86_64", "x86"} {
+			wantIndex, _ := repository.IndexFromArchive(io.NopCloser(bytes.NewReader(want[arch+"/APKINDEX.tar.gz"].Data)))
+			gotIndex, _ := repository.IndexFromArchive(io.NopCloser(bytes.NewReader(got[arch+"/APKINDEX.tar.gz"].Data)))
+
+			if diff := cmp.Diff(wantIndex.Packages, gotIndex.Packages); diff != "" {
+				t.Fatal(diff)
+			}
+
+			unsignedIndex, _ := repository.ArchiveFromIndex(gotIndex)
+			indexBytes, _ := io.ReadAll(unsignedIndex)
+			if !rsa.Verify(pub, indexBytes, gotIndex.Signature) {
+				t.Fatal("should pass RSA verification")
+			}
 		}
 	})
-}
-
-func readTestData(t *testing.T) map[string][]byte {
-	t.Helper()
-
-	want := make(map[string][]byte)
-
-	err := fs.WalkDir(os.DirFS("testdata"), ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
-			return err
-		}
-		b, err := fs.ReadFile(os.DirFS("testdata"), path)
-		if err != nil {
-			return err
-		}
-		want[path] = b
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return want
-}
-
-func testBuild(t *testing.T, c *apk.Config, want map[string][]byte) {
-	t.Helper()
-
-	err := apk.Build(t.Context(), c)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for name, data := range want {
-		r, err := c.Target.NewReader(t.Context(), name)
-		if err != nil {
-			t.Fatal(name, err)
-		}
-		defer r.Close()
-
-		got, err := io.ReadAll(r)
-		if err != nil {
-			t.Fatal(name, err)
-		}
-
-		if diff := cmp.Diff(data, got); diff != "" {
-			t.Error(name, diff)
-		}
-	}
 }

@@ -1,13 +1,7 @@
 package apt_test
 
 import (
-	"io"
-	"io/fs"
-	"maps"
 	"os"
-	"path"
-	"path/filepath"
-	"strings"
 	"testing"
 	"testing/fstest"
 	"time"
@@ -18,83 +12,77 @@ import (
 	"github.com/kubri/kubri/internal/test"
 	"github.com/kubri/kubri/pkg/crypto/pgp"
 	source "github.com/kubri/kubri/source/file"
-	"github.com/kubri/kubri/target"
-	ftarget "github.com/kubri/kubri/target/file"
+	target "github.com/kubri/kubri/target/file"
 )
 
 func TestBuild(t *testing.T) {
-	dir := t.TempDir() + "/apt"
-	test.Golden(t, "testdata", dir, test.Ignore("*.deb", "*.gz", "*.xz"))
+	dir := t.TempDir()
+	test.Golden(t, "testdata", dir)
 
-	want := readTestData(t, ".gz", ".xz")
-	now := time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC)
+	apt.SetTime(time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC))
 
-	src, _ := source.New(source.Config{Path: "../../testdata"})
-	tgt, _ := ftarget.New(ftarget.Config{Path: dir})
-
-	t.Run("New", func(t *testing.T) {
-		c := &apt.Config{Source: src, Target: tgt}
-		testBuild(t, c, want, now)
-	})
-
-	// Should be no-op as nothing changed so timestamp should still be valid.
-	t.Run("NoChange", func(t *testing.T) {
-		c := &apt.Config{Source: src, Target: tgt}
-		testBuild(t, c, want, now.Add(time.Hour))
-	})
+	test.Build(t, apt.Build, nil, dir)
 
 	t.Run("PGP", func(t *testing.T) {
 		dir := t.TempDir()
-		pgpKey, _ := pgp.NewPrivateKey("test", "test@example.com")
-		tgt, _ := ftarget.New(ftarget.Config{Path: dir})
 
-		c := &apt.Config{
-			Source: src,
-			Target: tgt,
-			PGPKey: pgpKey,
+		c := &apt.Config{}
+		c.Source, _ = source.New(source.Config{Path: "../../testdata"})
+		c.Target, _ = target.New(target.Config{Path: dir})
+		c.PGPKey, _ = pgp.NewPrivateKey("test", "test@example.com")
+
+		if err := apt.Build(t.Context(), c); err != nil {
+			t.Fatal(err)
 		}
 
-		// Remove InRelease and test that separately below.
-		wantPGP := maps.Clone(want)
-		delete(wantPGP, "dists/stable/InRelease")
+		want := test.ReadFS(os.DirFS("testdata"))
+		got := test.ReadFS(os.DirFS(dir))
 
-		testBuild(t, c, wantPGP, now)
-
-		data, _ := os.ReadFile(filepath.Join(dir, "dists", "stable", "Release"))
-		sig, _ := os.ReadFile(filepath.Join(dir, "dists", "stable", "Release.gpg"))
-		if !pgp.Verify(pgp.Public(pgpKey), data, sig) {
-			t.Error("should pass pgp verification")
+		opt := cmp.Options{
+			test.IgnoreFSMeta(),
+			test.IgnoreKeys("key.asc", "dists/stable/Release.gpg", "dists/stable/InRelease"),
+		}
+		if diff := cmp.Diff(want, got, opt); diff != "" {
+			t.Fatal(diff)
 		}
 
-		in, _ := os.ReadFile(filepath.Join(dir, "dists", "stable", "InRelease"))
-		data, sig, err := pgp.Split(in)
+		err := fstest.TestFS(os.DirFS(dir), "key.asc", "dists/stable/Release.gpg", "dists/stable/InRelease")
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !pgp.Verify(pgp.Public(c.PGPKey), data, sig) {
-			t.Error("failed to verify InRelease signature")
+
+		pub, _ := pgp.UnmarshalPublicKey(got["key.asc"].Data)
+		if diff := cmp.Diff(pub, c.PGPKey, test.ComparePGPKeys()); diff != "" {
+			t.Fatal(diff)
 		}
-		if diff := cmp.Diff(want["dists/stable/Release"], string(data)); diff != "" {
-			t.Error("dists/stable/InRelease", diff)
+		if !pgp.Verify(pub, got["dists/stable/Release"].Data, got["dists/stable/Release.gpg"].Data) {
+			t.Error("should pass pgp verification")
+		}
+
+		data, sig, err := pgp.Split(got["dists/stable/InRelease"].Data)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff := cmp.Diff(want["dists/stable/Release"].Data, data); diff != "" {
+			t.Error(diff)
+		}
+		if !pgp.Verify(pub, data, sig) {
+			t.Error("should pass pgp verification")
 		}
 	})
 
 	t.Run("CustomCompress", func(t *testing.T) {
 		dir := t.TempDir()
-		tgt, _ := ftarget.New(ftarget.Config{Path: dir})
 
-		c := &apt.Config{
-			Source:   src,
-			Target:   tgt,
-			Compress: apt.BZIP2 | apt.ZSTD,
-		}
+		c := &apt.Config{Compress: apt.BZIP2 | apt.ZSTD}
+		c.Source, _ = source.New(source.Config{Path: "../../testdata"})
+		c.Target, _ = target.New(target.Config{Path: dir})
 
-		err := apt.Build(t.Context(), c)
-		if err != nil {
+		if err := apt.Build(t.Context(), c); err != nil {
 			t.Fatal(err)
 		}
 
-		err = fstest.TestFS(os.DirFS(dir),
+		err := fstest.TestFS(os.DirFS(dir),
 			"dists/stable/main/binary-amd64/Packages",
 			"dists/stable/main/binary-amd64/Packages.bz2",
 			"dists/stable/main/binary-amd64/Packages.zst",
@@ -114,78 +102,4 @@ func TestBuild(t *testing.T) {
 			t.Error("should not have gzip files")
 		}
 	})
-}
-
-func readTestData(t *testing.T, compress ...string) map[string]string {
-	t.Helper()
-
-	want := make(map[string]string)
-
-	err := fs.WalkDir(os.DirFS("testdata"), ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
-			return err
-		}
-		b, err := fs.ReadFile(os.DirFS("testdata"), path)
-		if err != nil {
-			return err
-		}
-		want[path] = string(b)
-		if d.Name() == "Packages" {
-			for _, ext := range compress {
-				want[path+ext] = string(b)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return want
-}
-
-func testBuild(t *testing.T, c *apt.Config, want map[string]string, now time.Time) { //nolint:thelper
-	apt.SetTime(now)
-
-	err := apt.Build(t.Context(), c)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for name, data := range want {
-		got := readFile(t, c.Target, name)
-
-		ext := path.Ext(name)
-		base := strings.TrimSuffix(path.Base(name), ext)
-		if base == "Packages" {
-			data = want[strings.TrimSuffix(name, ext)]
-		}
-
-		if diff := cmp.Diff(data, string(got)); diff != "" {
-			t.Error(name, diff)
-		}
-	}
-}
-
-func readFile(t *testing.T, tgt target.Target, name string) []byte {
-	t.Helper()
-
-	r, err := tgt.NewReader(t.Context(), name)
-	if err != nil {
-		t.Fatal(name, err)
-	}
-	defer r.Close()
-
-	r, err = apt.Decompress(path.Ext(name))(r)
-	if err != nil {
-		t.Fatal(name, err)
-	}
-	defer r.Close()
-
-	b, err := io.ReadAll(r)
-	if err != nil {
-		t.Fatal(name, err)
-	}
-
-	return b
 }
