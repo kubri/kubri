@@ -37,7 +37,7 @@ func Verify(key *PublicKey, data, sig []byte) bool {
 
 // NewPrivateKey returns a new private key.
 func NewPrivateKey() (*PrivateKey, error) {
-	return rsa.GenerateKey(rand.Reader, 2048)
+	return rsa.GenerateKey(rand.Reader, 4096)
 }
 
 // MarshalPrivateKey returns the PEM encoded private key.
