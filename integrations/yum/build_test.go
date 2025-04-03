@@ -1,11 +1,9 @@
 package yum_test
 
 import (
-	"io"
-	"io/fs"
 	"os"
-	"path/filepath"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
@@ -18,101 +16,47 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	dir := t.TempDir() + "/rpm"
-	test.Golden(t, "testdata", dir, test.Ignore("*.rpm", "*.key", "*.asc"))
+	dir := t.TempDir()
+	test.Golden(t, "testdata", dir)
 
-	want := readTestData(t)
-	now := time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC)
+	yum.SetTime(time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC))
 
-	src, _ := source.New(source.Config{Path: "../../testdata"})
-	tgt, _ := target.New(target.Config{Path: dir})
-	key, _ := pgp.NewPrivateKey("test", "test@example.com")
-
-	c := &yum.Config{
-		Source: src,
-		Target: tgt,
-		PGPKey: key,
-	}
-
-	t.Run("New", func(t *testing.T) {
-		testBuild(t, c, want, now)
-	})
-
-	t.Run("NoChange", func(t *testing.T) {
-		testBuild(t, c, want, now.Add(time.Hour))
-	})
+	test.Build(t, yum.Build, nil, dir)
 
 	t.Run("PGP", func(t *testing.T) {
 		dir := t.TempDir()
-		pgpKey, _ := pgp.NewPrivateKey("test", "test@example.com")
-		tgt, _ := target.New(target.Config{Path: dir})
 
-		c := &yum.Config{
-			Source: src,
-			Target: tgt,
-			PGPKey: pgpKey,
+		c := &yum.Config{}
+		c.Source, _ = source.New(source.Config{Path: "../../testdata"})
+		c.Target, _ = target.New(target.Config{Path: dir})
+		c.PGPKey, _ = pgp.NewPrivateKey("test", "test@example.com")
+
+		if err := yum.Build(t.Context(), c); err != nil {
+			t.Fatal(err)
 		}
 
-		testBuild(t, c, want, now)
+		want := test.ReadFS(os.DirFS("testdata"))
+		got := test.ReadFS(os.DirFS(dir))
 
-		data, _ := os.ReadFile(filepath.Join(dir, "repodata", "repomd.xml"))
-		key, _ := os.ReadFile(filepath.Join(dir, "repodata", "repomd.xml.key"))
-		sig, _ := os.ReadFile(filepath.Join(dir, "repodata", "repomd.xml.asc"))
-		pub, _ := pgp.UnmarshalPublicKey(key)
+		opt := cmp.Options{
+			test.IgnoreFSMeta(),
+			test.IgnoreKeys("repodata/repomd.xml.asc", "repodata/repomd.xml.key"),
+		}
+		if diff := cmp.Diff(want, got, opt); diff != "" {
+			t.Fatal(diff)
+		}
 
-		if !pgp.Verify(pub, data, sig) {
+		err := fstest.TestFS(got, "repodata/repomd.xml.asc", "repodata/repomd.xml.key")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		pub, _ := pgp.UnmarshalPublicKey(got["repodata/repomd.xml.key"].Data)
+		if diff := cmp.Diff(pub, c.PGPKey, test.ComparePGPKeys()); diff != "" {
+			t.Fatal(diff)
+		}
+		if !pgp.Verify(pub, got["repodata/repomd.xml"].Data, got["repodata/repomd.xml.asc"].Data) {
 			t.Error("should pass pgp verification")
 		}
 	})
-}
-
-func readTestData(t *testing.T) map[string][]byte {
-	t.Helper()
-
-	want := make(map[string][]byte)
-
-	err := fs.WalkDir(os.DirFS("testdata"), ".", func(path string, d fs.DirEntry, err error) error {
-		if err != nil || d.IsDir() {
-			return err
-		}
-		b, err := fs.ReadFile(os.DirFS("testdata"), path)
-		if err != nil {
-			return err
-		}
-		want[path] = b
-		return nil
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return want
-}
-
-func testBuild(t *testing.T, c *yum.Config, want map[string][]byte, now time.Time) {
-	t.Helper()
-
-	yum.SetTime(now)
-
-	err := yum.Build(t.Context(), c)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for name, data := range want {
-		r, err := c.Target.NewReader(t.Context(), name)
-		if err != nil {
-			t.Fatal(name, err)
-		}
-		defer r.Close()
-
-		got, err := io.ReadAll(r)
-		if err != nil {
-			t.Fatal(name, err)
-		}
-
-		if diff := cmp.Diff(data, got); diff != "" {
-			t.Error(name, diff)
-		}
-	}
 }

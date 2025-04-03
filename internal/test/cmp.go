@@ -3,10 +3,13 @@ package test
 import (
 	"crypto/rsa"
 	"log"
+	"path"
 	"reflect"
+	"testing/fstest"
 
 	"github.com/ProtonMail/gopenpgp/v2/crypto"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 // CompareErrorMessages compares errors by message.
@@ -65,4 +68,32 @@ func IgnoreFunctions() cmp.Option {
 	return cmp.FilterPath(func(p cmp.Path) bool {
 		return p.Last().Type().Kind() == reflect.Func
 	}, cmp.Ignore())
+}
+
+// IgnoreKeys ignores keys in a map that match the given patterns.
+func IgnoreKeys(patterns ...string) cmp.Option {
+	return cmpopts.IgnoreMapEntries(func(k string, _ any) bool {
+		for _, pattern := range patterns {
+			if ok, _ := path.Match(pattern, k); ok {
+				return true
+			}
+		}
+		return false
+	})
+}
+
+// IgnoreFSMeta ignores the metadata of a file in a [fstest.MapFS].
+func IgnoreFSMeta() cmp.Option {
+	return cmpopts.IgnoreFields(fstest.MapFile{}, "ModTime", "Sys")
+}
+
+// CompareFSStrict compares file systems by transforming them into [fstest.MapFS].
+func CompareFSStrict() cmp.Option {
+	return cmp.Transformer("fs.FS", ReadFS)
+}
+
+// CompareFS compares file systems by transforming them into [fstest.MapFS].
+// It ignores the modification time and underlying data source.
+func CompareFS() cmp.Option {
+	return cmp.Options{CompareFSStrict(), IgnoreFSMeta()}
 }
