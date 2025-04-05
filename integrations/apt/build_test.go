@@ -55,8 +55,8 @@ func TestBuild(t *testing.T) {
 		if diff := cmp.Diff(pub, c.PGPKey, test.ComparePGPKeys()); diff != "" {
 			t.Fatal(diff)
 		}
-		if !pgp.Verify(pub, got["dists/stable/Release"].Data, got["dists/stable/Release.gpg"].Data) {
-			t.Error("should pass pgp verification")
+		if !pgp.VerifyText(pub, got["dists/stable/Release"].Data, got["dists/stable/Release.gpg"].Data) {
+			t.Error("Release should pass pgp verification")
 		}
 
 		data, sig, err := pgp.Split(got["dists/stable/InRelease"].Data)
@@ -66,8 +66,8 @@ func TestBuild(t *testing.T) {
 		if diff := cmp.Diff(want["dists/stable/Release"].Data, data); diff != "" {
 			t.Error(diff)
 		}
-		if !pgp.Verify(pub, data, sig) {
-			t.Error("should pass pgp verification")
+		if !pgp.VerifyText(pub, data, sig) {
+			t.Error("InRelease should pass pgp verification")
 		}
 	})
 
