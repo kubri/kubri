@@ -216,27 +216,26 @@ func TestEncodeErrors(t *testing.T) {
 }
 
 func BenchmarkMarshal(b *testing.B) {
-	type record struct {
-		String string
-		Hex    [4]byte
-		Int    int
+	benchmarks := []struct {
+		name string
+		in   any
+	}{
+		{"string", struct{ V string }{V: "foo\nbar\nbaz"}},
+		{"int", struct{ V int }{V: 1}},
+		{"uint", struct{ V uint }{V: 1}},
+		{"float64", struct{ V float64 }{V: 1.123}},
+		{"time", struct{ V time.Time }{V: time.Date(2023, 1, 10, 19, 4, 25, 0, time.UTC)}},
+		{"[8]byte", struct{ V [8]byte }{V: [8]byte{1, 2, 3, 4, 5, 6, 7, 8}}},
 	}
 
-	v := []record{
-		{
-			String: "foo\nbar\nbaz",
-			Hex:    [4]byte{1, 2, 3, 4},
-			Int:    1,
-		},
-		{
-			String: "foo\nbar\nbaz",
-			Hex:    [4]byte{1, 2, 3, 4},
-			Int:    1,
-		},
-	}
-
-	for b.Loop() {
-		deb.Marshal(v)
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for b.Loop() {
+				if _, err := deb.Marshal(bm.in); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
 	}
 }
 
