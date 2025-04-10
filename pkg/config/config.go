@@ -11,6 +11,7 @@ import (
 	"github.com/kubri/kubri/integrations/apk"
 	"github.com/kubri/kubri/integrations/appinstaller"
 	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/integrations/arch"
 	"github.com/kubri/kubri/integrations/sparkle"
 	"github.com/kubri/kubri/integrations/yum"
 	"github.com/kubri/kubri/source"
@@ -21,6 +22,7 @@ type Config struct {
 	Apk          *apk.Config
 	Appinstaller *appinstaller.Config
 	Apt          *apt.Config
+	Arch         *arch.Config
 	Yum          *yum.Config
 	Sparkle      *sparkle.Config
 }
@@ -61,6 +63,11 @@ func Load(path string) (*Config, error) {
 	}
 	if c.Apt != nil && !c.Apt.Disabled {
 		if p.Apt, err = getApt(c); err != nil {
+			return nil, err
+		}
+	}
+	if c.Arch != nil && !c.Arch.Disabled {
+		if p.Arch, err = getArch(c); err != nil {
 			return nil, err
 		}
 	}
@@ -116,6 +123,7 @@ type config struct {
 	Target         *targetConfig       `yaml:"target"                    validate:"required"`
 	Apk            *apkConfig          `yaml:"apk,omitempty"`
 	Apt            *aptConfig          `yaml:"apt,omitempty"`
+	Arch           *archConfig         `yaml:"arch,omitempty"`
 	Yum            *yumConfig          `yaml:"yum,omitempty"`
 	Sparkle        *sparkleConfig      `yaml:"sparkle,omitempty"`
 	Appinstaller   *appinstallerConfig `yaml:"appinstaller,omitempty"`

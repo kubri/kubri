@@ -86,14 +86,21 @@ func UnmarshalPublicKey(b []byte) (*PublicKey, error) {
 	return key, nil
 }
 
-// Sign signs the data with the private key.
+// Sign signs the data with the private key and returns the binary signature.
+// Data is considered binary and not canonicalised.
 func Sign(key *PrivateKey, data []byte) ([]byte, error) {
 	return sign(key, data, false)
 }
 
-// SignText signs the data with the private key and wraps it in a signed message.
+// SignText signs the data with the private key and wraps it in an armored signature.
 // Data is considered text and canonicalised with CRLF line endings.
 func SignText(key *PrivateKey, data []byte) ([]byte, error) {
+	return sign(key, data, true)
+}
+
+// ClearSign signs the data with the private key and wraps it in a signed message.
+// Data is considered text and canonicalised with CRLF line endings.
+func ClearSign(key *PrivateKey, data []byte) ([]byte, error) {
 	data = bytes.ReplaceAll(data, lf, crlf)
 	sig, err := sign(key, data, true)
 	if err != nil {
@@ -130,6 +137,10 @@ func sign(key *PrivateKey, data []byte, text bool) ([]byte, error) {
 		return nil, err
 	}
 
+	if !text {
+		return signature.Data, nil
+	}
+
 	sig, err := armor.ArmorWithTypeAndCustomHeaders(signature.Data, constants.PGPSignatureHeader, "", "")
 	if err != nil {
 		return nil, err
@@ -138,13 +149,22 @@ func sign(key *PrivateKey, data []byte, text bool) ([]byte, error) {
 	return []byte(sig), nil
 }
 
-// Verify verifies the signature of the data with the public key.
+// Verify verifies the binary signature of the data with the public key.
 func Verify(key *PublicKey, data, sig []byte) bool {
+	signature := pgpcrypto.NewPGPSignature(sig)
+	return verify(key, data, signature)
+}
+
+// VerifyText verifies the armored signature of the data with the public key.
+func VerifyText(key *PublicKey, data, sig []byte) bool {
 	signature, err := pgpcrypto.NewPGPSignatureFromArmored(string(sig))
 	if err != nil {
 		return false
 	}
+	return verify(key, data, signature)
+}
 
+func verify(key *PublicKey, data []byte, sig *pgpcrypto.PGPSignature) bool {
 	// TODO: Unlock locked key using env var passphrase.
 
 	keyring, err := pgpcrypto.NewKeyRing(key)
@@ -154,7 +174,7 @@ func Verify(key *PublicKey, data, sig []byte) bool {
 
 	msg := pgpcrypto.NewPlainMessage(data)
 
-	err = keyring.VerifyDetached(msg, signature, pgpcrypto.GetUnixTime())
+	err = keyring.VerifyDetached(msg, sig, pgpcrypto.GetUnixTime())
 	return err == nil
 }
 

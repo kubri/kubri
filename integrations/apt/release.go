@@ -184,14 +184,14 @@ func writeRelease(dir string, r Releases, key *pgp.PrivateKey) error {
 	}
 
 	if key != nil {
-		sig, err := pgp.Sign(key, b)
+		sig, err := pgp.SignText(key, b)
 		if err != nil {
 			return err
 		}
 		if err = os.WriteFile(filepath.Join(dir, "Release.gpg"), sig, 0o600); err != nil {
 			return err
 		}
-		b, err = pgp.SignText(key, b)
+		b, err = pgp.ClearSign(key, b)
 		if err != nil {
 			return err
 		}

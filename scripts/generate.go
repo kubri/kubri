@@ -21,7 +21,7 @@ import (
 var (
 	versions = []string{"v1.0.0", "v1.1.0-beta", "v1.1.0", "v2.0.0"}
 	archs    = []string{"amd64", "386"}
-	formats  = []string{"deb", "rpm", "apk"}
+	formats  = []string{"deb", "rpm", "apk", "archlinux"}
 
 	config = nfpm.Config{
 		Info: nfpm.Info{
@@ -50,6 +50,9 @@ var (
 				},
 				Deb: nfpm.Deb{Compression: "xz"},
 				RPM: nfpm.RPM{Group: "default"},
+				ArchLinux: nfpm.ArchLinux{
+					Packager: "Kubri <info@kubri.dev>",
+				},
 			},
 		},
 	}
@@ -79,7 +82,7 @@ func buildPackages(packager string, config nfpm.Config) error {
 	defer os.RemoveAll(srcDir)
 
 	binPath := filepath.Join(srcDir, "kubri-test")
-	bin := []byte(fmt.Sprintf("#/bin/bash\n\necho %q\n", config.Version))
+	bin := fmt.Appendf(nil, "#/bin/bash\n\necho %q\n", config.Version)
 	if err = os.WriteFile(filepath.Join(srcDir, "kubri-test"), bin, 0o755); err != nil { //nolint:gosec
 		return err
 	}
