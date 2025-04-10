@@ -281,7 +281,7 @@ func newFloatEncoder(typ reflect.Type) (encoder, error) {
 		if f == 0 {
 			return nil
 		}
-		_, err := w.Write(atob(strconv.FormatFloat(f, 'f', -1, bits)))
+		_, err := w.Write(strconv.AppendFloat(nil, f, 'f', -1, bits))
 		return err
 	}, nil
 }
