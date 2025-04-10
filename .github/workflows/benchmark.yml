@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  BENCH_COUNT: 3
+  BENCH_COUNT: 6
 
 jobs:
   packages:
@@ -49,7 +49,7 @@ jobs:
           echo "matrix={\"package\": $(IFS=,; echo "[${filtered[*]}]")}" >> $GITHUB_OUTPUT
 
   benchmark:
-    name: Benchmark ${{ matrix.package }}
+    name: ${{ matrix.package }}
     needs: packages
     runs-on: ubuntu-latest
     strategy:
