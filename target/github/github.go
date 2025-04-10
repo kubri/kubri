@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -113,6 +114,44 @@ func (t *githubTarget) Sub(dir string) target.Target {
 
 func (t *githubTarget) URL(_ context.Context, filename string) (string, error) {
 	return "https://raw.githubusercontent.com/" + path.Join(t.owner, t.repo, t.branch, t.path, filename), nil
+}
+
+func (g *githubTarget) ReadDir(ctx context.Context, p string) ([]fs.DirEntry, error) {
+	opt := &github.RepositoryContentGetOptions{Ref: g.branch}
+	fileContent, dirContents, _, err := g.client.GetContents(ctx, g.owner, g.repo, p, opt)
+	if err != nil {
+		return nil, err
+	}
+	if fileContent != nil {
+		return nil, fs.ErrInvalid
+	}
+
+	modified := make([]func() time.Time, len(dirContents))
+	for i, content := range dirContents {
+		modified[i] = func() time.Time {
+			opts := &github.CommitsListOptions{
+				SHA:         g.branch,
+				Path:        content.GetPath(),
+				ListOptions: github.ListOptions{PerPage: 1},
+			}
+
+			commits, _, err := g.client.ListCommits(context.Background(), g.owner, g.repo, opts)
+			if err != nil {
+				panic(err)
+			}
+			if len(commits) == 0 {
+				panic("no commits found for " + content.GetPath())
+			}
+
+			return commits[0].GetCommit().GetCommitter().GetDate()
+		}
+	}
+
+	entries := make([]fs.DirEntry, len(dirContents))
+	for i, content := range dirContents {
+		entries[i] = &githubDirEntry{content, modified[i]}
+	}
+	return entries, nil
 }
 
 type fileWriter struct {
