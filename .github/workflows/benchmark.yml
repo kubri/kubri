@@ -1,0 +1,128 @@
+name: Benchmark
+
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  BENCH_COUNT: 3
+
+jobs:
+  packages:
+    name: Changed packages
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix || '{}' }}
+    steps:
+      - name: Find packages with changes
+        id: packages
+        uses: tj-actions/changed-files@v46
+        with:
+          files: '**/*.go'
+          dir_names: true
+          json: true
+
+      - name: Checkout repository
+        if: steps.packages.outputs.any_changed == 'true'
+        uses: actions/checkout@v4
+
+      - name: Filter packages with benchmarks
+        id: set-matrix
+        if: steps.packages.outputs.any_changed == 'true'
+        run: |
+          PACKAGES=${{ steps.packages.outputs.all_changed_and_modified_files }}
+          filtered=()
+          for pkg in $(echo "$PACKAGES" | jq -r '.[]'); do
+            if grep -Rq "func Benchmark" ./$pkg; then
+              filtered+=("\"$pkg\"")
+            fi
+          done
+
+          echo "matrix={\"package\": $(IFS=,; echo "[${filtered[*]}]")}" >> $GITHUB_OUTPUT
+
+  benchmark:
+    name: Benchmark ${{ matrix.package }}
+    needs: packages
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.packages.outputs.matrix) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run benchmark
+        run: |
+          go test -run ^$ -bench=. -count=${{ env.BENCH_COUNT }} -benchmem ./${{ matrix.package }} | tee after
+
+      - name: Run benchmark for base code
+        run: |
+          git fetch --quiet origin master ${{ github.event.pull_request.base.sha }}
+          git reset --quiet --hard ${{ github.event.pull_request.base.sha }}
+          go test -run ^$ -bench=. -count=${{ env.BENCH_COUNT }} -benchmem ./${{ matrix.package }} | tee before
+
+      - name: Compare benchmarks
+        id: bench
+        run: |
+          go install golang.org/x/perf/cmd/benchstat@latest
+          OUTPUT=$(benchstat before after)
+          echo "${OUTPUT}"
+          echo "diff<<EOF" >> $GITHUB_OUTPUT && echo "$OUTPUT" >> $GITHUB_OUTPUT && echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Save benchmark results
+        uses: cloudposse/github-action-matrix-outputs-write@1.0.0
+        if: steps.bench.outputs.diff != ''
+        with:
+          matrix-step-name: ${{ github.job }}
+          matrix-key: ${{ matrix.package }}
+          outputs: ${{ toJSON(steps.bench.outputs) }}
+
+  comment:
+    name: Comment
+    needs: benchmark
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load benchmark results
+        uses: cloudposse/github-action-matrix-outputs-read@1.0.0
+        id: read
+        with:
+          matrix-step-name: benchmark
+
+      - name: Generate comment text
+        uses: actions/github-script@v7
+        if: steps.read.outputs.result != '{}'
+        id: parse
+        with:
+          result-encoding: string
+          script: |
+            const result = ${{ steps.read.outputs.result }}
+            return Object.keys(result.diff).sort().map((key) => `
+            <details><summary><code>${key}</code></summary>
+
+            ` + "```" + `
+            ${result.diff[key]}
+            ` + "```" + `
+            </details>
+            `).join('')
+
+      - name: Create comment
+        if: steps.parse.outputs.result != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          header: benchmarks
+          message: |
+            ### Benchmark Results
+            ${{ steps.parse.outputs.result }}

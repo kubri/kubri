@@ -65,6 +65,14 @@ Date: Tue, 10 Jan 2023 19:04:25 UTC
 			want: &want,
 		},
 		{
+			msg: "pointer to struct pointer",
+			in:  in,
+			want: func() **record {
+				v := &want
+				return &v
+			}(),
+		},
+		{
 			msg:  "struct slice",
 			in:   in + "\r\n\r\n" + in,
 			want: []record{want, want},
@@ -295,28 +303,26 @@ func TestDecodeErrors(t *testing.T) {
 }
 
 func BenchmarkUnmarshal(b *testing.B) {
-	type record struct {
-		String string
-		Hex    [4]byte
-		Int    int
+	benchmarks := []struct {
+		name string
+		data []byte
+		v    any
+	}{
+		{"string", []byte("V: test\n"), &struct{ V string }{}},
+		{"int", []byte("V: 1\n"), &struct{ V int }{}},
+		{"uint", []byte("V: 1\n"), &struct{ V uint }{}},
+		{"float64", []byte("V: 1\n"), &struct{ V float64 }{}},
+		{"time.Time", []byte("V: Tue, 10 Jan 2023 19:04:25 UTC\n"), &struct{ V time.Time }{}},
+		{"[8]byte", []byte("V: 0102030405060708\n"), &struct{ V [8]byte }{}},
 	}
 
-	in := []byte(`String: foo
- bar
- baz
-Hex: 01020304
-Int: 1
-
-String: foo
- bar
- baz
-Hex: 01020304
-Int: 1
-`)
-
-	var v []record
-
-	for b.Loop() {
-		deb.Unmarshal(in, &v)
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			for b.Loop() {
+				if err := deb.Unmarshal(bm.data, bm.v); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
 	}
 }
