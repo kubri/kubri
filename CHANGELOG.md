@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.7.0](https://github.com/kubri/kubri/compare/v0.6.0...v0.7.0) (2025-04-10)
+
+
+### Features
+
+* **apk:** support riscv64 & loongarch64 repositories ([#643](https://github.com/kubri/kubri/issues/643)) ([fa9599b](https://github.com/kubri/kubri/commit/fa9599b88f21579e7b3c80a500fa9f50f471497c))
+* **apt:** use better compression for indices ([#640](https://github.com/kubri/kubri/issues/640)) ([da08ba2](https://github.com/kubri/kubri/commit/da08ba244334b67d6989c692e325591cd839e19a))
+* **arch:** arch linux repository builder ([#638](https://github.com/kubri/kubri/issues/638)) ([a2d261a](https://github.com/kubri/kubri/commit/a2d261a0a7c33fa6010e05f7fc92f23a3fd185e1))
+* **keys:** export keys, allow ed25519 PEM import ([#622](https://github.com/kubri/kubri/issues/622)) ([fcc610f](https://github.com/kubri/kubri/commit/fcc610f8f8a3cdccf9d2bf3ab9211cb62d37b90c))
+* **rsa:** increase key size to 4096 ([#651](https://github.com/kubri/kubri/issues/651)) ([5dfc2b2](https://github.com/kubri/kubri/commit/5dfc2b2d2cd4104851715f3eb5fcbfc572b41238))
+* **sparkle:** support ed25519 signatures for windows ([#642](https://github.com/kubri/kubri/issues/642)) ([ff19ae1](https://github.com/kubri/kubri/commit/ff19ae1bf168a9366d11a16e6af36f6b0c10619d))
+
+
+### Performance Improvements
+
+* **deb,desc:** improve float encode performance ([#657](https://github.com/kubri/kubri/issues/657)) ([c2fe830](https://github.com/kubri/kubri/commit/c2fe83060bbab66208813433dcaf4e9a5beb5ff2))
+
 ## [0.6.0](https://github.com/kubri/kubri/compare/v0.5.2...v0.6.0) (2025-03-17)
 
 
