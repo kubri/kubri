@@ -13,7 +13,7 @@ replace github.com/go-playground/validator/v10 => github.com/abemedia/validator/
 require (
 	dario.cat/mergo v1.0.1
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
-	github.com/ProtonMail/go-crypto v1.1.6
+	github.com/ProtonMail/go-crypto v1.2.0
 	github.com/ProtonMail/gopenpgp/v2 v2.8.3
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 	github.com/cavaliergopher/rpm v1.3.0
