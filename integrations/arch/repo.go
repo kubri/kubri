@@ -70,56 +70,6 @@ func openRepo(ctx context.Context, t target.Target, repoName string, pgpKey *pgp
 	return r, nil
 }
 
-func (r *repo) readDB(dbData io.ReadCloser, arch string) error {
-	zr, err := zstd.NewReader(dbData)
-	if err != nil {
-		return fmt.Errorf("failed to decompress: %w", err)
-	}
-	defer zr.Close()
-
-	tarReader := tar.NewReader(zr)
-
-	for {
-		hdr, err := tarReader.Next()
-		if errors.Is(err, io.EOF) {
-			break
-		}
-		if err != nil {
-			return err
-		}
-		if hdr.Typeflag != tar.TypeReg || !strings.HasSuffix(hdr.Name, "/desc") {
-			continue
-		}
-
-		var pkg Package
-		if err = desc.NewDecoder(tarReader).Decode(&pkg); err != nil {
-			return fmt.Errorf("failed to decode %s: %w", hdr.Name, err)
-		}
-
-		if pkg.Arch != arch && pkg.Arch != "any" {
-			return fmt.Errorf("%s arch mismatch: %s", pkg.Name, pkg.Arch)
-		}
-
-		r.addPackage(&pkg)
-	}
-
-	return nil
-}
-
-func (r *repo) addPackage(p *Package) {
-	arch, ok := r.packages[p.Arch]
-	if !ok {
-		arch = make(map[string]map[string]*Package)
-		r.packages[p.Arch] = arch
-	}
-	pkg, ok := arch[p.Name]
-	if !ok {
-		pkg = make(map[string]*Package)
-		arch[p.Name] = pkg
-	}
-	pkg[p.Version] = p
-}
-
 // Add adds a package to the repository.
 func (r *repo) Add(filename string, data []byte) error {
 	p, err := parsePkgInfo(filename, bytes.NewReader(data))
@@ -176,6 +126,56 @@ func (r *repo) Write() error {
 	}
 
 	return nil
+}
+
+func (r *repo) readDB(dbData io.ReadCloser, arch string) error {
+	zr, err := zstd.NewReader(dbData)
+	if err != nil {
+		return fmt.Errorf("failed to decompress: %w", err)
+	}
+	defer zr.Close()
+
+	tarReader := tar.NewReader(zr)
+
+	for {
+		hdr, err := tarReader.Next()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		if hdr.Typeflag != tar.TypeReg || !strings.HasSuffix(hdr.Name, "/desc") {
+			continue
+		}
+
+		var pkg Package
+		if err = desc.NewDecoder(tarReader).Decode(&pkg); err != nil {
+			return fmt.Errorf("failed to decode %s: %w", hdr.Name, err)
+		}
+
+		if pkg.Arch != arch && pkg.Arch != "any" {
+			return fmt.Errorf("%s arch mismatch: %s", pkg.Name, pkg.Arch)
+		}
+
+		r.addPackage(&pkg)
+	}
+
+	return nil
+}
+
+func (r *repo) addPackage(p *Package) {
+	arch, ok := r.packages[p.Arch]
+	if !ok {
+		arch = make(map[string]map[string]*Package)
+		r.packages[p.Arch] = arch
+	}
+	pkg, ok := arch[p.Name]
+	if !ok {
+		pkg = make(map[string]*Package)
+		arch[p.Name] = pkg
+	}
+	pkg[p.Version] = p
 }
 
 //nolint:funlen

@@ -70,31 +70,6 @@ func (s *gitlabSource) GetRelease(ctx context.Context, version string) (*source.
 	return s.parseRelease(ctx, r), nil
 }
 
-func (s *gitlabSource) parseRelease(ctx context.Context, release *gitlab.Release) *source.Release {
-	r := &source.Release{
-		Name:        release.Name,
-		Description: release.Description,
-		Version:     release.TagName,
-		Date:        *release.CreatedAt,
-		Assets:      make([]*source.Asset, 0, len(release.Assets.Links)),
-	}
-
-	for _, l := range release.Assets.Links {
-		size, err := s.getSize(ctx, l.URL)
-		if err != nil {
-			log.Printf("failed to get size for %s: %s\n", l.Name, err)
-		}
-
-		r.Assets = append(r.Assets, &source.Asset{
-			Name: l.Name,
-			URL:  l.URL,
-			Size: size,
-		})
-	}
-
-	return r
-}
-
 func (s *gitlabSource) UploadAsset(ctx context.Context, version, name string, data []byte) error {
 	file, _, err := s.client.ProjectMarkdownUploads.UploadProjectMarkdown(
 		s.repo,
@@ -140,6 +115,31 @@ func (s *gitlabSource) DownloadAsset(ctx context.Context, version, name string) 
 	}
 
 	return nil, source.ErrAssetNotFound
+}
+
+func (s *gitlabSource) parseRelease(ctx context.Context, release *gitlab.Release) *source.Release {
+	r := &source.Release{
+		Name:        release.Name,
+		Description: release.Description,
+		Version:     release.TagName,
+		Date:        *release.CreatedAt,
+		Assets:      make([]*source.Asset, 0, len(release.Assets.Links)),
+	}
+
+	for _, l := range release.Assets.Links {
+		size, err := s.getSize(ctx, l.URL)
+		if err != nil {
+			log.Printf("failed to get size for %s: %s\n", l.Name, err)
+		}
+
+		r.Assets = append(r.Assets, &source.Asset{
+			Name: l.Name,
+			URL:  l.URL,
+			Size: size,
+		})
+	}
+
+	return r
 }
 
 func (s *gitlabSource) getSize(ctx context.Context, url string) (int, error) {
