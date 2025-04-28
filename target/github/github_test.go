@@ -39,6 +39,8 @@ func TestGithub(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
 			repo := fmt.Sprintf("test_%d", time.Now().UnixNano())
 
 			r, _, err := client.Repositories.Create(t.Context(), "", &gh.Repository{Name: &repo})
@@ -64,7 +66,7 @@ func TestGithub(t *testing.T) {
 
 			test.Target(t, tgt, func(asset string) string {
 				return "https://raw.githubusercontent.com/" + path.Join(owner, repo, branch, asset)
-			}, test.WithDelay(time.Second))
+			}, test.WithDelay(3*time.Second))
 
 			t.Run("Error", func(t *testing.T) {
 				_, err = github.New(github.Config{Owner: "owner", Repo: "repo", Branch: tc.branch})
