@@ -11,7 +11,7 @@ replace github.com/invopop/jsonschema v0.12.0 => github.com/abemedia/jsonschema 
 replace github.com/go-playground/validator/v10 => github.com/abemedia/validator/v10 v10.0.0-20240110181639-80db7adbfa70
 
 require (
-	dario.cat/mergo v1.0.1
+	dario.cat/mergo v1.0.2
 	github.com/MakeNowJust/heredoc/v2 v2.0.1
 	github.com/ProtonMail/go-crypto v1.2.0
 	github.com/ProtonMail/gopenpgp/v2 v2.8.3
