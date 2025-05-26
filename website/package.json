@@ -43,7 +43,7 @@
     "prettier": "^3.5.3",
     "prism-react-renderer": "^2.4.1",
     "sass": "^1.87.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "browserslist": {
     "production": [
