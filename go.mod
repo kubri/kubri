@@ -40,7 +40,7 @@ require (
 	github.com/ulikunitz/xz v0.5.12
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	gitlab.alpinelinux.org/alpine/go v0.10.1
-	gitlab.com/gitlab-org/api/client-go v0.128.0
+	gitlab.com/gitlab-org/api/client-go v0.129.0
 	gocloud.dev v0.41.0
 	golang.org/x/mod v0.24.0
 	golang.org/x/oauth2 v0.30.0
