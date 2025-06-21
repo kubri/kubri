@@ -3,14 +3,29 @@ name: Test
 on:
   push:
     branches: [master]
+    paths:
+      - '**.go'
+      - go.mod
+      - go.sum
   pull_request:
     branches: [master]
+    paths:
+      - '**.go'
+      - go.mod
+      - go.sum
   workflow_call:
     secrets:
       GH_TOKEN:
         required: true
       GITLAB_TOKEN:
         required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -43,6 +58,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unit
 
   lint:
     name: Lint

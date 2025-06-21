@@ -3,6 +3,7 @@ name: Benchmark
 on:
   pull_request:
     branches: [master]
+    paths: ['**.go']
 
 permissions:
   contents: read
@@ -26,17 +27,15 @@ jobs:
         id: packages
         uses: tj-actions/changed-files@v46
         with:
-          files: '**/*.go'
+          files: '**.go'
           dir_names: true
           json: true
 
       - name: Checkout repository
-        if: steps.packages.outputs.any_changed == 'true'
         uses: actions/checkout@v4
 
       - name: Filter packages with benchmarks
         id: set-matrix
-        if: steps.packages.outputs.any_changed == 'true'
         run: |
           PACKAGES=${{ steps.packages.outputs.all_changed_and_modified_files }}
           filtered=()
