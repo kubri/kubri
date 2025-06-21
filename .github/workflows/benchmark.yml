@@ -3,6 +3,10 @@ name: Benchmark
 on:
   pull_request:
     branches: [master]
+    paths:
+      - '**.go'
+      - go.mod
+      - go.sum
 
 permissions:
   contents: read

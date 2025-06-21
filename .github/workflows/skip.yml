@@ -1,0 +1,76 @@
+name: Skip
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**.go'
+      - go.mod
+      - go.sum
+  pull_request:
+    branches: [master]
+    paths-ignore:
+      - '**.go'
+      - go.mod
+      - go.sum
+
+jobs:
+  detect:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.detect.outputs.any_changed }}
+    steps:
+      - name: Checkout repository
+        if: github.event_name != 'pull_request'
+        uses: actions/checkout@v4
+
+      - name: Detect Go file changes
+        id: detect
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            **.go
+            go.mod
+            go.sum
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.changed == 'false'
+    steps:
+      - name: Skip test
+        run: echo "No Go files changed, skipping test."
+      - name: Codecov empty upload
+        uses: codecov/codecov-action@v5
+        with:
+          run_command: empty-upload
+          force: true
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.changed == 'false'
+    steps:
+      - name: Skip lint
+        run: echo "No Go files changed, skipping lint."
+
+  acceptance:
+    name: Acceptance Test
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.changed == 'false'
+    steps:
+      - name: Skip acceptance test
+        run: echo "No Go files changed, skipping acceptance test."
+
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    needs: detect
+    if: needs.detect.outputs.changed == 'false'
+    steps:
+      - name: Skip CodeQL Analysis
+        run: echo "No Go files changed, skipping CodeQL Analysis."
