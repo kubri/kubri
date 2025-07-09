@@ -28,9 +28,10 @@ type Config struct {
 }
 
 type Rule struct {
+	*Settings
+
 	OS      OS
 	Version string
-	*Settings
 }
 
 type Settings struct {

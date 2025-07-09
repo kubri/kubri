@@ -5,7 +5,7 @@ run:
     - acceptance
 
 issues:
-  fix: true
+  fix: false
 
 linters:
   default: all
@@ -21,6 +21,7 @@ linters:
     - mnd
     - musttag
     - nlreturn
+    - noinlineerr
     - nonamedreturns
     - paralleltest
     - recvcheck
@@ -28,6 +29,7 @@ linters:
     - varnamelen
     - wrapcheck
     - wsl
+    - wsl_v5
   settings:
     gomodguard:
       blocked:
