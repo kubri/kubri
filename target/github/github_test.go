@@ -48,7 +48,7 @@ func TestGithub(t *testing.T) {
 				t.Fatal(err)
 			}
 			t.Cleanup(func() {
-				_, err := client.Repositories.Delete(context.Background(), owner, repo) //nolint:usetesting
+				_, err := client.Repositories.Delete(context.Background(), owner, repo)
 				if err != nil {
 					t.Fatal(err)
 				}

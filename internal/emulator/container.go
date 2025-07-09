@@ -89,7 +89,7 @@ func runContainer(t *testing.T, cr testcontainers.ContainerRequest, opt ...Optio
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = c.Terminate(context.Background()) }) //nolint:usetesting
+	t.Cleanup(func() { _ = c.Terminate(context.Background()) })
 	return Container{c}
 }
 

@@ -94,6 +94,7 @@ func TestCopyFSError(t *testing.T) {
 
 type errFS struct {
 	fs.FS
+
 	readErr error
 }
 
@@ -107,6 +108,7 @@ func (e *errFS) Open(name string) (fs.File, error) {
 
 type errorFile struct {
 	fs.File
+
 	err error
 }
 
