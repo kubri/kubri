@@ -212,7 +212,7 @@ func TestPGP(t *testing.T) {
 		}
 
 		for _, a := range arguments {
-			cmd := exec.Command("gpg", append(baseArgs, a...)...)
+			cmd := exec.CommandContext(t.Context(), "gpg", append(baseArgs, a...)...)
 			cmd.Dir = dir
 			out, err := cmd.CombinedOutput()
 			if err != nil {

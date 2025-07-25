@@ -292,7 +292,7 @@ func Test[PrivateKey, PublicKey any](t *testing.T, i Implementation[PrivateKey, 
 			_ = os.WriteFile(filepath.Join(dir, "data.txt"), data, 0o600)
 			_ = os.WriteFile(filepath.Join(dir, "data.txt.sig"), sig, 0o600)
 
-			cmd := exec.Command("openssl", opt.opensslArgs...)
+			cmd := exec.CommandContext(t.Context(), "openssl", opt.opensslArgs...)
 			cmd.Dir = dir
 
 			out, err := cmd.CombinedOutput()
