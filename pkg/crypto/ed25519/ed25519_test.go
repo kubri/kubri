@@ -38,7 +38,7 @@ func TestEd25519(t *testing.T) {
 		os.WriteFile(filepath.Join(dir, "data.txt"), data, 0o600)
 		os.WriteFile(filepath.Join(dir, "data.txt.sig"), sig, 0o600)
 
-		cmd := exec.Command("openssl", "pkeyutl", "-verify", "-pubin", "-inkey", "public.der", "-rawin", "-in", "data.txt", "-sigfile", "data.txt.sig")
+		cmd := exec.CommandContext(t.Context(), "openssl", "pkeyutl", "-verify", "-pubin", "-inkey", "public.der", "-rawin", "-in", "data.txt", "-sigfile", "data.txt.sig")
 		cmd.Dir = dir
 		out, err := cmd.CombinedOutput()
 		t.Log(string(out))
