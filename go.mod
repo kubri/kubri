@@ -19,7 +19,7 @@ require (
 	github.com/cavaliergopher/rpm v1.3.0
 	github.com/dlclark/regexp2 v1.11.5
 	github.com/docker/docker v28.3.3+incompatible
-	github.com/docker/go-connections v0.5.0
+	github.com/docker/go-connections v0.6.0
 	github.com/dsnet/compress v0.0.1
 	github.com/fullstorydev/emulators/storage v1.0.0
 	github.com/go-playground/locales v0.14.1
