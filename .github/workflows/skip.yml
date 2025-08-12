@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: Checkout repository
         if: github.event_name != 'pull_request'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Detect Go file changes
         id: detect
