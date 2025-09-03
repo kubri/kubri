@@ -35,7 +35,7 @@ require (
 	github.com/klauspost/compress v1.18.0
 	github.com/pierrec/lz4 v2.6.1+incompatible
 	github.com/russross/blackfriday/v2 v2.1.0
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.1
 	github.com/testcontainers/testcontainers-go v0.38.0
 	github.com/ulikunitz/xz v0.5.15
 	github.com/wk8/go-ordered-map/v2 v2.1.8
@@ -174,7 +174,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
