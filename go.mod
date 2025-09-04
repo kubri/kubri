@@ -18,7 +18,7 @@ require (
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 	github.com/cavaliergopher/rpm v1.3.0
 	github.com/dlclark/regexp2 v1.11.5
-	github.com/docker/docker v28.3.3+incompatible
+	github.com/docker/docker v28.4.0+incompatible
 	github.com/docker/go-connections v0.6.0
 	github.com/dsnet/compress v0.0.1
 	github.com/fullstorydev/emulators/storage v1.0.0
@@ -125,7 +125,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.3 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/btree v1.1.3 // indirect
