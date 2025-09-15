@@ -27,7 +27,7 @@ jobs:
 
       - name: Detect Go file changes
         id: detect
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             **.go
