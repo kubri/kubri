@@ -40,7 +40,7 @@ require (
 	github.com/ulikunitz/xz v0.5.15
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	gitlab.alpinelinux.org/alpine/go v0.10.1
-	gitlab.com/gitlab-org/api/client-go v0.145.0
+	gitlab.com/gitlab-org/api/client-go v0.148.1
 	gocloud.dev v0.43.0
 	golang.org/x/mod v0.28.0
 	golang.org/x/oauth2 v0.31.0
@@ -192,6 +192,7 @@ require (
 	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
 	golang.org/x/crypto v0.40.0 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
