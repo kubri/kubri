@@ -190,7 +190,7 @@ func signAsset(c *Config, os OS, b []byte) (edSig, dsaSig string, err error) {
 		}
 		dsaSig = base64.StdEncoding.EncodeToString(sig)
 	}
-	return
+	return edSig, dsaSig, err
 }
 
 func uploadAsset(ctx context.Context, c *Config, name string, b []byte) (string, error) {
