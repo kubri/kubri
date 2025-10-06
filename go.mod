@@ -1,6 +1,6 @@
 module github.com/kubri/kubri
 
-go 1.24.0
+go 1.25
 
 // TODO: Remove when the following PR is merged:
 // https://github.com/invopop/jsonschema/pull/126
@@ -28,7 +28,7 @@ require (
 	github.com/go-xmlfmt/xmlfmt v1.1.3
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/goreleaser/nfpm/v2 v2.43.1
+	github.com/goreleaser/nfpm/v2 v2.43.2
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/invopop/jsonschema v0.13.0
 	github.com/joho/godotenv v1.5.1
@@ -136,7 +136,7 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
 	github.com/goreleaser/chglog v0.7.3 // indirect
-	github.com/goreleaser/fileglob v1.3.0 // indirect
+	github.com/goreleaser/fileglob v1.4.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
