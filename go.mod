@@ -43,7 +43,7 @@ require (
 	gitlab.com/gitlab-org/api/client-go v0.154.0
 	gocloud.dev v0.43.0
 	golang.org/x/mod v0.29.0
-	golang.org/x/oauth2 v0.31.0
+	golang.org/x/oauth2 v0.32.0
 	golang.org/x/sync v0.17.0
 	gopkg.in/yaml.v3 v3.0.1
 )
