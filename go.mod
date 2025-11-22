@@ -40,7 +40,7 @@ require (
 	github.com/ulikunitz/xz v0.5.15
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	gitlab.alpinelinux.org/alpine/go v0.10.1
-	gitlab.com/gitlab-org/api/client-go v0.154.0
+	gitlab.com/gitlab-org/api/client-go v0.160.1
 	gocloud.dev v0.43.0
 	golang.org/x/mod v0.29.0
 	golang.org/x/oauth2 v0.32.0
@@ -49,7 +49,7 @@ require (
 )
 
 require (
-	cel.dev/expr v0.24.0 // indirect
+	cel.dev/expr v0.25.1 // indirect
 	cloud.google.com/go v0.121.4 // indirect
 	cloud.google.com/go/auth v0.16.3 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
