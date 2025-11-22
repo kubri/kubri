@@ -57,7 +57,7 @@ func (d *Decoder) Decode(v any) error {
 }
 
 //nolint:gochecknoglobals
-var unmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
+var unmarshalerType = reflect.TypeFor[encoding.TextUnmarshaler]()
 
 func newDecoder(typ reflect.Type) (decoder, error) {
 	switch {

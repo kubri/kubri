@@ -130,8 +130,8 @@ func newEncoder(typ reflect.Type) (encoder, error) {
 
 //nolint:gochecknoglobals
 var (
-	stringerType  = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
-	marshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
+	stringerType  = reflect.TypeFor[fmt.Stringer]()
+	marshalerType = reflect.TypeFor[encoding.TextMarshaler]()
 )
 
 func newFieldEncoder(typ reflect.Type) (encoder, error) {

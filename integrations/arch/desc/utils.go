@@ -16,7 +16,7 @@ var (
 	percent = []byte("%")
 	nl      = []byte("\n")
 
-	dateType = reflect.TypeOf((*time.Time)(nil)).Elem()
+	dateType = reflect.TypeFor[time.Time]()
 )
 
 func getFieldName(field reflect.StructField) string {
