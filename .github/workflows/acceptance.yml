@@ -30,7 +30,7 @@ jobs:
       packages: ${{ steps.set-matrix.outputs.packages }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Check if go.mod or go.sum changed
         id: deps
@@ -68,7 +68,7 @@ jobs:
         package: ${{ fromJSON(needs.packages.outputs.packages) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Go
         uses: actions/setup-go@v6
