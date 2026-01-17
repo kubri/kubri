@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/kubri/kubri/compare/v0.7.0...v0.7.1) (2026-01-17)
+
+
+### Performance Improvements
+
+* use IndexByte instead of Index for single byte searches ([#824](https://github.com/kubri/kubri/issues/824)) ([1cd2280](https://github.com/kubri/kubri/commit/1cd228070ffacd4b6736f3043cbf0655b249ee56))
+
 ## [0.7.0](https://github.com/kubri/kubri/compare/v0.6.0...v0.7.0) (2025-04-10)
 
 
