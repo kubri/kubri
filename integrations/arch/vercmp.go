@@ -22,7 +22,7 @@ func compareVersions(v1, v2 string) int {
 // splitEpoch splits a version string into its epoch and the rest.
 // If no epoch is present, it returns 0 as the epoch.
 func splitEpoch(version string) (int, string) {
-	i := strings.Index(version, ":")
+	i := strings.IndexByte(version, ':') //nolint:modernize // more performant
 	if i == -1 {
 		return 0, version
 	}
