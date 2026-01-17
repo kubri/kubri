@@ -1,4 +1,4 @@
-package crypto
+package crypto //nolint:revive // var-naming
 
 import "errors"
 

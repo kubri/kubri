@@ -194,7 +194,7 @@ func newStructDecoder(typ reflect.Type) (decoder, error) {
 			if err != nil {
 				return err
 			}
-			if i := bytes.IndexByte(b, '\n'); i != -1 {
+			if i := bytes.IndexByte(b, '\n'); i != -1 { //nolint:modernize // more performant
 				return fmt.Errorf("invalid line: %q", b[:i])
 			}
 			if dec := decoders[btoa(trim(b)[:len(b)-1])]; dec != nil {

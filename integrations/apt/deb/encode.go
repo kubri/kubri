@@ -291,7 +291,7 @@ func newStringEncoder(reflect.Type) (encoder, error) {
 }
 
 func encodeText(w io.Writer, in []byte) error {
-	if i := bytes.IndexByte(in, '\n'); i == -1 {
+	if i := bytes.IndexByte(in, '\n'); i == -1 { //nolint:modernize // more performant
 		_, err := w.Write(in)
 		return err
 	}

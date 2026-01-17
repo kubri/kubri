@@ -100,10 +100,10 @@ func getLatest(repo map[string]map[string]map[string]*Package) string {
 }
 
 func stripVersion(version string) string {
-	if colon := strings.Index(version, ":"); colon != -1 {
+	if colon := strings.IndexByte(version, ':'); colon != -1 {
 		version = version[colon+1:]
 	}
-	if dash := strings.LastIndex(version, "-"); dash != -1 {
+	if dash := strings.LastIndexByte(version, '-'); dash != -1 {
 		version = version[:dash]
 	}
 	return strings.ReplaceAll(version, "_", "-")

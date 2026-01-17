@@ -130,7 +130,7 @@ func getFiles(path string) ([]string, error) {
 }
 
 func getRoot(path string) (string, error) {
-	if i := strings.IndexRune(path, '*'); i >= 0 {
+	if i := strings.IndexByte(path, '*'); i >= 0 { //nolint:modernize // more performant
 		return path[:i], nil
 	}
 
