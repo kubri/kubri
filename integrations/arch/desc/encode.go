@@ -293,7 +293,7 @@ func newByteArrayEncoder(typ reflect.Type) (encoder, error) {
 		b := make([]byte, size)
 		for i := range size {
 			if n := v.Index(i).Uint(); n > 0 {
-				b[i] = byte(n)
+				b[i] = byte(n) //nolint:gosec // element type is guaranteed to be uint8 by the caller
 				isNonZero = true
 			}
 		}

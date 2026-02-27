@@ -11,7 +11,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v83/github"
 	"golang.org/x/oauth2"
 
 	"github.com/kubri/kubri/source"
@@ -115,25 +115,12 @@ func (s *githubSource) DownloadAsset(ctx context.Context, version, name string) 
 
 	for _, asset := range release.Assets {
 		if asset.GetName() == name {
-			r, u, err := s.client.Repositories.DownloadReleaseAsset(ctx, s.owner, s.repo, asset.GetID())
+			r, _, err := s.client.Repositories.DownloadReleaseAsset(ctx, s.owner, s.repo, asset.GetID(), s.client.Client())
 			if err != nil {
 				return nil, err
 			}
-			if r != nil {
-				defer r.Close()
-				return io.ReadAll(r)
-			}
-
-			req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-			if err != nil {
-				return nil, err
-			}
-			res, err := http.DefaultClient.Do(req)
-			if err != nil {
-				return nil, err
-			}
-			defer res.Body.Close()
-			return io.ReadAll(res.Body)
+			defer r.Close()
+			return io.ReadAll(r)
 		}
 	}
 

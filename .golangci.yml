@@ -94,6 +94,8 @@ linters:
         source: ^\s*//
       - linters: [revive]
         text: '^(exported|package-comments): .*$'
+      - linters: [revive]
+        text: 'var-naming: avoid package names that conflict with Go standard library package names'
 
 formatters:
   enable:
