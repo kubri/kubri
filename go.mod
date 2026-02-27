@@ -27,7 +27,7 @@ require (
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/go-xmlfmt/xmlfmt v1.1.3
 	github.com/google/go-cmp v0.7.0
-	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/go-github/v83 v83.0.0
 	github.com/goreleaser/nfpm/v2 v2.44.2
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/invopop/jsonschema v0.13.0

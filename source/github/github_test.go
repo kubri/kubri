@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	gh "github.com/google/go-github/github"
+	gh "github.com/google/go-github/v83/github"
 	"golang.org/x/oauth2"
 
 	"github.com/kubri/kubri/internal/test"
@@ -42,7 +42,7 @@ func TestGithub(t *testing.T) {
 	})
 
 	_, _, err = client.Repositories.CreateFile(t.Context(), owner, repo, "test", &gh.RepositoryContentFileOptions{
-		Message: gh.String("test"),
+		Message: gh.Ptr("test"),
 		Content: []byte("test"),
 	})
 	if err != nil {
@@ -51,8 +51,8 @@ func TestGithub(t *testing.T) {
 
 	for _, r := range test.SourceWant() {
 		_, _, err = client.Repositories.CreateRelease(t.Context(), owner, repo, &gh.RepositoryRelease{
-			TagName: gh.String(r.Version),
-			Body:    gh.String(r.Description),
+			TagName: gh.Ptr(r.Version),
+			Body:    gh.Ptr(r.Description),
 		})
 		if err != nil {
 			t.Fatal(err)

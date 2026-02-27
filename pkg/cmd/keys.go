@@ -19,7 +19,9 @@ func keysCmd() *cobra.Command {
 			if len(args) > 0 && !slices.Contains(cmd.ValidArgs, args[0]) {
 				var b strings.Builder
 				for _, s := range cmd.ValidArgs {
-					b.WriteString(fmt.Sprintf("\t%v\n", s))
+					b.WriteByte('\t')
+					b.WriteString(s)
+					b.WriteByte('\n')
 				}
 				return fmt.Errorf("invalid argument %q for %q\n\nDid you mean this?\n%s", args[0], cmd.CommandPath(), b.String())
 			}

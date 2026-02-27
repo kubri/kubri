@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	gh "github.com/google/go-github/github"
+	gh "github.com/google/go-github/v83/github"
 	"golang.org/x/oauth2"
 
 	"github.com/kubri/kubri/internal/test"

@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	gh "github.com/google/go-github/github"
+	gh "github.com/google/go-github/v83/github"
 	"gopkg.in/yaml.v3"
 
 	"github.com/kubri/kubri/internal/test"
