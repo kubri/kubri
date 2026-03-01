@@ -270,6 +270,8 @@ github.com/goreleaser/fileglob v1.4.0 h1:Y7zcUnzQjT1gbntacGAkIIfLv+OwojxTXBFxjSF
 github.com/goreleaser/fileglob v1.4.0/go.mod h1:1pbHx7hhmJIxNZvm6fi6WVrnP0tndq6p3ayWdLn1Yf8=
 github.com/goreleaser/nfpm/v2 v2.44.2 h1:h1DLjxoxlA85qru1IsRrqbJw51DLJ64kAiWmlPQ3zaA=
 github.com/goreleaser/nfpm/v2 v2.44.2/go.mod h1:O0h9bB68D39NTnM9rSOJhVCYxQk7sU8i04q2bzczFdk=
+github.com/graph-gophers/graphql-go v1.9.0 h1:yu0ucKHLc5qGpRwLYKIWtr9bOoxovkWasuBrPQwlHls=
+github.com/graph-gophers/graphql-go v1.9.0/go.mod h1:23olKZ7duEvHlF/2ELEoSZaY1aNPfShjP782SOoNTyM=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1 h1:X5VWvz21y3gzm9Nw/kaUeku/1+uBhcekkmy4IkffJww=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.1/go.mod h1:Zanoh4+gvIgluNqcfMVTJueD4wSS5hT7zTt4Mrutd90=
 github.com/hashicorp/go-cleanhttp v0.5.2 h1:035FKYIWjmULyFRBKPs8TBQoi0x6d9G4xc9neXJWAZQ=
@@ -436,8 +438,8 @@ gitlab.alpinelinux.org/alpine/go v0.10.1 h1:QoidnfDyC9yeIMj+CvYVyjlroZD/Kl7JRXGE
 gitlab.alpinelinux.org/alpine/go v0.10.1/go.mod h1:zwds+1zTmPDgwf/9lOzzn+oZVBr6jyfVgH3zuwkfkzc=
 gitlab.com/digitalxero/go-conventional-commit v1.0.7 h1:8/dO6WWG+98PMhlZowt/YjuiKhqhGlOCwlIV8SqqGh8=
 gitlab.com/digitalxero/go-conventional-commit v1.0.7/go.mod h1:05Xc2BFsSyC5tKhK0y+P3bs0AwUtNuTp+mTpbCU/DZ0=
-gitlab.com/gitlab-org/api/client-go v1.24.0 h1:lTTuEw2oA3Ac5UOqLJ80tSusDclgq97zuqCTnXqlfHw=
-gitlab.com/gitlab-org/api/client-go v1.24.0/go.mod h1:ctGKgv9bErQHO0NOrfhoyFtKMAkBhUE7y53F2xHFAkE=
+gitlab.com/gitlab-org/api/client-go v1.45.0 h1:NrMgfNgFvrEthHz2TpSp37C6hiTKREuLxqN0k5LT1Wg=
+gitlab.com/gitlab-org/api/client-go v1.45.0/go.mod h1:FtgyU6g2HS5+fMhw6nLK96GBEEBx5MzntOiJWfIaiN8=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/contrib/detectors/gcp v1.37.0 h1:B+WbN9RPsvobe6q4vP6KgM8/9plR/HNjgGBrfcOlweA=
