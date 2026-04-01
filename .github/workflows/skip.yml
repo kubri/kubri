@@ -43,7 +43,7 @@ jobs:
       - name: Skip test
         run: echo "No Go files changed, skipping test."
       - name: Codecov empty upload
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           run_command: empty-upload
