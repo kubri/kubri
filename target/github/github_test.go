@@ -3,6 +3,7 @@ package github_test
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 	"testing"
@@ -53,6 +54,19 @@ func TestGithub(t *testing.T) {
 					t.Fatal(err)
 				}
 			})
+
+			// Wait for the repository to become available.
+			for range 10 {
+				_, resp, err := client.Repositories.Get(t.Context(), owner, repo)
+				if err == nil {
+					break
+				}
+				if resp.StatusCode == http.StatusNotFound {
+					time.Sleep(time.Second)
+					continue
+				}
+				t.Fatalf("unexpected error waiting for repo to be available: %v", err)
+			}
 
 			tgt, err := github.New(github.Config{Owner: user.GetLogin(), Repo: repo, Branch: tc.branch})
 			if err != nil {
