@@ -250,7 +250,7 @@ func (r *repo) writeDB(arch string, pkgs map[string]map[string]*Package) error {
 			return fmt.Errorf("failed to sign db file: %w", err)
 		}
 		sigPath := dbPath + ".sig"
-		if err := os.WriteFile(sigPath, sig, 0o600); err != nil {
+		if err := os.WriteFile(sigPath, sig, 0o600); err != nil { //nolint:gosec // false positive
 			return fmt.Errorf("failed to write sig: %w", err)
 		}
 	}
