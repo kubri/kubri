@@ -5,12 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import type { JSX } from 'react'
 import { useBlogPost } from '@docusaurus/plugin-content-blog/client'
-
-import BlogPostItemHeaderTitle from '@theme/BlogPostItem/Header/Title'
 import BlogPostItemHeaderInfo from '@theme/BlogPostItem/Header/Info'
+import BlogPostItemHeaderTitle from '@theme/BlogPostItem/Header/Title'
 import ChangelogItemHeaderAuthors from '@theme/ChangelogItem/Header/Authors'
+import type { JSX } from 'react'
 
 import styles from './styles.module.css'
 

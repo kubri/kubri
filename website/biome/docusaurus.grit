@@ -1,0 +1,24 @@
+// Ports of two rules from @docusaurus/eslint-plugin:
+// - prefer-docusaurus-heading: https://docusaurus.io/docs/api/misc/@docusaurus/eslint-plugin/prefer-docusaurus-heading
+// - no-html-links: https://docusaurus.io/docs/api/misc/@docusaurus/eslint-plugin/no-html-links
+
+engine biome(1.0)
+language js(typescript, jsx)
+
+or {
+  JsxOpeningElement(name=$name) as $el,
+  JsxSelfClosingElement(name=$name) as $el
+} where {
+  or {
+    // prefer-docusaurus-heading
+    {
+      $name <: r"^h[1-6]$",
+      register_diagnostic(span=$el, message="Do not use any of the `<hn>` tags for headings. Use the `<Heading />` component from `@theme/Heading` instead.", severity="error")
+    },
+    // no-html-links
+    {
+      $name <: "a",
+      register_diagnostic(span=$el, message="Do not use an `<a>` element to navigate. Use the `<Link />` component from `@docusaurus/Link` instead. See: https://docusaurus.io/docs/docusaurus-core#link", severity="error")
+    }
+  }
+}

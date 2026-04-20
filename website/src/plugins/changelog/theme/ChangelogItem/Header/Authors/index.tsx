@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { useState, type JSX } from 'react'
-import clsx from 'clsx'
 import { useBlogPost } from '@docusaurus/plugin-content-blog/client'
+import type { Props } from '@theme/BlogPostItem/Header/Authors'
 import ChangelogItemHeaderAuthor from '@theme/ChangelogItem/Header/Author'
 import IconExpand from '@theme/Icon/Expand'
-import type { Props } from '@theme/BlogPostItem/Header/Authors'
+import clsx from 'clsx'
+import { type JSX, useState } from 'react'
 
 import styles from './styles.module.css'
 

@@ -5,10 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import path from 'path'
-import fs from 'fs-extra'
+import path from 'node:path'
 import pluginContentBlog from '@docusaurus/plugin-content-blog'
 import { aliasedSitePath, docuHash, normalizeUrl } from '@docusaurus/utils'
+import fs from 'fs-extra'
 
 /**
  * Multiple versions may be published on the same day, causing the order to be

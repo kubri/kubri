@@ -5,11 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import type { JSX } from 'react'
-import ChangelogItemHeader from '@theme/ChangelogItem/Header'
 import type { Props } from '@theme/BlogPostItem'
 import BlogPostItemContainer from '@theme/BlogPostItem/Container'
 import BlogPostItemContent from '@theme/BlogPostItem/Content'
+import ChangelogItemHeader from '@theme/ChangelogItem/Header'
+import type { JSX } from 'react'
 
 import styles from './styles.module.css'
 
