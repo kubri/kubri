@@ -42,7 +42,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "prettier": "^3.8.3",
     "prism-react-renderer": "^2.4.1",
-    "sass": "^1.98.0",
+    "sass": "^1.99.0",
     "typescript": "^5.9.3"
   },
   "browserslist": {
