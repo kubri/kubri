@@ -4,7 +4,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/docker/go-connections/nat"
 	"github.com/fullstorydev/emulators/storage/gcsemu"
 	"github.com/johannesboyne/gofakes3"
 	"github.com/johannesboyne/gofakes3/backend/s3mem"
@@ -20,7 +19,7 @@ func AzureBlob(t *testing.T, bucket string) string {
 		Image:        "mcr.microsoft.com/azure-storage/azurite:latest",
 		ExposedPorts: []string{"10000"},
 		Cmd:          []string{"azurite-blob", "--blobHost", "0.0.0.0"},
-		WaitingFor:   wait.ForListeningPort(nat.Port("10000")),
+		WaitingFor:   wait.ForListeningPort("10000"),
 	})
 	host, err := c.PortEndpoint(t.Context(), "10000", "")
 	if err != nil {
