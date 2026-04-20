@@ -1,10 +1,13 @@
 package emulator
 
 import (
+	"net/http/httptest"
 	"testing"
 
 	"github.com/docker/go-connections/nat"
 	"github.com/fullstorydev/emulators/storage/gcsemu"
+	"github.com/johannesboyne/gofakes3"
+	"github.com/johannesboyne/gofakes3/backend/s3mem"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gocloud.dev/blob/azureblob"
@@ -62,19 +65,17 @@ func GCS(t *testing.T, bucket string) string {
 func S3(t *testing.T, bucket string) string {
 	t.Helper()
 
-	c := runContainer(t, testcontainers.ContainerRequest{
-		Image:        "adobe/s3mock:latest",
-		ExposedPorts: []string{"9090"},
-		Env:          map[string]string{"initialBuckets": bucket},
-		WaitingFor:   wait.ForHTTP("/").WithPort("9090").WithStatusCodeMatcher(nil),
-	})
-	host, err := c.PortEndpoint(t.Context(), "9090", "http")
-	if err != nil {
+	backend := s3mem.New()
+	faker := gofakes3.New(backend)
+	ts := httptest.NewServer(faker.Server())
+	t.Cleanup(ts.Close)
+
+	if err := backend.CreateBucket(bucket); err != nil {
 		t.Fatal(err)
 	}
 
-	t.Setenv("AWS_ACCESS_KEY_ID", "test")
-	t.Setenv("AWS_SECRET_ACCESS_KEY", "test")
+	t.Setenv("AWS_ACCESS_KEY_ID", "ACCESS_KEY")
+	t.Setenv("AWS_SECRET_ACCESS_KEY", "SECRET")
 
-	return host
+	return ts.URL
 }
