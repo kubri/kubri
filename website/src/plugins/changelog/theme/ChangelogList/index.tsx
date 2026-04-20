@@ -5,16 +5,16 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import type { JSX } from 'react'
-import clsx from 'clsx'
-import { PageMetadata, HtmlClassNameProvider, ThemeClassNames } from '@docusaurus/theme-common'
+import { HtmlClassNameProvider, PageMetadata, ThemeClassNames } from '@docusaurus/theme-common'
 import BlogLayout from '@theme/BlogLayout'
+import type { Props } from '@theme/BlogListPage'
 import BlogListPaginator from '@theme/BlogListPaginator'
 import BlogPostItems from '@theme/BlogPostItems'
-import SearchMetadata from '@theme/SearchMetadata'
 import ChangelogItem from '@theme/ChangelogItem'
 import ChangelogListHeader from '@theme/ChangelogList/Header'
-import type { Props } from '@theme/BlogListPage'
+import SearchMetadata from '@theme/SearchMetadata'
+import clsx from 'clsx'
+import type { JSX } from 'react'
 
 function ChangelogListMetadata({ metadata }: Props): JSX.Element {
   const { blogTitle, blogDescription } = metadata

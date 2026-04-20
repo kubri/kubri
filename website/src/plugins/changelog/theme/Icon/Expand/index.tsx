@@ -5,9 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import type { JSX } from 'react'
-
 import type { Props } from '@theme/Icon/Expand'
+import type { JSX } from 'react'
 
 export default function IconExpand({ expanded, ...props }: Props): JSX.Element {
   if (expanded) {

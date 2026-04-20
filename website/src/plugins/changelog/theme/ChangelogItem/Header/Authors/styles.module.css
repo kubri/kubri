@@ -20,7 +20,7 @@
   margin-right: 0.3rem;
 }
 
-.imageOnlyAuthorCol [class^='image'] {
+.imageOnlyAuthorCol [class^="image"] {
   background-color: var(--ifm-color-emphasis-100);
 }
 

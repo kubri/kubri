@@ -46,8 +46,8 @@ jobs:
       - name: Run type check
         run: yarn tsc
 
-      - name: Run ESLint
-        run: yarn lint
+      - name: Run Biome check
+        run: yarn biome ci
 
       - name: Build with Docusaurus
         run: yarn build

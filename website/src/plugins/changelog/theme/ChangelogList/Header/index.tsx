@@ -5,10 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import type { JSX } from 'react'
-import Translate from '@docusaurus/Translate'
 import Link from '@docusaurus/Link'
+import Translate from '@docusaurus/Translate'
 import Heading from '@theme/Heading'
+import type { JSX } from 'react'
 import styles from './styles.module.css'
 
 function RssLink() {

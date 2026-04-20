@@ -5,10 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import type { JSX } from 'react'
-import clsx from 'clsx'
 import Link from '@docusaurus/Link'
 import type { Props } from '@theme/Blog/Components/Author'
+import clsx from 'clsx'
+import type { JSX } from 'react'
 
 import styles from './styles.module.css'
 

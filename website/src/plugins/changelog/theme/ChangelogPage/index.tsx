@@ -5,19 +5,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import type { JSX, ReactNode } from 'react'
-import clsx from 'clsx'
-import Translate from '@docusaurus/Translate'
 import Link from '@docusaurus/Link'
-import { HtmlClassNameProvider, ThemeClassNames } from '@docusaurus/theme-common'
+import type { BlogSidebar } from '@docusaurus/plugin-content-blog'
 import { BlogPostProvider, useBlogPost } from '@docusaurus/plugin-content-blog/client'
-import BlogPostPageMetadata from '@theme/BlogPostPage/Metadata'
+import Translate from '@docusaurus/Translate'
+import { HtmlClassNameProvider, ThemeClassNames } from '@docusaurus/theme-common'
 import BlogLayout from '@theme/BlogLayout'
+import type { Props } from '@theme/BlogPostPage'
+import BlogPostPageMetadata from '@theme/BlogPostPage/Metadata'
 import ChangelogItem from '@theme/ChangelogItem'
 import ChangelogPaginator from '@theme/ChangelogPaginator'
 import TOC from '@theme/TOC'
-import type { Props } from '@theme/BlogPostPage'
-import type { BlogSidebar } from '@docusaurus/plugin-content-blog'
+import clsx from 'clsx'
+import type { JSX, ReactNode } from 'react'
 
 function BackToIndexLink() {
   const { metadata } = useBlogPost()
