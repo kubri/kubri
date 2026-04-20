@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/kubri/kubri/compare/v0.7.1...v0.7.2) (2026-04-20)
+
+
+### Miscellaneous Chores
+
+* release 0.7.2 to ship dependency security updates ([#895](https://github.com/kubri/kubri/issues/895)) ([6ca50ba](https://github.com/kubri/kubri/commit/6ca50baf53cb0e4db04d683ba5db4bfabd4522e6))
+
 ## [0.7.1](https://github.com/kubri/kubri/compare/v0.7.0...v0.7.1) (2026-01-17)
 
 
