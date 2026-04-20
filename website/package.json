@@ -21,11 +21,11 @@
     "react-dom": "^19.2.5"
   },
   "devDependencies": {
-    "@docusaurus/core": "^3.9.2",
-    "@docusaurus/eslint-plugin": "^3.9.2",
-    "@docusaurus/module-type-aliases": "^3.9.2",
-    "@docusaurus/preset-classic": "^3.9.2",
-    "@docusaurus/tsconfig": "^3.9.2",
+    "@docusaurus/core": "^3.10.0",
+    "@docusaurus/eslint-plugin": "^3.10.0",
+    "@docusaurus/module-type-aliases": "^3.10.0",
+    "@docusaurus/preset-classic": "^3.10.0",
+    "@docusaurus/tsconfig": "^3.10.0",
     "@docusaurus/types": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
