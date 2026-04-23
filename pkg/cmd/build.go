@@ -13,6 +13,7 @@ import (
 	"github.com/kubri/kubri/integrations/apk"
 	"github.com/kubri/kubri/integrations/appinstaller"
 	"github.com/kubri/kubri/integrations/apt"
+	"github.com/kubri/kubri/integrations/arch"
 	"github.com/kubri/kubri/integrations/sparkle"
 	"github.com/kubri/kubri/integrations/yum"
 	"github.com/kubri/kubri/pkg/config"
@@ -38,6 +39,7 @@ func buildCmd() *cobra.Command {
 				{"APK", fn(apk.Build, p.Apk)},
 				{"App Installer", fn(appinstaller.Build, p.Appinstaller)},
 				{"APT", fn(apt.Build, p.Apt)},
+				{"Arch", fn(arch.Build, p.Arch)},
 				{"YUM", fn(yum.Build, p.Yum)},
 				{"Sparkle", fn(sparkle.Build, p.Sparkle)},
 			}
