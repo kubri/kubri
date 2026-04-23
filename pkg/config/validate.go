@@ -22,11 +22,15 @@ func (e *Error) Error() string {
 }
 
 func Validate(c *config) error {
-	v := validator.New(validator.WithRequiredStructEnabled(), validator.WithOmitAnonymousName())
+	v := validator.New(validator.WithRequiredStructEnabled())
 	v.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name, _, _ := strings.Cut(fld.Tag.Get("yaml"), ",")
-		if name == "-" {
-			return ""
+		// TODO: Uncomment and remove statement below when https://github.com/go-playground/validator/pull/1567 lands.
+		// if name == "-" {
+		// 	return ""
+		// }
+		if name == "-" || fld.Anonymous {
+			return "_"
 		}
 		return name
 	})
@@ -48,6 +52,8 @@ func Validate(c *config) error {
 	errs := &Error{Errors: make([]string, len(validationErrors))}
 	for i, ve := range validationErrors {
 		_, ns, _ := strings.Cut(ve.Namespace(), ".")
+		// TODO: Remove line below when https://github.com/go-playground/validator/pull/1567 lands.
+		ns = strings.ReplaceAll(ns, "._.", ".")
 		errs.Errors[i] = ns + strings.TrimPrefix(ve.Translate(trans), ve.Field())
 	}
 
