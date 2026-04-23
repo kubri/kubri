@@ -1,4 +1,13 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
+
+gomod:
+  proxy: true
+
+report_sizes: true
+
+metadata:
+  mod_timestamp: '{{ .CommitTimestamp }}'
 
 builds:
   - targets:
@@ -7,9 +16,16 @@ builds:
       - -trimpath
     env:
       - CGO_ENABLED=0
+    mod_timestamp: '{{ .CommitTimestamp }}'
 
 universal_binaries:
   - replace: false
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  disable: true
 
 archives:
   - name_template: >-
@@ -21,10 +37,11 @@ archives:
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     builds_info:
       group: root
       owner: root
+      mtime: '{{ .CommitDate }}'
     files:
       - README.md
       - LICENSE
@@ -32,7 +49,7 @@ archives:
 nfpms:
   - id: packages
     file_name_template: '{{ .ConventionalFileName }}'
-    homepage: https://github.com/kubri/kubri
+    homepage: https://kubri.dev/
     description: >-
       Kubri signs and releases software for common package managers and
       software update frameworks.
@@ -45,6 +62,7 @@ nfpms:
       - deb
       - rpm
       - archlinux
+    mtime: '{{ .CommitDate }}'
     contents:
       - src: build/linux/kubri.gpg
         dst: /usr/share/keyrings/kubri.gpg
@@ -69,17 +87,25 @@ snapcrafts:
     publish: true
     disable: true # TODO: enable
 
-brews:
+homebrew_casks:
   - repository:
       owner: kubri
       name: homebrew-tap
-    license: MIT
-    test: system "#{bin}/kubri version"
-    directory: Formula
     homepage: https://kubri.dev/
     description: >-
       Kubri signs and releases software for common package managers and
       software update frameworks.
+    license: MIT
+    conflicts:
+      - formula: kubri
+    url:
+      verified: github.com/kubri/kubri/
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/kubri"]
+          end
 
 winget:
   - name: Kubri
@@ -115,50 +141,60 @@ winget:
           name: winget-pkgs
           branch: master
 
-dockers:
-  - image_templates:
-      - kubri/kubri:v{{ .Version }}-amd64
-    dockerfile: build/docker/Dockerfile
-    goos: linux
-    goarch: amd64
-    use: buildx
-    build_flag_templates:
-      - --pull
-      - --label=org.opencontainers.image.name={{.ProjectName}}
-      - --label=org.opencontainers.image.description=Sign and release software
-      - --label=org.opencontainers.image.source={{.GitURL}}
-      - --label=org.opencontainers.image.url={{.GitURL}}
-      - --label=org.opencontainers.image.documentation=https://kubri.dev/
-      - --label=org.opencontainers.image.created={{.Date}}
-      - --label=org.opencontainers.image.revision={{.FullCommit}}
-      - --label=org.opencontainers.image.version={{.Version}}
-      - --platform=linux/amd64
-  - image_templates:
-      - kubri/kubri:v{{ .Version }}-arm64
-    goos: linux
-    goarch: arm64
-    dockerfile: build/docker/Dockerfile
-    build_flag_templates:
-      - --pull
-      - --label=org.opencontainers.image.name={{.ProjectName}}
-      - --label=org.opencontainers.image.description=Sign and release software
-      - --label=org.opencontainers.image.source={{.GitURL}}
-      - --label=org.opencontainers.image.url={{.GitURL}}
-      - --label=org.opencontainers.image.documentation=https://kubri.dev/
-      - --label=org.opencontainers.image.created={{.Date}}
-      - --label=org.opencontainers.image.revision={{.FullCommit}}
-      - --label=org.opencontainers.image.version={{.Version}}
-      - --platform=linux/arm64
+scoops:
+  - repository:
+      owner: kubri
+      name: scoop-bucket
+    directory: bucket
+    homepage: https://kubri.dev/
+    description: Distribute auto-updating software with ease
+    license: MIT
 
-docker_manifests:
-  - name_template: kubri/kubri:v{{ .Version }}
-    image_templates:
-      - kubri/kubri:v{{ .Version }}-amd64
-      - kubri/kubri:v{{ .Version }}-arm64
-  - name_template: kubri/kubri:latest
-    image_templates:
-      - kubri/kubri:v{{ .Version }}-amd64
-      - kubri/kubri:v{{ .Version }}-arm64
+dockers_v2:
+  - images:
+      - kubri/kubri
+      - ghcr.io/kubri/kubri
+    tags:
+      - 'v{{ .Version }}'
+      - '{{ if not .Prerelease }}v{{ .Major }}.{{ .Minor }}{{ end }}'
+      # - '{{ if not .Prerelease }}v{{ .Major }}{{ end }}' # TODO: enable once we hit v1
+      - '{{ if not .Prerelease }}latest{{ end }}'
+    dockerfile: build/docker/Dockerfile
+    labels:
+      org.opencontainers.image.title: '{{ .ProjectName }}'
+      org.opencontainers.image.description: Distribute auto-updating software with ease
+      org.opencontainers.image.vendor: Kubri
+      org.opencontainers.image.source: '{{ .GitURL }}'
+      org.opencontainers.image.url: '{{ .GitURL }}'
+      org.opencontainers.image.documentation: https://kubri.dev/
+      org.opencontainers.image.created: '{{ .Date }}'
+      org.opencontainers.image.revision: '{{ .FullCommit }}'
+      org.opencontainers.image.version: '{{ .Version }}'
+      org.opencontainers.image.licenses: MIT
+      org.opencontainers.image.authors: Adam Bouqdib <adam@abemedia.co.uk>
+    annotations:
+      org.opencontainers.image.description: Distribute auto-updating software with ease
+      org.opencontainers.image.source: '{{ .GitURL }}'
 
-changelog:
-  disable: true
+sboms:
+  - artifacts: archive
+
+signs:
+  - cmd: cosign
+    signature: ${artifact}.sigstore.json
+    output: '{{ not (isEnvSet "CI" )}}'
+    artifacts: checksum
+    args:
+      - sign-blob
+      - --bundle=${signature}
+      - ${artifact}
+      - --yes
+
+docker_signs:
+  - cmd: cosign
+    artifacts: manifests
+    output: '{{ not (isEnvSet "CI" )}}'
+    args:
+      - sign
+      - ${artifact}@${digest}
+      - --yes

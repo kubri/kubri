@@ -11,7 +11,7 @@ Kubri offers many installation methods. Check out the available methods below.
 ### Homebrew
 
 ```sh
-brew install kubri/tap/kubri
+brew install --cask kubri/tap/kubri
 ```
 
 ### APT
@@ -57,10 +57,27 @@ echo 'https://pkg.kubri.dev/alpine' >> /etc/apk/repositories
 apk add kubri
 ```
 
+### Pacman
+
+```sh
+curl -fsSL https://pkg.kubri.dev/arch/key.asc | sudo pacman-key --add -
+sudo pacman-key --lsign-key 2565EFDCE78841C6EDCB31E3F0BA49B29B0548B4
+echo '[kubri]
+Server = https://pkg.kubri.dev/arch/$arch' | sudo tee -a /etc/pacman.conf
+sudo pacman -Syu kubri
+```
+
 ### Winget
 
 ```sh
 winget install Kubri.Kubri
+```
+
+### Scoop
+
+```sh
+scoop bucket add kubri https://github.com/kubri/scoop-bucket
+scoop install kubri
 ```
 
 ## Docker
@@ -68,30 +85,31 @@ winget install Kubri.Kubri
 Run Kubri from docker.
 
 ```sh
-docker run --rm -v $(pwd):/app -w /app kubri/kubri:latest kubri <command>
+docker run --rm -v $(pwd):/app -w /app kubri/kubri <command>
 ```
 
 If signing releases you will also need to pass in your keys.  
-See the following example for passing in keys via an environment variable.
+See the following example for passing in keys via environment variables.
 
 ```sh
 docker run --rm -v $(pwd):/app -w /app \
-  -e KUBRI_PGP_KEY="$(cat /path/to/pgp.key)" \
-  -e KUBRI_RSA_KEY="$(cat /path/to/rsa.key)" \
-  -e KUBRI_ED25519_KEY="$(cat /path/to/ed25519.key)" \
-  -e KUBRI_DSA_KEY="$(cat /path/to/dsa.key)" \
-  kubri/kubri:latest kubri build
+  -e KUBRI_PGP_KEY \
+  -e KUBRI_RSA_KEY \
+  -e KUBRI_ED25519_KEY \
+  -e KUBRI_DSA_KEY \
+  kubri/kubri build
 ```
 
-Alternatively you can also use a volume to persist the keys.
+Alternatively, mount the key files and reference them by path.
 
 ```sh
-# import keys
-docker run --rm -v $(pwd):/app -w /app -v ~/.config/kubri -v path/to/pgp.key:/pgp.key kubri/kubri:latest kubri keys import pgp /pgp.key
-docker run --rm -v $(pwd):/app -w /app -v ~/.config/kubri -v path/to/rsa.key:/rsa.key kubri/kubri:latest kubri keys import rsa /rsa.key
-
-# build
-docker run --rm -v $(pwd):/app -v ~/.config/kubri -w /app kubri/kubri:latest kubri build
+docker run --rm -v $(pwd):/app -w /app \
+  -v /path/to/keys:/keys:ro \
+  -e KUBRI_PGP_KEY_PATH=/keys/pgp.key \
+  -e KUBRI_RSA_KEY_PATH=/keys/rsa.key \
+  -e KUBRI_ED25519_KEY_PATH=/keys/ed25519.key \
+  -e KUBRI_DSA_KEY_PATH=/keys/dsa.key \
+  kubri/kubri build
 ```
 
 ## Binary

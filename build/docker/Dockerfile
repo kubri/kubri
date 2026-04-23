@@ -1,5 +1,9 @@
-FROM alpine:latest
+FROM gcr.io/distroless/static:latest
 
-COPY kubri /usr/bin/
+ARG TARGETPLATFORM
 
-CMD ["kubri"]
+COPY $TARGETPLATFORM/kubri /usr/bin/
+
+ENV KUBRI_PATH=/kubri
+
+ENTRYPOINT ["kubri"]
