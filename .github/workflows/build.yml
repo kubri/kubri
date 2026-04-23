@@ -66,7 +66,6 @@ jobs:
             kubri
             homebrew-tap
             scoop-bucket
-            winget-pkgs
 
       - uses: goreleaser/goreleaser-action@v7
         with:
@@ -74,4 +73,5 @@ jobs:
           args: release
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
