@@ -134,6 +134,7 @@ winget:
       owner: kubri
       name: winget-pkgs
       branch: kubri-{{.Version}}
+      token: '{{ .Env.PERSONAL_ACCESS_TOKEN }}'
       pull_request:
         enabled: true
         base:
