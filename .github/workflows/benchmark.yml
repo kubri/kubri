@@ -21,10 +21,10 @@ jobs:
     name: Changed packages
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix || '{}' }}
+      packages: ${{ steps.packages.outputs.packages }}
     steps:
       - name: Find packages with changes
-        id: packages
+        id: changed
         uses: tj-actions/changed-files@v47
         with:
           files: '**.go'
@@ -35,9 +35,9 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Filter packages with benchmarks
-        id: set-matrix
+        id: packages
         run: |
-          PACKAGES=${{ steps.packages.outputs.all_changed_and_modified_files }}
+          PACKAGES=${{ steps.changed.outputs.all_changed_and_modified_files }}
           filtered=()
           for pkg in $(echo "$PACKAGES" | jq -r '.[]'); do
             if grep -Rq "func Benchmark" ./$pkg; then
@@ -45,14 +45,16 @@ jobs:
             fi
           done
 
-          echo "matrix={\"package\": $(IFS=,; echo "[${filtered[*]}]")}" >> $GITHUB_OUTPUT
+          echo "packages=$(IFS=,; echo "[${filtered[*]}]")" >> $GITHUB_OUTPUT
 
   benchmark:
+    if: needs.packages.outputs.packages != '[]'
     name: ${{ matrix.package }}
     needs: packages
     runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJSON(needs.packages.outputs.matrix) }}
+      matrix:
+        package: ${{ fromJSON(needs.packages.outputs.packages) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
