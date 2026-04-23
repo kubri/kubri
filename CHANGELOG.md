@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.2](https://github.com/kubri/kubri/compare/v0.7.1...v0.7.2) (2026-04-23)
+
+
+### Bug Fixes
+
+* **apk:** close reader after loading index ([#900](https://github.com/kubri/kubri/issues/900)) ([5224ff5](https://github.com/kubri/kubri/commit/5224ff5764fdd47172c037f90f59a1f93b698776))
+* **arch:** include arch integration in build command ([#899](https://github.com/kubri/kubri/issues/899)) ([f7feea5](https://github.com/kubri/kubri/commit/f7feea56eb239e97a626d11931378396759b4cb3))
+
 ## [0.7.1](https://github.com/kubri/kubri/compare/v0.7.0...v0.7.1) (2026-01-17)
 
 
