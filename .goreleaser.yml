@@ -96,8 +96,6 @@ homebrew_casks:
       Kubri signs and releases software for common package managers and
       software update frameworks.
     license: MIT
-    conflicts:
-      - formula: kubri
     url:
       verified: github.com/kubri/kubri/
     hooks:
