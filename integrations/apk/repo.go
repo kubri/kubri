@@ -44,6 +44,7 @@ func openRepo(ctx context.Context, t target.Target) (*repo, error) {
 			return nil, err
 		}
 		index, err := repository.IndexFromArchive(r)
+		_ = r.Close()
 		if err != nil {
 			return nil, err
 		}
