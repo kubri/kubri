@@ -141,8 +141,8 @@ func newFieldDecoder(typ reflect.Type) (fieldDecoder, error) {
 	}
 
 	switch typ.Kind() {
-	case reflect.Ptr:
-		return newPtrDecoder(typ)
+	case reflect.Pointer:
+		return newPointerDecoder(typ)
 	case reflect.Slice:
 		return newSliceDecoder(typ)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -183,7 +183,7 @@ func newUnmarshalerDecoder(typ reflect.Type) (fieldDecoder, error) {
 	}, nil
 }
 
-func newPtrDecoder(typ reflect.Type) (fieldDecoder, error) {
+func newPointerDecoder(typ reflect.Type) (fieldDecoder, error) {
 	typ = typ.Elem()
 	dec, err := newFieldDecoder(typ)
 	if err != nil {

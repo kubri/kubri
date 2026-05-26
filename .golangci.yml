@@ -16,8 +16,9 @@ linters:
     - errorlint # TODO: turn on and fix
     - exhaustive
     - exhaustruct
+    - goconst
     - godox
-    - gomoddirectives # TODO: remove when go-rpm is updated.
+    - gomodguard # deprecated
     - mnd
     - musttag
     - nlreturn
@@ -31,13 +32,12 @@ linters:
     - wsl
     - wsl_v5
   settings:
-    gomodguard:
+    gomodguard_v2:
       blocked:
-        modules:
-          - encoding/json:
-              recommendations: [github.com/goccy/go-json]
-          - github.com/pkg/errors:
-              recommendations: [errors]
+        - module: encoding/json
+          recommendations: [github.com/goccy/go-json]
+        - module: github.com/pkg/errors
+          recommendations: [errors]
     gosec:
       excludes:
         - G104
@@ -81,7 +81,6 @@ linters:
           - errcheck
           - funlen
           - gocognit
-          - goconst
           - gosec
           - lll
           - maintidx

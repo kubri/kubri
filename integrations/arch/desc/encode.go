@@ -145,8 +145,8 @@ func newFieldEncoder(typ reflect.Type) (encoder, error) {
 	}
 
 	switch typ.Kind() {
-	case reflect.Ptr:
-		return newPtrEncoder(typ)
+	case reflect.Pointer:
+		return newPointerEncoder(typ)
 	case reflect.Slice:
 		return newSliceEncoder(typ)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -198,7 +198,7 @@ func newMarshalerEncoder(typ reflect.Type) (encoder, error) {
 	}, nil
 }
 
-func newPtrEncoder(typ reflect.Type) (encoder, error) {
+func newPointerEncoder(typ reflect.Type) (encoder, error) {
 	typ = typ.Elem()
 	enc, err := newFieldEncoder(typ)
 	if err != nil {
