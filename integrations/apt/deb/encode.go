@@ -70,8 +70,8 @@ func newEncoder(typ reflect.Type) (encoder, error) {
 	}
 
 	switch typ.Kind() {
-	case reflect.Ptr:
-		return newPtrEncoder(typ)
+	case reflect.Pointer:
+		return newPointerEncoder(typ)
 	case reflect.Slice:
 		return newSliceEncoder(typ)
 	case reflect.Struct:
@@ -123,7 +123,7 @@ func newMarshalerEncoder(typ reflect.Type) (encoder, error) {
 	}, nil
 }
 
-func newPtrEncoder(typ reflect.Type) (encoder, error) {
+func newPointerEncoder(typ reflect.Type) (encoder, error) {
 	typ = typ.Elem()
 	enc, err := newEncoder(typ)
 	if err != nil {

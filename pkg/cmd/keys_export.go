@@ -22,7 +22,7 @@ func keysExportCmd() *cobra.Command {
 			}
 
 			// Convert ed25519 key to PEM format for better compatibility.
-			if args[0] == "ed25519" { //nolint:goconst,nolintlint
+			if args[0] == "ed25519" {
 				key, err := ed25519.UnmarshalPrivateKey(out)
 				if err != nil {
 					return err
