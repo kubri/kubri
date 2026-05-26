@@ -64,15 +64,24 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Run benchmark
-        run: |
-          go test -run ^$ -bench=. -count=${{ env.BENCH_COUNT }} -benchmem ./${{ matrix.package }} | tee after
+      - name: Compile head benchmark
+        run: go test -c -o /tmp/head.test ./${{ matrix.package }}
 
-      - name: Run benchmark for base code
+      - name: Compile base benchmark
         run: |
           git fetch --quiet origin master ${{ github.event.pull_request.base.sha }}
           git reset --quiet --hard ${{ github.event.pull_request.base.sha }}
-          go test -run ^$ -bench=. -count=${{ env.BENCH_COUNT }} -benchmem ./${{ matrix.package }} | tee before
+          go test -c -o /tmp/base.test ./${{ matrix.package }}
+
+      - name: Run benchmarks interleaved
+        run: |
+          cd ${{ matrix.package }}
+          : > "$GITHUB_WORKSPACE/after"
+          : > "$GITHUB_WORKSPACE/before"
+          for i in $(seq 1 ${{ env.BENCH_COUNT }}); do
+            /tmp/head.test -test.run=^$ -test.bench=. -test.benchmem -test.count=1 | tee -a "$GITHUB_WORKSPACE/after"
+            /tmp/base.test -test.run=^$ -test.bench=. -test.benchmem -test.count=1 | tee -a "$GITHUB_WORKSPACE/before"
+          done
 
       - name: Compare benchmarks
         id: bench
