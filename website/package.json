@@ -17,8 +17,8 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
