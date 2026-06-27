@@ -69,6 +69,22 @@ func (t *blobTarget) URL(ctx context.Context, filename string) (string, error) {
 	return url, nil
 }
 
+func (t *blobTarget) ReadDir(ctx context.Context, root string) ([]fs.DirEntry, error) {
+	it := t.bucket.List(&blob.ListOptions{Prefix: path.Join(t.prefix, root), Delimiter: "/"})
+	var res []fs.DirEntry
+	for {
+		obj, err := it.Next(ctx)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, mapError("readDir", root, err)
+		}
+		res = append(res, &blobDirEntry{obj})
+	}
+	return res, nil
+}
+
 func mapError(op, name string, err error) error {
 	switch gcerrors.Code(err) {
 	case gcerrors.OK:
