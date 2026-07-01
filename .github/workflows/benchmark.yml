@@ -32,7 +32,7 @@ jobs:
           json: true
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Filter packages with benchmarks
         id: packages
@@ -57,7 +57,7 @@ jobs:
         package: ${{ fromJSON(needs.packages.outputs.packages) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Go
         uses: actions/setup-go@v6
