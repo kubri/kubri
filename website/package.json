@@ -21,7 +21,7 @@
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.16",
+    "@biomejs/biome": "^2.5.1",
     "@docusaurus/core": "^3.10.1",
     "@docusaurus/module-type-aliases": "^3.10.1",
     "@docusaurus/preset-classic": "^3.10.1",
