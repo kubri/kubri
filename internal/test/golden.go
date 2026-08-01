@@ -47,8 +47,7 @@ func Golden(t *testing.T, golden, result string, filter ...PathFilter) {
 			t.Fatal("failed to remove golden files:", err)
 		}
 
-		from := os.DirFS(result)
-		err := fs.WalkDir(from, ".", func(path string, d fs.DirEntry, err error) error {
+		err := fs.WalkDir(os.DirFS(result), ".", func(path string, d fs.DirEntry, err error) error {
 			if err != nil || d.IsDir() {
 				return err
 			}
@@ -80,8 +79,7 @@ func GoldenFile(t *testing.T, file string, data []byte) {
 		return
 	}
 
-	err := os.WriteFile(file, data, 0o600)
-	if err != nil {
+	if err := os.WriteFile(file, data, 0o600); err != nil {
 		t.Fatal("failed to write golden file:", err)
 	}
 }
