@@ -21,7 +21,7 @@ require (
 	github.com/goreleaser/nfpm/v2 v2.46.3
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/invopop/jsonschema v0.14.0
-	github.com/johannesboyne/gofakes3 v0.0.0-20260208201424-4c385a1f6a73
+	github.com/johannesboyne/gofakes3 v1.2.0
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.18.7
 	github.com/moby/moby/api v1.54.2
