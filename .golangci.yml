@@ -16,6 +16,7 @@ linters:
     - errorlint # TODO: turn on and fix
     - exhaustive
     - exhaustruct
+    - exhaustruct_v5
     - goconst
     - godox
     - gomodguard # deprecated
@@ -107,6 +108,9 @@ formatters:
         - pattern: interface{}
           replacement: any
     gofumpt:
-      extra-rules: true
+      extra:
+        group-params: true
+        clothe-returns: true
+        balance-calls: true
     goimports:
       local-prefixes: [github.com/kubri/kubri]
