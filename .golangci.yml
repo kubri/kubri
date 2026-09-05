@@ -107,7 +107,7 @@ formatters:
       rewrite-rules:
         - pattern: interface{}
           replacement: any
-    gofumpt
+    gofumpt:
       extra:
         group-params: true
         clothe-returns: true
