@@ -30,7 +30,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/testcontainers/testcontainers-go v0.43.0
-	github.com/ulikunitz/xz v0.5.15
+	github.com/ulikunitz/xz v0.5.16
 	gitlab.alpinelinux.org/alpine/go v0.10.1
 	gitlab.com/gitlab-org/api/client-go v1.46.0
 	gocloud.dev v0.45.0
