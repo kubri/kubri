@@ -89,7 +89,7 @@ linters:
       - linters: [govet]
         text: 'shadow: declaration of "err" shadows declaration'
       - linters: [staticcheck]
-        text: 'SA1019: "crypto/dsa" has been deprecated'
+        text: 'SA1019: crypto/dsa has been deprecated'
       - linters: [lll]
         source: ^\s*//
       - linters: [revive]
