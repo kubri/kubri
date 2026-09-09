@@ -7,9 +7,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"gitlab.alpinelinux.org/alpine/go/repository"
-
 	"github.com/google/go-cmp/cmp"
+	"gitlab.alpinelinux.org/alpine/go/repository"
 
 	"github.com/kubri/kubri/integrations/apk"
 	"github.com/kubri/kubri/internal/test"
