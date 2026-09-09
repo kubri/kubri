@@ -56,7 +56,7 @@ func TestGithub(t *testing.T) {
 	}
 
 	_, _, err = client.Repositories.CreateFile(t.Context(), owner, repo, "test", &gh.RepositoryContentFileOptions{
-		Message: gh.Ptr("test"),
+		Message: new("test"),
 		Content: []byte("test"),
 	})
 	if err != nil {
@@ -65,8 +65,8 @@ func TestGithub(t *testing.T) {
 
 	for _, r := range test.SourceWant() {
 		_, _, err = client.Repositories.CreateRelease(t.Context(), owner, repo, &gh.RepositoryRelease{
-			TagName: gh.Ptr(r.Version),
-			Body:    gh.Ptr(r.Description),
+			TagName: new(r.Version),
+			Body:    new(r.Description),
 		})
 		if err != nil {
 			t.Fatal(err)

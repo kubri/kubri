@@ -47,9 +47,9 @@ func TestGitlab(t *testing.T) {
 	})
 
 	_, _, err = client.RepositoryFiles.CreateFile(pid, "test", &gl.CreateFileOptions{
-		Branch:        gl.Ptr("main"),
-		CommitMessage: gl.Ptr("test"),
-		Content:       gl.Ptr("test"),
+		Branch:        new("main"),
+		CommitMessage: new("test"),
+		Content:       new("test"),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -57,9 +57,9 @@ func TestGitlab(t *testing.T) {
 
 	for _, r := range test.SourceWant() {
 		_, _, err = client.Releases.CreateRelease(pid, &gl.CreateReleaseOptions{
-			Description: gl.Ptr(r.Description),
-			Ref:         gl.Ptr("main"),
-			TagName:     gl.Ptr(r.Version),
+			Description: new(r.Description),
+			Ref:         new("main"),
+			TagName:     new(r.Version),
 		})
 		if err != nil {
 			t.Fatal(err)

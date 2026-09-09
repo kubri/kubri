@@ -98,7 +98,7 @@ func (t *githubTarget) Remove(ctx context.Context, filename string) error {
 		return err
 	}
 	_, _, err = t.client.DeleteFile(ctx, t.owner, t.repo, path, &github.RepositoryContentFileOptions{
-		Message: github.Ptr("Delete " + path),
+		Message: new("Delete " + path),
 		Branch:  &t.branch,
 		SHA:     file.SHA,
 	})
@@ -136,7 +136,7 @@ func (w *fileWriter) Close() error {
 	}
 
 	if res.StatusCode == http.StatusNotFound {
-		opt.Message = github.Ptr("Create " + w.path)
+		opt.Message = new("Create " + w.path)
 		_, _, err = w.t.client.CreateFile(w.ctx, w.t.owner, w.t.repo, w.path, opt)
 
 		// Retry if writing failed due to race condition.
@@ -147,7 +147,7 @@ func (w *fileWriter) Close() error {
 		// 	return w.Close()
 		// }
 	} else {
-		opt.Message = github.Ptr("Update " + w.path)
+		opt.Message = new("Update " + w.path)
 		opt.SHA = file.SHA
 		_, _, err = w.t.client.UpdateFile(w.ctx, w.t.owner, w.t.repo, w.path, opt)
 	}
