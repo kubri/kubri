@@ -49,14 +49,19 @@ jobs:
           dir_names_max_depth: 2
           json: true
 
-      - name: Set output
+      - name: Set matrix
         id: set-matrix
         run: |
+          RUNNER=$(yq -o=json '.github/acceptance.yml')
+
           if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ steps.deps.outputs.any_changed }}" == "true" ]]; then
-            echo "packages=$(find integrations -mindepth 1 -maxdepth 1 -type d | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+            PACKAGES=$(find integrations -mindepth 1 -maxdepth 1 -type d | jq -R -s -c 'split("\n")[:-1]')
           else
-            echo "packages=${{ steps.packages.outputs.all_changed_and_modified_files }}" >> $GITHUB_OUTPUT
+            PACKAGES='${{ steps.packages.outputs.all_changed_and_modified_files }}'
           fi
+
+          MATRIX=$(echo "$PACKAGES" | jq -c --argjson os "$RUNNER" '[.[] | {package: ., os: ($os[.] // "ubuntu-latest")}]')
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
   test:
     name: ${{ matrix.package }}

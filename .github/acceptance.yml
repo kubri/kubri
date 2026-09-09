@@ -1,0 +1,2 @@
+# Mappings of what acceptance tests to run on what platforms.
+integrations/appinstaller: windows-latest
