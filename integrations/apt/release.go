@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -91,9 +90,10 @@ func releaseSuite(key *pgp.PrivateKey, algos CompressionAlgo, p []*Package, suit
 			return err
 		}
 
-		r.MD5Sum += fmt.Sprintf("\n%x %d %s", md5.Sum(b), len(b), path)
-		r.SHA1 += fmt.Sprintf("\n%x %d %s", sha1.Sum(b), len(b), path)
-		r.SHA256 += fmt.Sprintf("\n%x %d %s", sha256.Sum256(b), len(b), path)
+		// TODO: Do we want this? What is perf impact vs benefit?
+		r.MD5Sum = append(r.MD5Sum, ChecksumFile[[16]byte]{md5.Sum(b), len(b), path})
+		r.SHA1 = append(r.SHA1, ChecksumFile[[20]byte]{sha1.Sum(b), len(b), path})
+		r.SHA256 = append(r.SHA256, ChecksumFile[[32]byte]{sha256.Sum256(b), len(b), path})
 
 		return nil
 	})
