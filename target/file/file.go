@@ -4,6 +4,7 @@ package file
 import (
 	"context"
 	"io"
+	"io/fs"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -60,4 +61,8 @@ func (t *fileTarget) Sub(dir string) target.Target {
 
 func (t *fileTarget) URL(_ context.Context, filename string) (string, error) {
 	return url.JoinPath(t.url, filename)
+}
+
+func (t *fileTarget) ReadDir(_ context.Context, path string) ([]fs.DirEntry, error) {
+	return os.ReadDir(filepath.Join(t.path, path))
 }
