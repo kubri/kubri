@@ -23,7 +23,7 @@ require (
 	github.com/invopop/jsonschema v0.14.0
 	github.com/johannesboyne/gofakes3 v1.2.0
 	github.com/joho/godotenv v1.5.1
-	github.com/klauspost/compress v1.18.7
+	github.com/klauspost/compress v1.20.0
 	github.com/moby/moby/api v1.54.2
 	github.com/pb33f/ordered-map/v2 v2.3.1
 	github.com/pierrec/lz4 v2.6.1+incompatible
