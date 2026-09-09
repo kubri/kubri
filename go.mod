@@ -36,7 +36,7 @@ require (
 	gocloud.dev v0.46.0
 	golang.org/x/mod v0.41.0
 	golang.org/x/oauth2 v0.37.0
-	golang.org/x/sync v0.22.0
+	golang.org/x/sync v0.23.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
