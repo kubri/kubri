@@ -10,13 +10,25 @@ metadata:
   mod_timestamp: '{{ .CommitTimestamp }}'
 
 builds:
-  - targets:
-      - go_first_class
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - '386'
+      - amd64
+      - arm
+      - arm64
+      - loong64
+      # - ppc64le # enable once https://github.com/goreleaser/nfpm/pull/1138 lands
+      - riscv64
+    goarm:
+      - '7'
+    mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - -trimpath
-    env:
-      - CGO_ENABLED=0
-    mod_timestamp: '{{ .CommitTimestamp }}'
 
 universal_binaries:
   - replace: false
