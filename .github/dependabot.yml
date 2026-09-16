@@ -9,6 +9,10 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    groups:
+      github-actions:
+        patterns:
+          - '*'
 
   - package-ecosystem: npm
     directory: website
@@ -18,10 +22,6 @@ updates:
       - dependency-type: direct
       - dependency-name: caniuse-lite
     groups:
-      docusaurus:
+      npm:
         patterns:
-          - '@docusaurus/*'
-      react:
-        patterns:
-          - react
-          - react-dom
+          - '*'
