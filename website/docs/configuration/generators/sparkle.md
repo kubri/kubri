@@ -113,7 +113,7 @@ Setting `os` to `windows` will also apply the parameters to `windows-arm64`, `wi
 
 - Type: `string`
 
-A version constraint to limit what what releases these parameters should be applied to.  
+A version constraint to limit what what releases these parameters should be applied to.\
 See [Version Constraints](../../guides/version-constrains.md) for more information.
 
 ### `params[*].installer-arguments`
