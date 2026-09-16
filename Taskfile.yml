@@ -27,6 +27,8 @@ tasks:
     cmds:
       - command -v gotestsum || go install gotest.tools/gotestsum@latest
       - command -v stagelint || brew install abemedia/tap/stagelint
+      - command -v goreleaser || brew install goreleaser
+      - command -v dprint || brew install dprint
       - stagelint init -- --stash untracked
 
   mod:

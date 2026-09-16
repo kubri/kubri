@@ -1,3 +1,7 @@
 '*.go':
   command: golangci-lint run --fix --fast-only
   pass_filenames: false
+
+.goreleaser.yml: goreleaser check
+
+'*': dprint fmt --allow-no-files

@@ -50,7 +50,6 @@ func buildCmd() *cobra.Command {
 
 			for _, integration := range integrations {
 				if integration.fn != nil {
-					integration := integration
 					n++
 					g.Go(func() error {
 						log.Print("Publishing " + integration.name + " packages...")

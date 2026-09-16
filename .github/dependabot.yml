@@ -20,8 +20,8 @@ updates:
     groups:
       docusaurus:
         patterns:
-        - "@docusaurus/*"
+          - '@docusaurus/*'
       react:
         patterns:
-        - react
-        - react-dom
+          - react
+          - react-dom

@@ -26,7 +26,7 @@ It runs on Windows, Mac & Linux with zero dependencies.
 
 ## Usage
 
-Your release process is configured through a YAML file called `.kubri.yml`.  
+Your release process is configured through a YAML file called `.kubri.yml`.\
 Once you've set it up you can publish your new releases anytime by running the command
 `kubri build`.
 

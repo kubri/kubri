@@ -88,7 +88,7 @@ Run Kubri from docker.
 docker run --rm -v $(pwd):/app -w /app kubri/kubri <command>
 ```
 
-If signing releases you will also need to pass in your keys.  
+If signing releases you will also need to pass in your keys.\
 See the following example for passing in keys via environment variables.
 
 ```sh
