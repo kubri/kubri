@@ -48,6 +48,7 @@ func openRepo(ctx context.Context, t target.Target, repoName string, pgpKey *pgp
 		"x86_64", "any",
 		"aarch64", "armv7h", // https://archlinuxarm.org/packages
 		"powerpc64le", "powerpc64", "powerpc", "riscv64", // https://archlinuxpower.org/
+		"loong64",          // https://loongarchlinux.org/packages
 		"i686", "pentium4", // https://archlinux32.org/architecture/
 	}
 
