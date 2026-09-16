@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.8.0](https://github.com/kubri/kubri/compare/v0.7.2...v0.8.0) (2026-09-16)
+
+
+### Features
+
+* build for windows arm64, loong64 and riscv64 ([#990](https://github.com/kubri/kubri/issues/990)) ([1143d98](https://github.com/kubri/kubri/commit/1143d989b773eab1951e0cdc45daaa4e0ef27592))
+
+
+### Bug Fixes
+
+* **arch:** read back loong64 repositories ([#991](https://github.com/kubri/kubri/issues/991)) ([89beb25](https://github.com/kubri/kubri/commit/89beb250b9679e80972c9e41787797edd6c98826))
+
 ## [0.7.2](https://github.com/kubri/kubri/compare/v0.7.1...v0.7.2) (2026-04-23)
 
 
