@@ -19,6 +19,7 @@ jobs:
       contents: write
       packages: write
       id-token: write
+      attestations: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -32,7 +33,7 @@ jobs:
         run: sudo snap install snapcraft --classic
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@v4.1.2
 
       - name: Install Syft
         uses: anchore/sbom-action/download-syft@v0
@@ -75,3 +76,13 @@ jobs:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
+
+      - name: Attest build provenance
+        uses: actions/attest@v4
+        with:
+          subject-checksums: ./dist/checksums.txt
+
+      - name: Attest Docker images
+        uses: actions/attest@v4
+        with:
+          subject-checksums: ./dist/digests.txt
