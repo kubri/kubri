@@ -3,16 +3,8 @@ name: CodeQL
 on:
   push:
     branches: [master]
-    paths:
-      - '**.go'
-      - go.mod
-      - go.sum
   pull_request:
     branches: [master]
-    paths:
-      - '**.go'
-      - go.mod
-      - go.sum
   schedule:
     - cron: '25 9 * * 4'
 
@@ -29,15 +21,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Detect changes
+        id: changes
+        if: github.event_name != 'schedule'
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **.go
+            go.mod
+            go.sum
+
       - name: Setup Go
+        if: github.event_name == 'schedule' || steps.changes.outputs.any_changed == 'true'
         uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
 
       - name: Initialize CodeQL
+        if: github.event_name == 'schedule' || steps.changes.outputs.any_changed == 'true'
         uses: github/codeql-action/init@v4
         with:
           languages: go
 
       - name: Perform CodeQL Analysis
+        if: github.event_name == 'schedule' || steps.changes.outputs.any_changed == 'true'
         uses: github/codeql-action/analyze@v4

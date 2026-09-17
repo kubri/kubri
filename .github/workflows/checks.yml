@@ -1,18 +1,10 @@
-name: Test
+name: Checks
 
 on:
   push:
     branches: [master]
-    paths:
-      - '**.go'
-      - go.mod
-      - go.sum
   pull_request:
     branches: [master]
-    paths:
-      - '**.go'
-      - go.mod
-      - go.sum
   workflow_call:
     secrets:
       GH_TOKEN:
@@ -79,3 +71,24 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: latest
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check formatting
+        uses: dprint/check@v2
+        with:
+          cache: true
+
+  checks:
+    name: Checks
+    needs: [test, lint, format]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1

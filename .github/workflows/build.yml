@@ -5,15 +5,16 @@ on:
     tags: [v*]
 
 jobs:
-  test:
-    uses: ./.github/workflows/test.yml
+  checks:
+    name: Checks
+    uses: ./.github/workflows/checks.yml
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
 
   build:
     name: Build
-    needs: test
+    needs: checks
     runs-on: ubuntu-latest
     permissions:
       contents: write

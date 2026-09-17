@@ -3,16 +3,8 @@ name: Acceptance Test
 on:
   push:
     branches: [master]
-    paths:
-      - '**.go'
-      - go.mod
-      - go.sum
   pull_request:
     branches: [master]
-    paths:
-      - '**.go'
-      - go.mod
-      - go.sum
   workflow_dispatch:
 
 permissions:
@@ -88,6 +80,8 @@ jobs:
   acceptance:
     name: Acceptance Test
     needs: test
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: exit 0
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+        run: exit 1
