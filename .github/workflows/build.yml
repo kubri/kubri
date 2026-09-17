@@ -87,3 +87,11 @@ jobs:
         uses: actions/attest@v4
         with:
           subject-checksums: ./dist/digests.txt
+
+      - uses: kubri/kubri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          KUBRI_PGP_KEY: ${{ secrets.KUBRI_PGP_KEY }}
+          KUBRI_RSA_KEY: ${{ secrets.KUBRI_RSA_KEY }}
