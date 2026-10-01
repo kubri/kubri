@@ -13,7 +13,7 @@ require (
 	github.com/dsnet/compress v0.0.1
 	github.com/fullstorydev/emulators/storage v1.0.0
 	github.com/go-playground/locales v0.14.2
-	github.com/go-playground/universal-translator v0.18.1
+	github.com/go-playground/universal-translator v0.18.2
 	github.com/go-playground/validator/v10 v10.30.4
 	github.com/go-xmlfmt/xmlfmt v1.1.3
 	github.com/google/go-cmp v0.7.0
