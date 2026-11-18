@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/kubri/kubri/compare/v0.8.0...v0.8.1) (2026-11-18)
+
+
+### Bug Fixes
+
+* **yum:** exclude rpmlib requires from primary metadata ([#1039](https://github.com/kubri/kubri/issues/1039)) ([77e3969](https://github.com/kubri/kubri/commit/77e3969a52f99bf54781e1791ae9ae644fafe5f3))
+
 ## [0.8.0](https://github.com/kubri/kubri/compare/v0.7.2...v0.8.0) (2026-09-16)
 
 
