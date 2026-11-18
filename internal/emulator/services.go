@@ -18,7 +18,7 @@ func AzureBlob(t *testing.T, bucket string) string {
 	c := runContainer(t, testcontainers.ContainerRequest{
 		Image:        "mcr.microsoft.com/azure-storage/azurite:latest",
 		ExposedPorts: []string{"10000"},
-		Cmd:          []string{"azurite-blob", "--blobHost", "0.0.0.0"},
+		Cmd:          []string{"azurite-blob", "--blobHost", "0.0.0.0", "--skipApiVersionCheck"},
 		WaitingFor:   wait.ForListeningPort("10000"),
 	})
 	host, err := c.PortEndpoint(t.Context(), "10000", "")
@@ -31,6 +31,7 @@ func AzureBlob(t *testing.T, bucket string) string {
 		"Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==")
 	t.Setenv("AZURE_STORAGE_DOMAIN", host)
 	t.Setenv("AZURE_STORAGE_PROTOCOL", "http")
+	t.Setenv("AZURE_STORAGE_IS_LOCAL_EMULATOR", "true")
 
 	u := azureblob.ServiceURL("http://" + host + "/devstoreaccount1")
 	client, err := azureblob.NewDefaultClient(u, azureblob.ContainerName(bucket))
