@@ -11,6 +11,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -125,7 +126,7 @@ func (r *repo) Add(b []byte) error {
 			HeaderRange: HeaderRange{Start: start, End: end},
 			Provides:    getEntries(h.Provides()),
 			Obsoletes:   getEntries(h.Obsoletes()),
-			Requires:    getEntries(h.Requires()),
+			Requires:    getEntries(slices.DeleteFunc(h.Requires(), isRPMLib)),
 			Conflicts:   getEntries(h.Conflicts()),
 			Files:       filterPackageFiles(files),
 		},
@@ -283,6 +284,10 @@ func getEntries(d []rpm.Dependency) *Entries {
 	}
 
 	return &Entries{entries}
+}
+
+func isRPMLib(d rpm.Dependency) bool {
+	return strings.HasPrefix(d.Name(), "rpmlib(")
 }
 
 func getChecksum(b []byte) Checksum {
