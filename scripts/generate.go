@@ -24,36 +24,32 @@ var (
 	formats  = []string{"deb", "rpm", "apk", "archlinux"}
 
 	config = nfpm.Config{
-		Info: nfpm.Info{
-			MTime:       time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC),
-			Name:        "kubri-test",
-			Platform:    "linux",
-			Section:     "utils",
-			Priority:    "optional",
-			Maintainer:  "Test User <test@example.com>",
-			Description: "This is a test.\nIt does nothing.\n\nAbsolutely nothing.",
-			Vendor:      "Test Company",
-			Homepage:    "http://example.com",
-			License:     "MIT",
-			Overridables: nfpm.Overridables{
-				Replaces:   []string{"kubri-test-old"},
-				Provides:   []string{"kubri-test-alt"},
-				Depends:    []string{"bash"},
-				Recommends: []string{"git"},
-				Suggests:   []string{"wget"},
-				Conflicts:  []string{"kubri-test-new"},
-				Contents: files.Contents{
-					{
-						Source:      "./kubri-test",
-						Destination: "/usr/bin/kubri-test",
-					},
-				},
-				Deb: nfpm.Deb{Compression: "xz"},
-				RPM: nfpm.RPM{Group: "default"},
-				ArchLinux: nfpm.ArchLinux{
-					Packager: "Kubri <info@kubri.dev>",
-				},
+		MTime:       time.Date(2023, 11, 19, 23, 37, 12, 0, time.UTC),
+		Name:        "kubri-test",
+		Platform:    "linux",
+		Section:     "utils",
+		Priority:    "optional",
+		Maintainer:  "Test User <test@example.com>",
+		Description: "This is a test.\nIt does nothing.\n\nAbsolutely nothing.",
+		Vendor:      "Test Company",
+		Homepage:    "http://example.com",
+		License:     "MIT",
+		Replaces:    []string{"kubri-test-old"},
+		Provides:    []string{"kubri-test-alt"},
+		Depends:     []string{"bash"},
+		Recommends:  []string{"git"},
+		Suggests:    []string{"wget"},
+		Conflicts:   []string{"kubri-test-new"},
+		Contents: files.Contents{
+			{
+				Source:      "./kubri-test",
+				Destination: "/usr/bin/kubri-test",
 			},
+		},
+		Deb: nfpm.Deb{Compression: "xz"},
+		RPM: nfpm.RPM{Group: "default"},
+		ArchLinux: nfpm.ArchLinux{
+			Packager: "Kubri <info@kubri.dev>",
 		},
 	}
 )

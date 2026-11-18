@@ -91,10 +91,10 @@ func UnmarshalPrivateKey(b []byte) (*PrivateKey, error) {
 	}
 
 	return &dsa.PrivateKey{
-		PublicKey: dsa.PublicKey{
-			Parameters: dsa.Parameters{P: k.P, Q: k.Q, G: k.G},
-			Y:          k.Y,
-		},
+		P: k.P,
+		Q: k.Q,
+		G: k.G,
+		Y: k.Y,
 		X: k.X,
 	}, nil
 }
