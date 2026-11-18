@@ -90,8 +90,12 @@ func (r *repo) Write(rsaKey *rsa.PrivateKey, publicKeyName string) error {
 			}
 		}
 
-		path := filepath.Join(r.dir, arch, "APKINDEX.tar.gz")
-		f, err := os.Create(path)
+		dirname := filepath.Join(r.dir, arch)
+		if err = os.MkdirAll(dirname, fs.ModePerm); err != nil {
+			return err
+		}
+
+		f, err := os.Create(filepath.Join(dirname, "APKINDEX.tar.gz"))
 		if err != nil {
 			return err
 		}
