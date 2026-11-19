@@ -152,6 +152,27 @@ func TestSparkle(t *testing.T) {
 			},
 		},
 		{
+			desc: "validation",
+			in: `
+				source:
+					type: file
+					path: ` + dir + `
+				target:
+					type: file
+					path: ` + dir + `
+				sparkle:
+					folder: '*'
+					params:
+						- version: invalid
+			`,
+			err: &config.Error{
+				Errors: []string{
+					"sparkle.folder must be a valid folder name",
+					"sparkle.params[0].version must be a valid version constraint",
+				},
+			},
+		},
+		{
 			desc: "invalid dsa key",
 			in: `
 				source:

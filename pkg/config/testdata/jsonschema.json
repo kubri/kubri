@@ -400,7 +400,8 @@
                   "macos",
                   "windows",
                   "windows-x86",
-                  "windows-x64"
+                  "windows-x64",
+                  "windows-arm64"
                 ]
               },
               "version": {
