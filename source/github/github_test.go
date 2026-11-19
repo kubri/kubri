@@ -9,8 +9,8 @@ import (
 	"time"
 
 	gh "github.com/google/go-github/v83/github"
-	"golang.org/x/oauth2"
 
+	"github.com/kubri/kubri/internal/githubclient"
 	"github.com/kubri/kubri/internal/test"
 	"github.com/kubri/kubri/source/github"
 )
@@ -21,8 +21,7 @@ func TestGithub(t *testing.T) {
 		t.Skip("Missing environment variable: GITHUB_TOKEN")
 	}
 
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-	client := gh.NewClient(oauth2.NewClient(t.Context(), ts))
+	client := githubclient.New(token)
 	user, _, err := client.Users.Get(t.Context(), "")
 	if err != nil {
 		t.Fatal(err)
@@ -31,7 +30,7 @@ func TestGithub(t *testing.T) {
 	owner := user.GetLogin()
 	repo := fmt.Sprintf("test_%d", time.Now().UnixNano())
 
-	_, _, err = client.Repositories.Create(t.Context(), "", &gh.Repository{Name: &repo})
+	_, _, err = client.Repositories.Create(t.Context(), "", &gh.Repository{Name: &repo, AutoInit: new(true)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,14 +52,6 @@ func TestGithub(t *testing.T) {
 			continue
 		}
 		t.Fatalf("unexpected error waiting for repo to be available: %v", err)
-	}
-
-	_, _, err = client.Repositories.CreateFile(t.Context(), owner, repo, "test", &gh.RepositoryContentFileOptions{
-		Message: new("test"),
-		Content: []byte("test"),
-	})
-	if err != nil {
-		t.Fatal(err)
 	}
 
 	for _, r := range test.SourceWant() {
