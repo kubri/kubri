@@ -1,8 +1,3 @@
----
-sidebar_position: 1
-sidebar_label: Google Cloud Storage
----
-
 # Google Cloud Storage Target
 
 Uploads your repositories to a Google Cloud Storage bucket.
@@ -18,7 +13,7 @@ Uploads your repositories to a Google Cloud Storage bucket.
 | Name     | Description                                                                           |
 | -------- | ------------------------------------------------------------------------------------- |
 | `type`   | Must be `gcs`.                                                                        |
-| `bucket` | Storage bucket name.                                                                  |
+| `bucket` | Required. Storage bucket name.                                                        |
 | `folder` | The folder to store your artifacts in. Defaults to the bucket root.                   |
 | `url`    | The public URL of your bucket. Defaults to `https://storage.googleapis.com/{bucket}`. |
 

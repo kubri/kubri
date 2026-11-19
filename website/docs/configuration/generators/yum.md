@@ -1,7 +1,3 @@
----
-sidebar_position: 0
----
-
 # YUM Repository
 
 Generate and publish a YUM repository from your `.rpm` files.
