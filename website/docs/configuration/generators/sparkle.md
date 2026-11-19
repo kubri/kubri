@@ -1,7 +1,3 @@
----
-sidebar_position: 10
----
-
 # Sparkle Framework
 
 Generate and publish a Sparkle appcast file from your `.dmg`, `.pkg`, `.mpkg`, `.msi` and `.exe`
@@ -58,7 +54,7 @@ A map of globs to override detecting what file is what OS. Set this if your upda
 `.zip` files or you use non-standard naming to differentiate between Windows 64-bit and 32-bit
 installers.
 
-:::info Default behaviour
+::: info Default behaviour
 
 - Files with the extensions `.dmg` and `.pkg` are picked up as `macos`.
 - Files with the extensions `.exe` and `.msi` are picked up as `windows`.
@@ -76,9 +72,9 @@ sparkle:
   detect-os:
     macos: '*_MacOS.zip'
     windows: '*_Windows.zip'
-    windows_arm64: '*_Windows_arm64.zip'
-    windows_x64: '*_Windows_x64.zip'
-    windows_x86: '*_Windows_x86.zip'
+    windows-arm64: '*_Windows_arm64.zip'
+    windows-x64: '*_Windows_x64.zip'
+    windows-x86: '*_Windows_x86.zip'
 ```
 
 ### `params`
@@ -89,10 +85,11 @@ Set attributes on your appcast feed based on the OS & version of your release.
 
 ```yaml
 sparkle:
-  - os: windows
-    installer-arguments: /passive
-  - os: macos
-    minimum-system-version: '10.13.0'
+  params:
+    - os: windows
+      installer-arguments: /passive
+    - os: macos
+      minimum-system-version: '10.13.0'
 ```
 
 ### `params[*].os`
@@ -102,7 +99,7 @@ sparkle:
 Apply these parameters only if the OS matches. Must be either `macos`, `windows`, `windows-arm64`,
 `windows-x64` or `windows-x86`.
 
-:::info
+::: info
 
 Setting `os` to `windows` will also apply the parameters to `windows-arm64`, `windows-x64` and
 `windows-x86` releases.
@@ -113,12 +110,12 @@ Setting `os` to `windows` will also apply the parameters to `windows-arm64`, `wi
 
 - Type: `string`
 
-A version constraint to limit what what releases these parameters should be applied to.\
-See [Version Constraints](../../guides/version-constrains.md) for more information.
+A version constraint to limit what releases these parameters should be applied to.\
+See [Version Constraints](/docs/version-constraints/) for more information.
 
 ### `params[*].installer-arguments`
 
-:::info Windows only
+::: info Windows only
 
 This parameter is only supported by WinSparkle, not Sparkle.
 
@@ -148,7 +145,7 @@ string should contain three period-separated components e.g `10.13.0`.
 
 ### `params[*].minimum-autoupdate-version`
 
-:::info MacOS only
+::: info MacOS only
 
 This parameter is only supported by Sparkle, not WinSparkle.
 
@@ -163,7 +160,7 @@ is always prompted to install the update.
 
 ### `params[*].ignore-skipped-upgrades-below-version`
 
-:::info MacOS only
+::: info MacOS only
 
 This parameter is only supported by Sparkle, not WinSparkle.
 
@@ -183,7 +180,7 @@ promptly. Sparkle’s standard user interface also does not allow them to be ski
 
 ### `params[*].critical-update-below-version`
 
-:::info MacOS only
+::: info MacOS only
 
 This parameter is only supported by Sparkle, not WinSparkle.
 

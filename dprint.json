@@ -17,9 +17,9 @@
     "npm:dprint-plugin-yaml@0.6.0"
   ],
   "excludes": [
-    "**/*-lock.json",
     "**/testdata/**",
     ".github/.release-please-manifest.json",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "website/**"
   ]
 }

@@ -1,11 +1,9 @@
----
-sidebar_position: 1
-sidebar_label: GitLab
----
-
 # GitLab Source
 
 Automatically gets your GitLab releases to generate your repositories.
+
+Only releases tagged with a semantic version with a leading `v`, such as `v1.2.3`, are used. Other
+releases are skipped.
 
 ## Environment variables
 
@@ -18,8 +16,8 @@ Automatically gets your GitLab releases to generate your repositories.
 | Name    | Description                                                       |
 | ------- | ----------------------------------------------------------------- |
 | `type`  | Must be `gitlab`.                                                 |
-| `owner` | Repository owner i.e. username or organisation.                   |
-| `repo`  | Repository name.                                                  |
+| `owner` | Required. Repository owner i.e. username or organisation.         |
+| `repo`  | Required. Repository name.                                        |
 | `url`   | The URL of your GitLab instance. Defaults to `https://gitlab.com` |
 
 ## Example

@@ -1,7 +1,3 @@
----
-sidebar_position: 0
----
-
 # APT Repository
 
 Generate and publish an APT repository from your `.deb` files.
