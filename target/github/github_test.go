@@ -10,8 +10,8 @@ import (
 	"time"
 
 	gh "github.com/google/go-github/v83/github"
-	"golang.org/x/oauth2"
 
+	"github.com/kubri/kubri/internal/githubclient"
 	"github.com/kubri/kubri/internal/test"
 	"github.com/kubri/kubri/target/github"
 )
@@ -22,8 +22,7 @@ func TestGithub(t *testing.T) {
 		t.Skip("Missing environment variable: GITHUB_TOKEN")
 	}
 
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-	client := gh.NewClient(oauth2.NewClient(t.Context(), ts))
+	client := githubclient.New(token)
 	user, _, err := client.Users.Get(t.Context(), "")
 	if err != nil {
 		t.Fatal(err)
@@ -81,13 +80,17 @@ func TestGithub(t *testing.T) {
 			test.Target(t, tgt, func(asset string) string {
 				return "https://raw.githubusercontent.com/" + path.Join(owner, repo, branch, asset)
 			}, test.WithDelay(3*time.Second))
-
-			t.Run("Error", func(t *testing.T) {
-				_, err = github.New(github.Config{Owner: "owner", Repo: "repo", Branch: tc.branch})
-				if err == nil {
-					t.Fatal("should fail for invalid repo")
-				}
-			})
 		})
+	}
+}
+
+func TestGithubError(t *testing.T) {
+	if _, ok := os.LookupEnv("GITHUB_TOKEN"); !ok {
+		t.Skip("Missing environment variable: GITHUB_TOKEN")
+	}
+
+	_, err := github.New(github.Config{Owner: "owner", Repo: "repo"})
+	if err == nil {
+		t.Fatal("should fail for invalid repo")
 	}
 }
