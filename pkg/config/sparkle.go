@@ -12,14 +12,14 @@ import (
 
 type sparkleConfig struct {
 	Disabled    bool                  `yaml:"disabled,omitempty"`
-	Folder      string                `yaml:"folder,omitempty"`
+	Folder      string                `yaml:"folder,omitempty"      validate:"omitempty,dirname"`
 	Title       string                `yaml:"title,omitempty"`
 	Description string                `yaml:"description,omitempty"`
 	Filename    string                `yaml:"filename,omitempty"`
 	DetectOS    map[sparkle.OS]string `yaml:"detect-os,omitempty"`
 	Params      []struct {
-		OS       sparkle.OS `yaml:"os,omitempty"      jsonschema:"type=string,enum=macos,enum=windows,enum=windows-x86,enum=windows-x64"` //nolint:lll
-		Version  string     `yaml:"version,omitempty"`
+		OS       sparkle.OS `yaml:"os,omitempty"      jsonschema:"type=string,enum=macos,enum=windows,enum=windows-x86,enum=windows-x64,enum=windows-arm64"` //nolint:lll
+		Version  string     `yaml:"version,omitempty" validate:"omitempty,version_constraint"`
 		Settings *struct {
 			InstallerArguments                string `yaml:"installer-arguments,omitempty"`
 			MinimumSystemVersion              string `yaml:"minimum-system-version,omitempty"`
@@ -28,7 +28,7 @@ type sparkleConfig struct {
 			CriticalUpdate                    bool   `yaml:"critical-update,omitempty"`
 			CriticalUpdateBelowVersion        string `yaml:"critical-update-below-version,omitempty"`
 		} `yaml:",inline"`
-	} `yaml:"params,omitempty"`
+	} `yaml:"params,omitempty" validate:"dive"`
 }
 
 func getSparkle(c *config) (*sparkle.Config, error) {
