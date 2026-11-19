@@ -96,4 +96,5 @@ tasks:
     aliases: [d]
     dir: website
     cmds:
-      - yarn start
+      - npm install
+      - npm run dev

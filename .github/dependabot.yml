@@ -22,9 +22,6 @@ updates:
     directory: website
     schedule:
       interval: monthly
-    allow:
-      - dependency-type: direct
-      - dependency-name: caniuse-lite
     groups:
       npm:
         patterns:

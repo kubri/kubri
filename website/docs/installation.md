@@ -1,7 +1,3 @@
----
-sidebar_position: 2
----
-
 # Installation
 
 Kubri offers many installation methods. Check out the available methods below.

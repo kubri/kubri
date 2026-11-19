@@ -1,8 +1,3 @@
----
-sidebar_position: 1
-sidebar_label: GitHub
----
-
 # GitHub Target
 
 Pushes your repositories to a GitHub repository.
@@ -18,8 +13,8 @@ Pushes your repositories to a GitHub repository.
 | Name     | Description                                                              |
 | -------- | ------------------------------------------------------------------------ |
 | `type`   | Must be `github`.                                                        |
-| `owner`  | Repository owner i.e. username or organisation.                          |
-| `repo`   | Repository name.                                                         |
+| `owner`  | Required. Repository owner i.e. username or organisation.                |
+| `repo`   | Required. Repository name.                                               |
 | `branch` | The git branch to push the artifacts to. Defaults to the default branch. |
 | `folder` | The folder to store your artifacts in. Defaults to the repo root.        |
 

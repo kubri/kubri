@@ -1,7 +1,3 @@
----
-sidebar_position: 20
----
-
 # Windows App Installer
 
 Generate and publish a Windows App Installer file from your `.msix`, `.msixbundle`, `.appx` and
@@ -69,7 +65,7 @@ the user will see, allows the user to take the update or start the app without u
 latter case, the update will be applied silently at an opportune time. This value is supported on
 Windows 10, version 1903 and later.
 
-:::info
+::: info
 
 `show-prompt` needs to be set to `true` if `update-blocks-activation` is set to `true`.
 
