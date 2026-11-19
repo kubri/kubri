@@ -156,7 +156,7 @@ func (c constraint) check(v string) bool {
 			return false
 		}
 		if strings.IndexByte(c.v, '.') == -1 {
-			return strings.HasPrefix(v, c.v)
+			return semver.Major(v) == c.v
 		}
 		return semver.MajorMinor(v) == semver.MajorMinor(c.v)
 	case caret:
