@@ -24,35 +24,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Check if go.mod or go.sum changed
-        id: deps
-        if: github.event_name != 'workflow_dispatch'
-        uses: tj-actions/changed-files@v47
-        with:
-          files: go.{mod,sum}
-
-      - name: Find packages with changes
-        id: packages
-        if: steps.deps.outputs.any_changed == 'false'
-        uses: tj-actions/changed-files@v47
-        with:
-          files: integrations/**
-          dir_names: true
-          dir_names_max_depth: 2
-          json: true
-
-      - name: Set output
+      - name: Find packages with acceptance tests
         id: set-matrix
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ steps.deps.outputs.any_changed }}" == "true" ]]; then
-            echo "packages=$(find integrations -mindepth 1 -maxdepth 1 -type d | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-          else
-            echo "packages=${{ steps.packages.outputs.all_changed_and_modified_files }}" >> $GITHUB_OUTPUT
-          fi
+          echo "packages=$(grep -rl --include='*_test.go' '^func TestAcceptance(' integrations | xargs dirname | sort -u | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
 
   test:
     name: ${{ matrix.package }}
-    if: needs.packages.outputs.packages != '[]'
     needs: packages
     runs-on: ubuntu-latest
     strategy:
@@ -66,6 +44,9 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+
+      - name: Download dependencies
+        run: go mod download
 
       - name: Run acceptance tests
         run: |
