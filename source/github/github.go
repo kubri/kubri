@@ -7,13 +7,12 @@ import (
 	"fmt"
 	"io"
 	"mime"
-	"net/http"
 	"os"
 	"path"
 
 	"github.com/google/go-github/v83/github"
-	"golang.org/x/oauth2"
 
+	"github.com/kubri/kubri/internal/githubclient"
 	"github.com/kubri/kubri/source"
 )
 
@@ -25,14 +24,8 @@ type Config struct {
 
 // New returns a new GitHub source.
 func New(c Config) (*source.Source, error) {
-	var client *http.Client
-	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
-		ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
-		client = oauth2.NewClient(context.Background(), ts)
-	}
-
 	s := &githubSource{
-		client: github.NewClient(client),
+		client: githubclient.New(os.Getenv("GITHUB_TOKEN")),
 		owner:  c.Owner,
 		repo:   c.Repo,
 	}

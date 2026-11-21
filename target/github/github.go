@@ -12,8 +12,8 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v83/github"
-	"golang.org/x/oauth2"
 
+	"github.com/kubri/kubri/internal/githubclient"
 	"github.com/kubri/kubri/target"
 )
 
@@ -28,8 +28,7 @@ type Config struct {
 // New returns a new GitHub target.
 func New(c Config) (target.Target, error) {
 	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")})
-	client := github.NewClient(oauth2.NewClient(ctx, ts)).Repositories
+	client := githubclient.New(os.Getenv("GITHUB_TOKEN")).Repositories
 
 	// Ensure config is valid.
 	repo, _, err := client.Get(ctx, c.Owner, c.Repo)
@@ -73,7 +72,7 @@ func (t *githubTarget) NewReader(ctx context.Context, filename string) (io.ReadC
 	opt := &github.RepositoryContentGetOptions{Ref: t.branch}
 	file, _, r, err := t.client.GetContents(ctx, t.owner, t.repo, path.Join(t.path, filename), opt)
 	if err != nil {
-		if r.StatusCode == http.StatusNotFound {
+		if r != nil && r.StatusCode == http.StatusNotFound {
 			return nil, &fs.PathError{Op: "read", Path: filename, Err: fs.ErrNotExist}
 		}
 		return nil, err
