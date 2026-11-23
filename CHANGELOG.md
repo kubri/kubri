@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.8.2](https://github.com/kubri/kubri/compare/v0.8.1...v0.8.2) (2026-11-22)
+
+
+### Bug Fixes
+
+* **apk:** create arch folder when writing index ([#1043](https://github.com/kubri/kubri/issues/1043)) ([6251a7f](https://github.com/kubri/kubri/commit/6251a7f9622186c2425e9d0c21a371a0f5aaea80))
+* compare major version for tilde constraints without a minor ([#1046](https://github.com/kubri/kubri/issues/1046)) ([89cb590](https://github.com/kubri/kubri/commit/89cb59022dc6ce95fb3077d0ca1288c45d82e825))
+* **github:** wait and retry when rate limited ([#1049](https://github.com/kubri/kubri/issues/1049)) ([5c0e45a](https://github.com/kubri/kubri/commit/5c0e45af5500dbeea8d60952575fe9672b9e81c8))
+* **sparkle:** validate folder and params version, add windows-arm64 to schema ([#1047](https://github.com/kubri/kubri/issues/1047)) ([a9442a9](https://github.com/kubri/kubri/commit/a9442a93f64bb6f8ed8114747fadef0b36a87ba5))
+
 ## [0.8.1](https://github.com/kubri/kubri/compare/v0.8.0...v0.8.1) (2026-11-18)
 
 
