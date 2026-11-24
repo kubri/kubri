@@ -22,6 +22,7 @@ func withType(v any, t string) *jsonschema.Schema {
 		Value: &jsonschema.Schema{Type: "string", Const: t},
 	})
 	_ = s.Properties.MoveToFront("type")
+	s.Required = append([]string{"type"}, s.Required...)
 	return s
 }
 
