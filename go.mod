@@ -16,6 +16,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.2
 	github.com/go-playground/validator/v10 v10.30.6
 	github.com/go-xmlfmt/xmlfmt v1.1.3
+	github.com/goccy/go-yaml v1.19.2
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v83 v83.0.0
 	github.com/goreleaser/nfpm/v2 v2.49.0
@@ -36,7 +37,6 @@ require (
 	gocloud.dev v0.49.0
 	golang.org/x/mod v0.43.0
 	golang.org/x/sync v0.25.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

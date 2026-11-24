@@ -5,10 +5,13 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"syscall"
 	"testing"
 
+	"github.com/goccy/go-yaml"
+	"github.com/goccy/go-yaml/token"
 	"github.com/google/go-cmp/cmp"
-	"gopkg.in/yaml.v3"
+	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/kubri/kubri/internal/test"
 	"github.com/kubri/kubri/pkg/config"
@@ -35,20 +38,20 @@ func TestLoad(t *testing.T) {
 		{
 			desc: "permission denied",
 			path: "kubri.yml",
-			err:  errors.New("open kubri.yml: permission denied"),
+			err:  &fs.PathError{Op: "open", Path: "kubri.yml", Err: syscall.EACCES},
 			mode: 0o200,
 		},
 		{
 			desc:   "invalid yaml",
 			config: `*&%^`,
 			path:   "kubri.yml",
-			err:    errors.New("yaml: did not find expected alphabetic or numeric character"),
+			err:    &yaml.SyntaxError{Message: "unexpected directive value. document not started"},
 		},
 		{
 			desc:   "non-existent field",
 			config: `foo: bar`,
 			path:   "kubri.yml",
-			err:    &yaml.TypeError{Errors: []string{"line 1: field foo not found in type config.config"}},
+			err:    &yaml.UnknownFieldError{Message: `unknown field "foo"`},
 		},
 		{
 			desc:   "failed validation",
@@ -66,7 +69,7 @@ func TestLoad(t *testing.T) {
 
 	opts := cmp.Options{
 		test.ExportAll(),
-		test.CompareErrorMessages(),
+		cmpopts.IgnoreTypes(&token.Token{}),
 	}
 
 	for _, tc := range tests {

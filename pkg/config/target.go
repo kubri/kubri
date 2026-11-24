@@ -1,8 +1,10 @@
 package config
 
 import (
+	"errors"
+
+	"github.com/goccy/go-yaml"
 	"github.com/invopop/jsonschema"
-	"gopkg.in/yaml.v3"
 
 	"github.com/kubri/kubri/target"
 	"github.com/kubri/kubri/target/azureblob"
@@ -12,46 +14,42 @@ import (
 	"github.com/kubri/kubri/target/s3"
 )
 
-type targetConfig struct {
-	*azureblobTarget
-	*gcsTarget
-	*s3Target
-	*fileTarget
-	*githubTarget
-}
+type targetConfig struct{ Config any }
 
-func (tc *targetConfig) UnmarshalYAML(node *yaml.Node) error {
-	var typ struct {
+func (c *targetConfig) UnmarshalYAML(unmarshal func(any) error) error {
+	var t struct {
 		Type string `yaml:"type"`
 	}
-	if err := node.Decode(&typ); err != nil {
-		return err
+	if err := unmarshal(&t); err != nil {
+		if _, ok := errors.AsType[*yaml.UnknownFieldError](err); !ok {
+			return err
+		}
 	}
 
-	switch typ.Type {
+	switch t.Type {
 	case "azureblob":
-		return node.Decode(&tc.azureblobTarget)
+		return decodeTyped[azureblobTarget](unmarshal, &c.Config)
 	case "gcs":
-		return node.Decode(&tc.gcsTarget)
+		return decodeTyped[gcsTarget](unmarshal, &c.Config)
 	case "s3":
-		return node.Decode(&tc.s3Target)
+		return decodeTyped[s3Target](unmarshal, &c.Config)
 	case "file":
-		return node.Decode(&tc.fileTarget)
+		return decodeTyped[fileTarget](unmarshal, &c.Config)
 	case "github":
-		return node.Decode(&tc.githubTarget)
+		return decodeTyped[githubTarget](unmarshal, &c.Config)
 	default:
 		return nil
 	}
 }
 
-func (tc targetConfig) JSONSchema() *jsonschema.Schema {
+func (targetConfig) JSONSchema() *jsonschema.Schema {
 	return &jsonschema.Schema{
 		OneOf: []*jsonschema.Schema{
-			withType(tc.azureblobTarget, "azureblob"),
-			withType(tc.gcsTarget, "gcs"),
-			withType(tc.s3Target, "s3"),
-			withType(tc.fileTarget, "file"),
-			withType(tc.githubTarget, "github"),
+			withType(azureblobTarget{}, "azureblob"),
+			withType(gcsTarget{}, "gcs"),
+			withType(s3Target{}, "s3"),
+			withType(fileTarget{}, "file"),
+			withType(githubTarget{}, "github"),
 		},
 	}
 }
@@ -89,17 +87,17 @@ type githubTarget struct {
 }
 
 func getTarget(c *targetConfig) (target.Target, error) {
-	switch {
-	case c.azureblobTarget != nil:
-		return azureblob.New(azureblob.Config(*c.azureblobTarget))
-	case c.gcsTarget != nil:
-		return gcs.New(gcs.Config(*c.gcsTarget))
-	case c.s3Target != nil:
-		return s3.New(s3.Config(*c.s3Target))
-	case c.fileTarget != nil:
-		return file.New(file.Config(*c.fileTarget))
-	case c.githubTarget != nil:
-		return github.New(github.Config(*c.githubTarget))
+	switch c := c.Config.(type) {
+	case *azureblobTarget:
+		return azureblob.New(azureblob.Config(*c))
+	case *gcsTarget:
+		return gcs.New(gcs.Config(*c))
+	case *s3Target:
+		return s3.New(s3.Config(*c))
+	case *fileTarget:
+		return file.New(file.Config(*c))
+	case *githubTarget:
+		return github.New(github.Config(*c))
 	default:
 		return nil, &Error{Errors: []string{"target.type must be one of [azureblob gcs s3 file github]"}}
 	}

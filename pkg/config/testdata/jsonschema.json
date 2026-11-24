@@ -38,6 +38,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "bucket"
           ]
         },
@@ -60,6 +61,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "bucket"
           ]
         },
@@ -88,6 +90,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "bucket"
           ]
         },
@@ -107,6 +110,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "path"
           ]
         },
@@ -126,6 +130,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "owner",
             "repo"
           ]
@@ -149,6 +154,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "owner",
             "repo"
           ]
@@ -169,6 +175,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "path",
             "version"
           ]
@@ -196,6 +203,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "bucket"
           ]
         },
@@ -218,6 +226,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "bucket"
           ]
         },
@@ -246,6 +255,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "bucket"
           ]
         },
@@ -265,6 +275,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "path"
           ]
         },
@@ -290,6 +301,7 @@
           "additionalProperties": false,
           "type": "object",
           "required": [
+            "type",
             "owner",
             "repo"
           ]

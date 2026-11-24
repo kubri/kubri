@@ -3,10 +3,13 @@ package config_test
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
+	"github.com/goccy/go-yaml"
+	"github.com/goccy/go-yaml/token"
 	"github.com/google/go-cmp/cmp"
-	"gopkg.in/yaml.v3"
+	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/kubri/kubri/internal/test"
 	"github.com/kubri/kubri/pkg/config"
@@ -174,6 +177,19 @@ func TestSource(t *testing.T) {
 			},
 		},
 		{
+			desc: "github with aliases",
+			config: `
+				title: &name test
+				source:
+					type: github
+					owner: *name
+					repo: *name
+			`,
+			want: func() (*source.Source, error) {
+				return github.New(github.Config{Owner: "test", Repo: "test"})
+			},
+		},
+		{
 			desc: "github invalid",
 			config: `
 				source:
@@ -266,9 +282,25 @@ func TestSource(t *testing.T) {
 			desc: "unmarshal error",
 			config: `
 				source:
-					type: {}
+					type: github
+					owner: {}
 			`,
-			err: &yaml.TypeError{Errors: []string{"line 2: cannot unmarshal !!map into string"}},
+			err: &yaml.TypeError{
+				DstType:         reflect.TypeFor[string](),
+				SrcType:         reflect.TypeFor[map[string]any](),
+				StructFieldName: new("config.Source"),
+			},
+		},
+		{
+			desc: "unknown field",
+			config: `
+				source:
+					type: github
+					owner: test
+					repo: test
+					foler: test
+			`,
+			err: &yaml.UnknownFieldError{Message: `unknown field "foler"`},
 		},
 	}
 
@@ -276,6 +308,7 @@ func TestSource(t *testing.T) {
 		test.ExportAll(),
 		test.IgnoreFunctions(),
 		test.CompareLoggers(),
+		cmpopts.IgnoreTypes(&token.Token{}),
 	}
 
 	for _, tc := range tests {

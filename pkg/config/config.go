@@ -1,12 +1,11 @@
 package config
 
 import (
-	"bytes"
 	"errors"
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v3"
+	"github.com/goccy/go-yaml"
 
 	"github.com/kubri/kubri/integrations/apk"
 	"github.com/kubri/kubri/integrations/appinstaller"
@@ -33,11 +32,8 @@ func Load(path string) (*Config, error) {
 		return nil, err
 	}
 
-	dec := yaml.NewDecoder(bytes.NewReader(b))
-	dec.KnownFields(true)
-
 	c := &config{}
-	if err = dec.Decode(c); err != nil {
+	if err = yaml.UnmarshalWithOptions(b, c, yaml.DisallowUnknownField()); err != nil {
 		return nil, err
 	}
 
@@ -130,4 +126,16 @@ type config struct {
 
 	source *source.Source
 	target target.Target
+}
+
+func decodeTyped[T any](unmarshal func(any) error, dst *any) error {
+	var v struct {
+		Type   string `yaml:"type"`
+		Config T      `yaml:",inline"`
+	}
+	if err := unmarshal(&v); err != nil {
+		return err
+	}
+	*dst = &v.Config
+	return nil
 }

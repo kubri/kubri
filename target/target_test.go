@@ -77,7 +77,7 @@ func TestCopyFSError(t *testing.T) {
 		},
 	}
 
-	opts := test.CompareErrorMessages()
+	opts := test.ExportAll()
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

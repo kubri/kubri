@@ -3,12 +3,14 @@ package config_test
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
+	"github.com/goccy/go-yaml"
+	"github.com/goccy/go-yaml/token"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	gh "github.com/google/go-github/v83/github"
-	"gopkg.in/yaml.v3"
 
 	"github.com/kubri/kubri/internal/test"
 	"github.com/kubri/kubri/pkg/config"
@@ -184,9 +186,25 @@ func TestTarget(t *testing.T) {
 			desc: "unmarshal error",
 			config: `
 				target:
-					type: {}
+					type: github
+					owner: {}
 			`,
-			err: &yaml.TypeError{Errors: []string{"line 2: cannot unmarshal !!map into string"}},
+			err: &yaml.TypeError{
+				DstType:         reflect.TypeFor[string](),
+				SrcType:         reflect.TypeFor[map[string]any](),
+				StructFieldName: new("config.Target"),
+			},
+		},
+		{
+			desc: "unknown field",
+			config: `
+				target:
+					type: github
+					owner: test
+					repo: test
+					foler: test
+			`,
+			err: &yaml.UnknownFieldError{Message: `unknown field "foler"`},
 		},
 	}
 
@@ -194,6 +212,7 @@ func TestTarget(t *testing.T) {
 		test.ExportAll(),
 		test.IgnoreFunctions(),
 		test.CompareLoggers(),
+		cmpopts.IgnoreTypes(&token.Token{}),
 
 		// Ignore GitHub rate limit.
 		cmpopts.IgnoreTypes(gh.Rate{}),
