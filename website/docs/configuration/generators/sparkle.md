@@ -126,9 +126,9 @@ This parameter is only supported by WinSparkle, not Sparkle.
 
 - Type: `string`
 
-On Windows, the enclosure is typically some kind of installer — an MSI, InnoSetup etc. It is often
-useful to pass additional arguments to the installer when launching it, e.g. to force
-non-interactive installation with reduce UI (notice that the installer shouldn’t be completely
+On Windows, the enclosure is typically some kind of installer, such as an MSI or InnoSetup. It is
+often useful to pass additional arguments to the installer when launching it, e.g. to force
+non-interactive installation with reduced UI (notice that the installer shouldn't be completely
 invisible, because neither WinSparkle nor the hosting application is showing any UI at the time).
 
 Useful values for common installers are listed below:
@@ -144,7 +144,7 @@ Useful values for common installers are listed below:
 - Type: `string`
 
 The required minimum system operating version string for this update if provided. This version
-string should contain three period-separated components e.g `10.13.0`.
+string should contain three period-separated components, e.g. `10.13.0`.
 
 ### `params[*].minimum-autoupdate-version`
 
@@ -157,7 +157,7 @@ This parameter is only supported by Sparkle, not WinSparkle.
 - Type: `string`
 
 The minimum bundle version string this update requires for automatically downloading and installing
-updates if provided. If an application’s bundle version meets this version requirement, it can
+updates if provided. If an application's bundle version meets this version requirement, it can
 install the new update item in the background automatically. If the requirement is not met, the user
 is always prompted to install the update.
 
@@ -179,7 +179,7 @@ precedes this version.
 - Type: `boolean`
 
 Indicates whether or not the update item is critical. Critical updates are shown to the user more
-promptly. Sparkle’s standard user interface also does not allow them to be skipped.
+promptly. Sparkle's standard user interface also does not allow them to be skipped.
 
 ### `params[*].critical-update-below-version`
 

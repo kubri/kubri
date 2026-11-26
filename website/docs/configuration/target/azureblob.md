@@ -9,11 +9,16 @@ Uploads your repositories to an Azure Blob Storage bucket.
 
 ## Environment variables
 
-| Name                      | Description                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------------- |
-| `AZURE_STORAGE_ACCOUNT`   | Storage account name. Must be used in conjunction with either storage account key or a SAS token. |
-| `AZURE_STORAGE_KEY`       | Storage account key. Must be used in conjunction with storage account name.                       |
-| `AZURE_STORAGE_SAS_TOKEN` | A Shared Access Signature (SAS). Must be used in conjunction with storage account name.           |
+Kubri authenticates using the environment variables below. If none of the key, SAS token or
+connection string is set, it falls back to
+[`DefaultAzureCredential`](https://learn.microsoft.com/en-us/azure/developer/go/sdk/authentication/credential-chains).
+
+| Name                              | Description                                                                             |
+| --------------------------------- | --------------------------------------------------------------------------------------- |
+| `AZURE_STORAGE_ACCOUNT`           | Storage account name. Required unless a connection string is set.                       |
+| `AZURE_STORAGE_KEY`               | Storage account key. Must be used in conjunction with storage account name.             |
+| `AZURE_STORAGE_SAS_TOKEN`         | A Shared Access Signature (SAS). Must be used in conjunction with storage account name. |
+| `AZURE_STORAGE_CONNECTION_STRING` | A storage account connection string. Used when no key or SAS token is set.              |
 
 ## Configuration
 
