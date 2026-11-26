@@ -26,9 +26,10 @@ Path to the directory on your target.
 
 - Type: `string[]`
 - Default: `['gzip', 'xz']`
-- Allowed Values: `'gzip'`, `'bzip2'`, `'xz'`, `'lzma'`, `'zstd'`
+- Allowed Values: `'none'`, `'gzip'`, `'bzip2'`, `'xz'`, `'lzma'`, `'lz4'`, `'zstd'`
 
-Compression algorithms to compress your package metadata with.
+Compression algorithms to compress your package metadata with. The uncompressed metadata is always
+written as well. Use `none` to write only the uncompressed metadata.
 
 ## Example
 

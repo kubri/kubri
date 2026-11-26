@@ -9,6 +9,10 @@ Uploads your repositories to a Google Cloud Storage bucket.
 
 ## Environment variables
 
+Kubri authenticates using
+[Application Default Credentials](https://docs.cloud.google.com/docs/authentication/application-default-credentials).
+The most common environment variable is:
+
 | Name                             | Description                                                         |
 | -------------------------------- | ------------------------------------------------------------------- |
 | `GOOGLE_APPLICATION_CREDENTIALS` | The location of a credential JSON file used to authenticate to GCS. |
