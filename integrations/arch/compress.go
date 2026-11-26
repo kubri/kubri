@@ -1,6 +1,7 @@
 package arch
 
 import (
+	"compress/bzip2"
 	"compress/gzip"
 	"errors"
 	"io"
@@ -24,6 +25,10 @@ func decompress(ext string) func(io.Reader) (io.ReadCloser, error) {
 		return func(r io.Reader) (io.ReadCloser, error) {
 			rd, err := xz.NewReader(r)
 			return io.NopCloser(rd), err
+		}
+	case ".bz2":
+		return func(r io.Reader) (io.ReadCloser, error) {
+			return io.NopCloser(bzip2.NewReader(r)), nil
 		}
 	default:
 		return func(io.Reader) (io.ReadCloser, error) {
