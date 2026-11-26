@@ -84,9 +84,22 @@ jobs:
         with:
           cache: true
 
+  goreleaser:
+    name: GoReleaser config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check config
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          version: ~> v2
+          args: check
+
   checks:
     name: Checks
-    needs: [test, lint, format]
+    needs: [test, lint, format, goreleaser]
     if: always()
     runs-on: ubuntu-latest
     steps:
