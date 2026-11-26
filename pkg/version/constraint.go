@@ -20,6 +20,7 @@ const (
 	tilde
 	caret
 	glob
+	partial
 	anything
 )
 
@@ -67,6 +68,9 @@ func parseOperator(v string) (operator, string, bool) {
 	case 'v', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		if e := strings.IndexByte(v, '*'); e != -1 {
 			return glob, v[i:e], true
+		}
+		if strings.Count(v[i:], ".") < 2 {
+			return partial, v[i:], true
 		}
 		return equal, v[i:], true
 	}
@@ -169,6 +173,11 @@ func (c constraint) check(v string) bool {
 		return semver.Major(v) == semver.Major(c.v)
 	case glob:
 		return strings.HasPrefix(v, c.v)
+	case partial:
+		if strings.IndexByte(c.v, '.') == -1 {
+			return semver.Major(v) == c.v
+		}
+		return semver.MajorMinor(v) == c.v
 	default:
 		return false // Does not happen.
 	}
