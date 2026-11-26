@@ -1,8 +1,3 @@
----
-sidebar_position: 1
-sidebar_label: Azure Blob Storage
----
-
 # Azure Blob Storage Target
 
 Uploads your repositories to an Azure Blob Storage bucket.
@@ -20,7 +15,7 @@ Uploads your repositories to an Azure Blob Storage bucket.
 | Name     | Description                                                         |
 | -------- | ------------------------------------------------------------------- |
 | `type`   | Must be `azureblob`.                                                |
-| `bucket` | Storage bucket name.                                                |
+| `bucket` | Required. Storage bucket name.                                      |
 | `folder` | The folder to store your artifacts in. Defaults to the bucket root. |
 | `url`    | The public URL of your bucket.                                      |
 

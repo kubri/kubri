@@ -1,7 +1,3 @@
----
-sidebar_position: 0
----
-
 # Arch Linux Repository
 
 Generate and publish an Arch Linux repository from your `.pkg.tar.zst` files.

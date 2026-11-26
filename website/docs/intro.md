@@ -1,7 +1,3 @@
----
-sidebar_position: 1
----
-
 # Introduction
 
 Kubri is a tool which automates signing and releasing software for common package managers and
@@ -49,8 +45,10 @@ target:
 # Use an empty object to enable the integration with default settings.
 apt: {}
 yum: {}
-apk: {}
 appinstaller: {}
+
+apk:
+  key-name: alpine@example.com
 
 arch:
   repo-name: my-repo

@@ -1,7 +1,3 @@
----
-sidebar_position: 4
----
-
 # Alpine Linux Repository
 
 Generate and publish an Alpine Linux repository from your `.apk` files.
@@ -26,7 +22,7 @@ Path to the directory on your target.
 
 - Type: `string`
 
-The name of the ed25519 key used to sign the metadata. Required if signing is enabled.
+The name of the RSA key used to sign the metadata. Required if signing is enabled.
 
 ## Example
 
