@@ -12,6 +12,7 @@ type Target interface {
 	Remove(ctx context.Context, path string) error
 	Sub(dir string) Target
 	URL(ctx context.Context, path string) (string, error)
+	ReadDir(ctx context.Context, root string) ([]fs.DirEntry, error)
 }
 
 // CopyFS copies the file system fsys to the target t.

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"github.com/kubri/kubri/target"
 )
@@ -135,6 +136,56 @@ func Target(t *testing.T, tgt target.Target, makeURL func(string) string, opt ..
 		}
 
 		if diff := cmp.Diff(makeURL("path/to/file"), url); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+
+	t.Run("ReadDir", func(t *testing.T) {
+		t.Helper()
+
+		dirent, err := tgt.ReadDir(t.Context(), ".")
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := []DirEntry{
+			{
+				Name:  "path",
+				IsDir: true,
+				Type:  fs.ModeDir,
+				Info: FileInfo{
+					Name:    "path",
+					Size:    0,
+					Mode:    fs.ModeDir | 0o555,
+					ModTime: time.Now(),
+					IsDir:   true,
+					Sys:     nil,
+				},
+			},
+		}
+		if diff := cmp.Diff(want, ReadDirEntries(dirent), cmpopts.EquateApproxTime(10*time.Second)); diff != "" {
+			t.Fatal(diff)
+		}
+
+		dirent, err = tgt.ReadDir(t.Context(), "path/to")
+		if err != nil {
+			t.Fatal(err)
+		}
+		want = []DirEntry{
+			{
+				Name:  "file",
+				IsDir: false,
+				Type:  0,
+				Info: FileInfo{
+					Name:    "file",
+					Size:    4,
+					Mode:    0o444,
+					ModTime: time.Now(),
+					IsDir:   false,
+					Sys:     nil,
+				},
+			},
+		}
+		if diff := cmp.Diff(want, ReadDirEntries(dirent), cmpopts.EquateApproxTime(10*time.Second)); diff != "" {
 			t.Fatal(diff)
 		}
 	})
