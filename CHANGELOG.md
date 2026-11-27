@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.3](https://github.com/kubri/kubri/compare/v0.8.2...v0.8.3) (2026-11-27)
+
+
+### Bug Fixes
+
+* **arch:** support bzip2-compressed packages ([#1055](https://github.com/kubri/kubri/issues/1055)) ([6c9ae36](https://github.com/kubri/kubri/commit/6c9ae3695fb027bcabd9cb8e01d486e5896a202f))
+* **schema:** mark source and target type as required ([#1052](https://github.com/kubri/kubri/issues/1052)) ([29d2059](https://github.com/kubri/kubri/commit/29d2059be96c9cff7309d835e77f2d497d43daf0))
+* **version:** match partial version constraints as ranges ([#1057](https://github.com/kubri/kubri/issues/1057)) ([88c1882](https://github.com/kubri/kubri/commit/88c18825a13406218cdf49a38829d85ba3350d33))
+
 ## [0.8.2](https://github.com/kubri/kubri/compare/v0.8.1...v0.8.2) (2026-11-22)
 
 
